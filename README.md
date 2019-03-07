@@ -1,0 +1,2 @@
+# ecfeed.junit
+jUnit runner
