@@ -8,7 +8,7 @@ public final class Localization {
 	public static final ResourceBundle bundle;
 	
 	static {	
-		bundle = ResourceBundle.getBundle("ecfeed", new Locale("en", "US"));
+		bundle = ResourceBundle.getBundle("localization/ecfeed", new Locale("en", "US"));
 	}
 	
 	private Localization() {

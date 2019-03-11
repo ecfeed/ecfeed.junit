@@ -30,7 +30,7 @@ import com.google.common.io.BaseEncoding;
 public final class SecurityHelper {
 
 	private final static String[] DEFAULT_STORE_PATH = {
-		"ecfeed/security",	
+		"ecfeed/security",
 		System.getProperty("user.home") + "/ecfeed/security",
 		System.getProperty("java.home") + "/lib/security/cacerts"
 	};
@@ -57,7 +57,7 @@ public final class SecurityHelper {
 		if (loadedStore == null) {
 			prepareStore(loadedStorePath);
 		}
-		
+		System.out.println(Paths.get(".").toAbsolutePath().toString());
 		return loadedStore;
 	}
 	

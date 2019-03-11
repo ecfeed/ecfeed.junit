@@ -2,8 +2,9 @@ package com.example.test;
 
 import com.ecfeed.junit.annotation.*;
 
-@EcFeedModel("testResources/tutorial.ect")
+@EcFeedModel("src/test/resources/tutorial.ect")
 @EcFeedInput("'dataSource':'genNWise', 'constraints':'ALL', 'coverage':'100', 'N':'2'")
+@EcFeedKeyStore("src/test/resources/security")
 public class LoanDecisionTest {
 
 	@EcFeedTest

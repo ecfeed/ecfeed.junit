@@ -9,10 +9,6 @@ version = '1.2.1'
 
 repositories {
     mavenCentral()
-
-    maven {
-        url 'https://dl.bintray.com/lorislab/maven/'
-    }
 }
 
 dependencies {
@@ -34,8 +30,10 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
     implementation 'org.junit.jupiter:junit-jupiter-params:5.4.0'
 
-    compile group: 'nl.flotsam', name: 'xeger', version: '1.0.0-lorislab-1'
+    implementation 'com.io7m.xom:xom:1.2.10'
+    implementation 'dk.brics.automaton:automaton:1.11-8'
 
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 }
 
 sourceSets {
@@ -47,7 +45,7 @@ sourceSets {
 
     test {
         java {
-            srcDirs = ['src/test/java']
+            srcDirs = ['src/test/java', 'reference/submodule/ecfeed.core/test']
         }
     }
 }

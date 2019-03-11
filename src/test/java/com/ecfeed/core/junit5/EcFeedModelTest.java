@@ -17,7 +17,7 @@ public class EcFeedModelTest {
 	public static enum EnumData {D1, D2, D3, D4, D5}
 	
 	@EcFeedTest
-	@EcFeedModel("testResources/test.ect")
+	@EcFeedModel("src/test/resources/test.ect")
 	@Disabled("The test containing each input parameter")
 	@DisplayName("Custom test")
 	@EcFeedInput(""
@@ -39,7 +39,7 @@ public class EcFeedModelTest {
 	}
 	
 	@EcFeedTest
-	@EcFeedModel("testResources/test.ect")
+	@EcFeedModel("src/test/resources/test.ect")
 	@EcFeedInput(""
 			+ "'dataSource':'static',"
 			+ "'testSuites':['t1'],"
