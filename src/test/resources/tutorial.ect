@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Model name="Tutorial" version="2">
+    <Class name="com.example.test.LoanDecisionTest">
+        <Properties>
+            <Property name="runOnAndroid" type="boolean" value="false"/>
+        </Properties>
+        <Method name="generateCustomerData">
+            <Properties>
+                <Property name="methodRunner" type="String" value="Java Runner"/>
+                <Property name="wbMapBrowserToParam" type="boolean" value="false"/>
+                <Property name="wbBrowser" type="String" value="Chrome"/>
+                <Property name="wbMapStartUrlToParam" type="boolean" value="false"/>
+            </Properties>
+            <Parameter name="familyName" type="String" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:familyName">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="firstName" type="String" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:firstName">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="gender" type="com.example.test.gender" isExpected="false" expected="VALUE" linked="true" link="com.example.test.LoanDecisionTest:gender">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Choice name="value" value="VALUE" isRandomized="false"/>
+            </Parameter>
+            <Parameter name="age" type="int" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:age">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="documentSerialNumber" type="String" isExpected="false" expected="0" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="driving\slicence" value="[A-Z]{1}[0-9]{7}" isRandomized="true"/>
+                <Choice name="personal\sID" value="[A-Z]{3}[0-9]{6}" isRandomized="true"/>
+                <Choice name="passport" value="[A-Z]{2}[0-9]{9}" isRandomized="true"/>
+            </Parameter>
+            <Parameter name="documentType" type="com.example.test.DocumentType" isExpected="false" expected="PASSPORT" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="passport" value="PASSPORT" isRandomized="false"/>
+                <Choice name="drivers\slicence" value="DRIVERS_LICENSE" isRandomized="false"/>
+                <Choice name="personal\sID" value="PERSONAL_ID" isRandomized="false"/>
+            </Parameter>
+            <Constraint name="document\stype">
+                <Premise>
+                    <Statement choice="passport" parameter="documentType" relation="="/>
+                </Premise>
+                <Consequence>
+                    <Statement choice="passport" parameter="documentSerialNumber" relation="="/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="document\stype">
+                <Premise>
+                    <Statement choice="drivers\slicence" parameter="documentType" relation="="/>
+                </Premise>
+                <Consequence>
+                    <Statement choice="driving\slicence" parameter="documentSerialNumber" relation="="/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="document\stype">
+                <Premise>
+                    <Statement choice="personal\sID" parameter="documentType" relation="="/>
+                </Premise>
+                <Consequence>
+                    <Statement choice="personal\sID" parameter="documentSerialNumber" relation="="/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="gender">
+                <Premise>
+                    <StatementArray operator="or">
+                        <StatementArray operator="and">
+                            <Statement choice="male" parameter="gender" relation="="/>
+                            <Statement choice="male" parameter="firstName" relation="≠"/>
+                        </StatementArray>
+                        <StatementArray operator="and">
+                            <Statement choice="female" parameter="gender" relation="="/>
+                            <Statement choice="female" parameter="firstName" relation="≠"/>
+                        </StatementArray>
+                    </StatementArray>
+                </Premise>
+                <Consequence>
+                    <StaticStatement value="false"/>
+                </Consequence>
+            </Constraint>
+        </Method>
+        <Method name="processLoanApplication">
+            <Properties>
+                <Property name="methodRunner" type="String" value="Java Runner"/>
+                <Property name="wbMapBrowserToParam" type="boolean" value="false"/>
+                <Property name="wbBrowser" type="String" value="Chrome"/>
+                <Property name="wbMapStartUrlToParam" type="boolean" value="false"/>
+            </Properties>
+            <Parameter name="age" type="int" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:age">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="firstName" type="String" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:firstName">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="familyName" type="String" isExpected="false" expected="0" linked="true" link="com.example.test.LoanDecisionTest:familyName">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+            </Parameter>
+            <Parameter name="gender" type="com.example.test.Gender" isExpected="false" expected="VALUE" linked="true" link="com.example.test.LoanDecisionTest:gender">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Choice name="value" value="VALUE" isRandomized="false"/>
+            </Parameter>
+            <Parameter name="employmentStatus" type="com.example.test.EmploymentStatus" isExpected="false" expected="UNEMPLOYED" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="unemployed" value="UNEMPLOYED" isRandomized="false"/>
+                <Choice name="self\semployed" value="SELF_EMPLOYED" isRandomized="false"/>
+                <Choice name="temporary\swork\scontract" value="WORK_CONTRACT_TEMPORARY" isRandomized="false">
+                    <Label label="potentially\spositive\sloan\sdecission"/>
+                </Choice>
+                <Choice name="indefinite\swork\scontract" value="WORK_CONTRACT_INDEFINITE" isRandomized="false"/>
+                <Choice name="retired" value="RETIRED" isRandomized="false">
+                    <Label label="potentially\spositive\sloan\sdecission"/>
+                </Choice>
+            </Parameter>
+            <Parameter name="lastYearIncome" type="long" isExpected="false" expected="0" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="low" value="0:20000" isRandomized="true"/>
+                <Choice name="medium" value="20001:50000" isRandomized="true"/>
+                <Choice name="high" value="50001:100000" isRandomized="true"/>
+                <Choice name="very\shigh" value="100001:MAX_VALUE" isRandomized="true"/>
+            </Parameter>
+            <Parameter name="loanDecision" type="com.example.test.LoanDecision" isExpected="false" expected="POSITIVE" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="positive" value="POSITIVE" isRandomized="false"/>
+                <Choice name="negative" value="NEGATIVE" isRandomized="false"/>
+                <Choice name="inconclusive" value="INCONCLUSIVE" isRandomized="false"/>
+            </Parameter>
+            <Constraint name="loan\sdecission">
+                <Premise>
+                    <StatementArray operator="and">
+                        <LabelStatement label="potentially\spositive\sloan\sdecission" parameter="employmentStatus" relation="="/>
+                        <Statement choice="very\shigh" parameter="lastYearIncome" relation="&gt;="/>
+                    </StatementArray>
+                </Premise>
+                <Consequence>
+                    <Statement choice="inconclusive" parameter="loanDecision" relation="="/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="constraint">
+                <Premise>
+                    <StatementArray operator="or">
+                        <StatementArray operator="and">
+                            <Statement choice="indefinite\swork\scontract" parameter="employmentStatus" relation="="/>
+                            <Statement choice="medium" parameter="lastYearIncome" relation="&gt;="/>
+                        </StatementArray>
+                        <StatementArray operator="and">
+                            <Statement choice="self\semployed" parameter="employmentStatus" relation="="/>
+                            <Statement choice="high" parameter="lastYearIncome" relation="&gt;="/>
+                        </StatementArray>
+                    </StatementArray>
+                </Premise>
+                <Consequence>
+                    <Statement choice="positive" parameter="loanDecision" relation="="/>
+                </Consequence>
+            </Constraint>
+        </Method>
+        <Parameter name="familyName" type="String">
+            <Properties>
+                <Property name="wbIsOptional" type="boolean" value="false"/>
+            </Properties>
+            <Comments>
+                <TypeComments/>
+            </Comments>
+            <Choice name="short" value="Smith" isRandomized="false"/>
+            <Choice name="long" value="Rockefeller" isRandomized="false"/>
+            <Choice name="long\scomplex" value="Mendelssohn-Bartholdy" isRandomized="false"/>
+            <Choice name="two\swords" value="van\sBeethoven" isRandomized="false"/>
+            <Choice name="more\sthen\stwo\swords" value="van\sder\sSar" isRandomized="false"/>
+        </Parameter>
+        <Parameter name="firstName" type="String">
+            <Properties>
+                <Property name="wbIsOptional" type="boolean" value="false"/>
+            </Properties>
+            <Comments>
+                <TypeComments/>
+            </Comments>
+            <Choice name="male" value="" isRandomized="false">
+                <Choice name="short" value="John" isRandomized="false"/>
+                <Choice name="long" value="Alexander" isRandomized="false"/>
+                <Choice name="two\snames" value="Jean\sPierre" isRandomized="false"/>
+            </Choice>
+            <Choice name="female" value="" isRandomized="false">
+                <Choice name="short" value="Eva" isRandomized="false"/>
+                <Choice name="long" value="Katherina" isRandomized="false"/>
+                <Choice name="two\snames" value="Mary\sJane" isRandomized="false"/>
+            </Choice>
+        </Parameter>
+        <Parameter name="gender" type="com.example.test.Gender">
+            <Properties>
+                <Property name="wbIsOptional" type="boolean" value="false"/>
+            </Properties>
+            <Comments>
+                <TypeComments/>
+            </Comments>
+            <Choice name="male" value="MALE" isRandomized="false"/>
+            <Choice name="female" value="FEMALE" isRandomized="false"/>
+        </Parameter>
+        <Parameter name="age" type="int">
+            <Properties>
+                <Property name="wbIsOptional" type="boolean" value="false"/>
+            </Properties>
+            <Comments>
+                <TypeComments/>
+            </Comments>
+            <Choice name="choice1" value="1" isRandomized="false"/>
+            <Choice name="choice2" value="2" isRandomized="false"/>
+            <Choice name="choice3" value="3" isRandomized="false"/>
+        </Parameter>
+    </Class>
+</Model>

@@ -1,0 +1,3 @@
+[submodule "reference/submodule/ecfeed.core"]
+	path = reference/submodule/ecfeed.core
+	url = https://github.com/ecfeed/ecfeed.core.git
