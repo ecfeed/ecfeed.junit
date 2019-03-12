@@ -57,7 +57,7 @@ public final class SecurityHelper {
 		if (loadedStore == null) {
 			prepareStore(loadedStorePath);
 		}
-		System.out.println(Paths.get(".").toAbsolutePath().toString());
+
 		return loadedStore;
 	}
 	

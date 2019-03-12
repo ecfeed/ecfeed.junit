@@ -262,8 +262,8 @@ public final class CertificateGenerator {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		generateServerStore();
-		generateClientStore("server", "runner", "rap");
+
+		generateClientStore("prod-gen.ecfeed.com");
 	}
 	
 	
