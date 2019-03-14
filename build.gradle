@@ -46,7 +46,7 @@ sourceSets {
     }
     test {
         java {
-            srcDirs = ['src/test/java', 'reference/submodule/ecfeed.core/test']
+            srcDirs = ['src/test/java']
         }
     }
 }
