@@ -1,9 +1,10 @@
 package com.ecfeed.core.json;
 
-import com.ecfeed.core.generators.DataSourceHelper;
+import com.ecfeed.core.parser.DataSource;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class TestCasesUserInputParserTest {
@@ -31,7 +32,13 @@ public final class TestCasesUserInputParserTest {
 
 		TestCasesUserInput testCasesRequest = TestCasesUserInputParser.parseRequest(request);
 
-		assertEquals(DataSourceHelper.dataSourceStaticContent, testCasesRequest.getDataSource());
+		DataSource dataSource = null;
+		try {
+			dataSource = DataSource.parse(testCasesRequest.getDataSource());
+		} catch (Exception e) {
+			fail();
+		}
+		assertEquals(DataSource.STATIC, dataSource);
 		assertEquals("method1", testCasesRequest.getMethod());
 		assertEquals("suiteSize1", testCasesRequest.getSuiteSize());
 		assertEquals("coverage1", testCasesRequest.getCoverage());

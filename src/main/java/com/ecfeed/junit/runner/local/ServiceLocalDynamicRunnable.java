@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-import com.ecfeed.core.generators.DataSourceHelper;
 import com.ecfeed.core.generators.algorithms.AbstractAlgorithm;
 import com.ecfeed.core.generators.algorithms.AdaptiveRandomAlgorithm;
 import com.ecfeed.core.generators.algorithms.CartesianProductAlgorithm;
@@ -17,6 +16,8 @@ import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
+import com.ecfeed.core.parser.DataSource;
+import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.message.MessageHelper;
 import com.ecfeed.junit.runner.UserInputHelper;
@@ -34,27 +35,34 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 		fModel = model;
 		fRequest = request;
 		fResponseQueue = responseQueue;
-		
-		getGeneratorType();
-		getGeneratorData(testMethod);
+
+		try {
+			setGeneratorAlgorithm();
+		} catch (Exception e) {
+			ExceptionHelper.reportRuntimeException(e.getMessage());
+		}
+
+		initializeAlgorithm(testMethod);
 	}
 	
-	private void getGeneratorType() {
-		
-		switch (fRequest.getDataSource()) {
-			case DataSourceHelper.dataSourceGenNWise :
+	private void setGeneratorAlgorithm() throws Exception {
+
+		DataSource dataSource = DataSource.parse(fRequest.getDataSource());
+
+		switch (dataSource) {
+			case GEN_N_WISE :
 				fAlgorithm = new RandomizedNWiseAlgorithm<>(Integer.parseInt(fRequest.getN()), Integer.parseInt(fRequest.getCoverage()));
 				break;
-			case DataSourceHelper.dataSourceGenCartesian :
+			case GEN_CARTESIAN :
 				fAlgorithm = new CartesianProductAlgorithm<>();
 				break;
-			case DataSourceHelper.dataSourceGenRandom :
+			case GEN_RAMDOM :
 				fAlgorithm = new RandomAlgorithm<>(Integer.parseInt(fRequest.getLength()), Boolean.parseBoolean(fRequest.getDuplicates()));
 				break;
-			case DataSourceHelper.dataSourceGenAdaptiveRandom :
+			case GEN_ADAPTIVE_RANDOM :
 				fAlgorithm = new AdaptiveRandomAlgorithm<>(Integer.parseInt(fRequest.getDepth()), Integer.parseInt(fRequest.getCandidates()), Integer.parseInt(fRequest.getLength()), Boolean.parseBoolean(fRequest.getDuplicates()));
 				break;
-			case DataSourceHelper.dataSourceStaticContent : 
+			case STATIC:
 				fAlgorithm = null;
 				break;
 			default :
@@ -65,7 +73,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 		
 	}
 	
-	private void getGeneratorData(Method testMethod) {
+	private void initializeAlgorithm(Method testMethod) {
 		Collection<IConstraint<ChoiceNode>> generatorDataConstraints;
 		List<List<ChoiceNode>> generatorDataInput;
 		
@@ -82,6 +90,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 			}
 			
 			fAlgorithm.initialize(generatorDataInput, generatorDataConstraints, null);
+
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
 			exception.addSuppressed(e);
