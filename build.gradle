@@ -11,6 +11,10 @@ repositories {
     mavenCentral()
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.61'
