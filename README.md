@@ -1,4 +1,15 @@
-# ecfeed.junit
+# Using command line
+
+To run all gradle tasks type <b>./gradlew [task]</b>. Alternatively, you can install gradle on your local machine and type <b>gradle [task]</b>. Note, that the first option uses the gradle provided with the distribution and no additional instalation is required.
+
+Examples:
+- <b>./gradlew clean</b> - cleans the project
+- <b>./gradlew jar</b> - generates the jar file without dependencies
+- <b>./gradlew jarWithDependencies</b> - generates the jar file with dependencies included (custom task)
+- <b>./gradlew test</b> - run all tests and stores the results in the folder: build/reports/tests/test
+- <b>./gradlew tasks</b> - lists all tasks available
+
+# Using IDE
 
 The project was generated using [IntelliJ](https://www.jetbrains.com/idea/download/#section=linux), and therefore it is recommended to use the same IDE for future development. Note, that the free (community) version is enough to run the defined gradle tasks.
 
