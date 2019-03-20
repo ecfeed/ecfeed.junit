@@ -15,22 +15,22 @@ public class WebServiceClient implements IWebServiceClient {
     static final private String TAG_REQUEST_TYPE = "requestType";
 
     private WebTarget fWebTarget;
-    private String fClientType;
-    private String fClientVersion;
 
-    public WebServiceClient(WebTarget webTarget, String clientType, String clientVersion) {
+    public WebServiceClient(WebTarget webTarget) {
 
         fWebTarget = webTarget;
-        fClientType = clientType;
-        fClientVersion = clientVersion;
     }
 
     @Override
-    public ResponseData getServerResponse(String requestType, String requestText) {
+    public ResponseData getServerResponse(
+            String clientType,
+            String clientVersion,
+            String requestType,
+            String requestText) {
 
         Response response = fWebTarget
-                .queryParam(TAG_CLIENT_TYPE, fClientType)
-                .queryParam(TAG_CLIENT_VERSION, fClientVersion)
+                .queryParam(TAG_CLIENT_TYPE, clientType)
+                .queryParam(TAG_CLIENT_VERSION, clientVersion)
                 .queryParam(TAG_REQUEST_TYPE, requestType)
                 .request()
                 .post(Entity.entity(requestText, MediaType.APPLICATION_JSON));

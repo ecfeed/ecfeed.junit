@@ -22,8 +22,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 
-    static final private String NAME_CLIENT_REQUEST_TYPE = "requestType"; // TODO - REMOVE
-
     static final String REQUEST_TEST_STREAM = "requestData";
     static final String REQUEST_UPDATE_CHUNK = "requestChunk";
     static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
@@ -32,6 +30,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private WebTarget fWebTarget;
     private Client fClient;
+    private WebServiceClient fWebServiceClient;
 
     private BufferedReader fResponseBufferedReader;
     private int fResponseStatus;
@@ -87,6 +86,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
     private void createConnection(String target) {
         fClient = createConnectionClient();
         fWebTarget = fClient.target(target);
+        fWebServiceClient = new WebServiceClient(fWebTarget);
     }
 
     private void startRestClient() {
@@ -149,8 +149,9 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
-            ResponseData responseData = webServiceClient.getServerResponse(fRequestType, requestText);
+            ResponseData responseData =
+                    fWebServiceClient.getServerResponse(
+                            fClientType, fClientVersion,fRequestType, requestText);
 
             fResponseStatus = responseData.getResponseStatus();
             fResponseBufferedReader = responseData.getResponseBufferedReader();
@@ -186,8 +187,9 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             handleException(exception);
         }
 
-        WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
-        ResponseData responseData = webServiceClient.getServerResponse(requestType, requestText);
+        ResponseData responseData =
+                fWebServiceClient.getServerResponse(
+                        fClientVersion, fClientVersion, requestType, requestText);
 
         fResponseStatus = responseData.getResponseStatus();
         fResponseBufferedReader = responseData.getResponseBufferedReader();
