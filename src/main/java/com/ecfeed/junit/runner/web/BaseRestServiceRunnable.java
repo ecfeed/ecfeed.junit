@@ -149,9 +149,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            ResponseData responseData =
-                    WebServiceClient.getResponse(
-                            requestText, fWebTarget, fClientType, fClientVersion, fRequestType);
+            WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
+            ResponseData responseData = webServiceClient.getServerResponse(fRequestType, requestText);
 
             fResponseStatus = responseData.getResponseStatus();
             fResponseBufferedReader = responseData.getResponseBufferedReader();
@@ -187,8 +186,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             handleException(exception);
         }
 
-        ResponseData responseData =
-                WebServiceClient.getResponse2(requestText, requestType, fWebTarget);
+        WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
+        ResponseData responseData = webServiceClient.getServerResponse(requestType, requestText);
 
         fResponseStatus = responseData.getResponseStatus();
         fResponseBufferedReader = responseData.getResponseBufferedReader();
