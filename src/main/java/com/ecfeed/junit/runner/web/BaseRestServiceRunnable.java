@@ -62,12 +62,52 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 		
 		createConnection(target);
 	}
-	
+
+	@Override
+	final public void run() {
+		startRestClient();
+	}
+
+	abstract protected void consumeReceivedMessage(String message);
+
+	abstract protected boolean cancelExecution();
+
+	abstract protected Object sendUpdatedRequest();
+
+	abstract protected void handleException(Exception e);
+
+	abstract protected void adjustParameters(String... customSettings);
+
+	abstract protected void waitForStreamEnd();
+
+	abstract protected void lifecycleStart();
+
+	abstract protected void lifecycleEnd();
+
 	private void createConnection(String target) {
 		fClient = createConnectionClient();
 		fWebTarget = fClient.target(target);
 	}
-	
+
+	private void startRestClient() {
+		lifecycleStart();
+
+		getServerResponse();
+
+		try {
+			processTestStream();
+		} catch (Exception e) {
+			RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
+			exception.addSuppressed(e);
+			handleException(exception);
+		} finally {
+			closeBufferedReader();
+			closeClient();
+		}
+
+		lifecycleEnd();
+	}
+
 	private Client createConnectionClient() {
 		ClientBuilder client = ClientBuilder.newBuilder();
 		
@@ -159,30 +199,6 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 		fResponseBufferedReader = new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)));
 	}
 	
-	@Override
- 	final public void run() {
-		startRestClient();
-	}
-	
-	final protected void startRestClient() {
-		lifecycleStart();
-		
-		getServerResponse();
-		
-		try {		   
-			processTestStream();
-		} catch (Exception e) {
-			RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
-			exception.addSuppressed(e);
-			handleException(exception);
-		} finally {
-			closeBufferedReader();
-			closeClient();
-		}
-
-		lifecycleEnd();
-	}
-	
 	private void processTestStream() throws IOException {
 		
 		while (true) {
@@ -248,25 +264,5 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 		}
 		
 	}
-	
-	protected void adjustParameters(String... customSettings) {
-	}
-	
-	protected void waitForStreamEnd() {
-	}
-	
-	protected void lifecycleStart() {
-	}
-	
-	protected void lifecycleEnd() {
-	}
-	
-	abstract protected void consumeReceivedMessage(String message);
-	
-	abstract protected boolean cancelExecution();
-	
-	abstract protected Object sendUpdatedRequest();
-	
-	abstract protected void handleException(Exception e);
 	
 }
