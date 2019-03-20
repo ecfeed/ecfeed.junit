@@ -64,8 +64,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     abstract protected Object sendUpdatedRequest();
 
-    abstract protected void handleException(Exception e);
-
     abstract protected void adjustParameters(String... customSettings);
 
     abstract protected void waitForStreamEnd();
@@ -97,7 +95,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } catch (Exception e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
         } finally {
             closeBufferedReader();
             closeClient();
@@ -124,12 +122,12 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } catch (KeyManagementException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestSecureConnectionError"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
 
         } catch (NoSuchAlgorithmException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNoProtocolProvider"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
         }
 
         return securityContext;
@@ -143,7 +141,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
         }
 
         try {
@@ -156,7 +154,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } catch (Exception e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonConnectionException"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
         }
     }
 
@@ -174,7 +172,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             requestType = REQUEST_UPDATE_CONFIRMATION;
         } else {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNotRecognizedRequestType"));
-            handleException(exception);
+            throw exception;
         }
 
         try {
@@ -182,7 +180,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);
-            handleException(exception);
+            throw exception;
         }
 
         ResponseData responseData =
@@ -245,7 +243,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             } catch (IOException e) {
                 Exception exception = new Exception(Localization.bundle.getString("serviceRestConnctionCloseError"), e);
                 exception.addSuppressed(e);
-                handleException(exception);
             }
         }
 

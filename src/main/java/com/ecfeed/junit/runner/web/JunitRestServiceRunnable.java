@@ -82,11 +82,4 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 		return request;
 	}
 
-	@Override
-	protected void handleException(Exception e) {
-		Logger.exception(e);
-		
-		new RuntimeException(e);
-	}
-	
 }
