@@ -18,7 +18,7 @@ The project was generated using [IntelliJ](https://www.jetbrains.com/idea/downlo
 To download the source code and create a local repository, you have to:
 1) Connect to the remote repository, i.e. File - New - Project from Version Control, provide a valid GitHub URL and press clone. Note, that you might be asked for your credentials during the process. You can set the download directory according to your personal preference.
 2) Switch to the correct branch (develop). Go to the project directory (it contains the .git folder), open the terminal and type <b>git fetch</b>, then <b>git checkout develop</b>.
-3) Go to the project directory (it contains the .git folder), open the terminal and type <b>git submodule update --recursive --remote</b>. This command updates the submodules in the project path.
+3) Go to the project directory (it contains the .git folder), open the terminal and type <b>git submodule init</b> and later <b>git submodule update --recursive --remote</b>. This command updates the submodules in the project path.
 4) Go to the submodule directory, i.e. reference/submodule/ecfeec.core. Open the terminal and switch to the correct branch <b>git fetch</b>, then <b>git checkout develop</b>.
   
  ## Creating .jar files
