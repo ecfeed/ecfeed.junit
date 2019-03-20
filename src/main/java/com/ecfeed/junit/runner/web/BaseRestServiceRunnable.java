@@ -28,7 +28,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private Object fRequest;
 
-    private Client fClient;
+
     private WebServiceClient fWebServiceClient;
 
     private BufferedReader fResponseBufferedReader;
@@ -39,18 +39,17 @@ public abstract class BaseRestServiceRunnable implements Runnable {
     private String fClientVersion = "1.0";
     private String fClientType = "regular";
 
-    private String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
     private String fRequestType = REQUEST_TEST_STREAM;
-    private String fKeyStorePath = "";
 
     public BaseRestServiceRunnable(Object request, String target, String... customSettings) {
-        mapper = new ObjectMapper();
 
+        mapper = new ObjectMapper();
         fRequest = request;
 
-        adjustParameters(customSettings);
+        adjustParameters(customSettings); // TODO
 
-        createConnection(target);
+        String keyStorePath = customSettings[0];
+        fWebServiceClient = new WebServiceClient(target, COMMUNICATION_PROTOCOL, keyStorePath);
     }
 
     @Override
@@ -76,15 +75,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         fClientType = clientType;
     }
 
-    protected void setKeyStorePath(String keyStorePath) {
-        fKeyStorePath = keyStorePath;
-    }
-
-    private void createConnection(String target) {
-        fClient = createConnectionClient();
-        fWebServiceClient = new WebServiceClient(fClient, target);
-    }
-
     private void startRestClient() {
         startLifeCycle();
 
@@ -102,35 +92,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         finishLifeCycle();
-    }
-
-    private Client createConnectionClient() {
-        ClientBuilder client = ClientBuilder.newBuilder();
-
-        client.hostnameVerifier(ServiceWebHostnameVerifier.noSecurity());
-        client.sslContext(createConnectionClientSecurityContext());
-
-        return client.build();
-    }
-
-    private SSLContext createConnectionClientSecurityContext() {
-        SSLContext securityContext = null;
-
-        try {
-            securityContext = SSLContext.getInstance(fCommunicationProtocol);
-            securityContext.init(ServiceRestKeyManager.useKeyManagerCustom(fKeyStorePath), ServiceRestTrustManager.useTrustManagerCustom(fKeyStorePath), new SecureRandom());
-        } catch (KeyManagementException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestSecureConnectionError"), e);
-            exception.addSuppressed(e);
-            throw exception;
-
-        } catch (NoSuchAlgorithmException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNoProtocolProvider"), e);
-            exception.addSuppressed(e);
-            throw exception;
-        }
-
-        return securityContext;
     }
 
     private void getServerResponse() {
@@ -250,10 +211,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private void closeClient() {
 
-        if (fClient != null) {
-            fClient.close();
-        }
-
+        fWebServiceClient.close();
     }
 
 }
