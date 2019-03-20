@@ -51,8 +51,7 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 	private String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
 	private String fClientInitialReqeust = REQUEST_TEST_STREAM;
 	private String fTrustStorePath = "";
-	private String fKeyStorePath = "";
-	
+
 	public BaseRestServiceRunnable(Object request, String target, String... customSettings) {	
 		mapper = new ObjectMapper();
 		
@@ -90,10 +89,6 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 
 	protected void setTrustStorePath(String trustStorePath) {
 		fTrustStorePath = trustStorePath;
-	}
-
-	protected void setKeyStorePath(String keyStorePath) {
-		fKeyStorePath = keyStorePath;
 	}
 
 	private void createConnection(String target) {
