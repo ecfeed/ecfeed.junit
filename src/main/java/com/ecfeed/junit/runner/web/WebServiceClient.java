@@ -1,5 +1,6 @@
 package com.ecfeed.junit.runner.web;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -16,9 +17,9 @@ public class WebServiceClient implements IWebServiceClient {
 
     private WebTarget fWebTarget;
 
-    public WebServiceClient(WebTarget webTarget) {
+    public WebServiceClient(Client javaxClient, String targetStr) {
 
-        fWebTarget = webTarget;
+        fWebTarget = javaxClient.target(targetStr);
     }
 
     @Override

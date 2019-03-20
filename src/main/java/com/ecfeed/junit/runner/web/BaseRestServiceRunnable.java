@@ -28,7 +28,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private Object fRequest;
 
-    private WebTarget fWebTarget;
     private Client fClient;
     private WebServiceClient fWebServiceClient;
 
@@ -85,8 +84,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private void createConnection(String target) {
         fClient = createConnectionClient();
-        fWebTarget = fClient.target(target);
-        fWebServiceClient = new WebServiceClient(fWebTarget);
+        fWebServiceClient = new WebServiceClient(fClient, target);
     }
 
     private void startRestClient() {
