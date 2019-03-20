@@ -22,7 +22,7 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	
 	@Override
 	protected void adjustParameters(String... customSettings) {
-		setTrustStorePath(customSettings[0]);
+		setKeyStorePath(customSettings[0]);
 
 		if (customSettings[1].equals("TestUuid1")) {
 			setClientType("localTestRunner");
