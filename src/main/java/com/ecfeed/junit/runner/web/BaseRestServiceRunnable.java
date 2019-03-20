@@ -32,7 +32,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private String fRequestType = REQUEST_TEST_STREAM;
 
-    public BaseRestServiceRunnable(Object request, String target, String... customSettings) {
+    public BaseRestServiceRunnable(Object request, String serviceUrl, String... customSettings) { // TODO customSettings divide into parameters
 
         mapper = new ObjectMapper();
         fRequest = request;
@@ -41,8 +41,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
         String keyStorePath = customSettings[0];
         fWebServiceClient =
-                new WebServiceClient(
-                        target, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
+                new GenWebServiceClient(
+                        serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
     }
 
     @Override
@@ -99,8 +99,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            WebServiceResponseData responseData =
-                    fWebServiceClient.getServerResponse(fRequestType, requestText);
+            WebServiceResponse responseData =
+                    fWebServiceClient.postRequest(fRequestType, requestText);
 
             fResponseStatus = responseData.getResponseStatus();
             fResponseBufferedReader = responseData.getResponseBufferedReader();
@@ -116,8 +116,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
         fRequest = sendUpdatedRequest();
 
-        String requestText = null;
-        String requestType = null;
+        String requestType;
 
         if (fRequest instanceof RequestChunkSchema) {
             requestType = REQUEST_UPDATE_CHUNK;
@@ -128,6 +127,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             throw exception;
         }
 
+        String requestText;
+
         try {
             requestText = mapper.writer().writeValueAsString(fRequest);
         } catch (JsonProcessingException e) {
@@ -136,8 +137,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             throw exception;
         }
 
-        WebServiceResponseData responseData =
-                fWebServiceClient.getServerResponse(requestType, requestText);
+        WebServiceResponse responseData =
+                fWebServiceClient.postRequest(requestType, requestText);
 
         fResponseStatus = responseData.getResponseStatus();
         fResponseBufferedReader = responseData.getResponseBufferedReader();

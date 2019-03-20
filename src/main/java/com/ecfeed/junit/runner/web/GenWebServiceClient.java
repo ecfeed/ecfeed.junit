@@ -16,7 +16,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class WebServiceClient implements IWebServiceClient {
+public class GenWebServiceClient implements IWebServiceClient {
 
     static final private String TAG_CLIENT_VERSION = "clientVersion";
     static final private String TAG_CLIENT_TYPE = "clientType";
@@ -27,7 +27,7 @@ public class WebServiceClient implements IWebServiceClient {
     private String fClientVersion;
     private WebTarget fWebTarget;
 
-    public WebServiceClient(
+    public GenWebServiceClient(
             String targetStr,
             String communicationProtocol,
             String keyStorePath,
@@ -37,30 +37,30 @@ public class WebServiceClient implements IWebServiceClient {
         fClientType = clientType;
         fClientVersion = clientVersion;
 
-        fClient = createConnectionClient(communicationProtocol, keyStorePath);
+        fClient = createClient(communicationProtocol, keyStorePath);
         fWebTarget = fClient.target(targetStr);
     }
 
     @Override
-    public WebServiceResponseData getServerResponse(
-            String requestType,
-            String requestText) {
+    public WebServiceResponse postRequest(
+            String requestType, String requestJson) {
 
         Response response = fWebTarget
                 .queryParam(TAG_CLIENT_TYPE, fClientType)
                 .queryParam(TAG_CLIENT_VERSION, fClientVersion)
                 .queryParam(TAG_REQUEST_TYPE, requestType)
                 .request()
-                .post(Entity.entity(requestText, MediaType.APPLICATION_JSON));
+                .post(Entity.entity(requestJson, MediaType.APPLICATION_JSON));
 
         int responseStatus = response.getStatus();
 
         BufferedReader responseBufferedReader =
                 new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)));
 
-        return new WebServiceResponseData(responseStatus, responseBufferedReader);
+        return new WebServiceResponse(responseStatus, responseBufferedReader);
     }
 
+    @Override
     public void close() {
 
         if (fClient != null) {
@@ -68,8 +68,7 @@ public class WebServiceClient implements IWebServiceClient {
         }
     }
 
-    private static Client createConnectionClient(
-            String communicationProtocol, String keyStorePath) {
+    private static Client createClient(String communicationProtocol, String keyStorePath) {
 
         ClientBuilder client = ClientBuilder.newBuilder();
 
@@ -79,15 +78,16 @@ public class WebServiceClient implements IWebServiceClient {
         return client.build();
     }
 
-    private static SSLContext createSslContext(
-            String communicationProtocol, String keyStorePath) {
+    private static SSLContext createSslContext(String communicationProtocol, String keyStorePath) {
 
         SSLContext securityContext = null;
 
         try {
             securityContext = SSLContext.getInstance(communicationProtocol);
             securityContext.init(ServiceRestKeyManager.useKeyManagerCustom(keyStorePath), ServiceRestTrustManager.useTrustManagerCustom(keyStorePath), new SecureRandom());
+
         } catch (KeyManagementException e) {
+
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestSecureConnectionError"), e);
             exception.addSuppressed(e);
             throw exception;
