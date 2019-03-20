@@ -2,8 +2,6 @@ package com.ecfeed.junit.runner.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -11,10 +9,7 @@ import java.security.SecureRandom;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
@@ -27,9 +22,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 
-    static final private String NAME_CLIENT_VERSION = "clientVersion";
-    static final private String NAME_CLIENT_TYPE = "clientType";
-    static final private String NAME_CLIENT_REQUEST_TYPE = "requestType";
+    static final private String NAME_CLIENT_REQUEST_TYPE = "requestType"; // TODO - REMOVE
 
     static final String REQUEST_TEST_STREAM = "requestData";
     static final String REQUEST_UPDATE_CHUNK = "requestChunk";
@@ -49,7 +42,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
     private String fClientType = "regular";
 
     private String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
-    private String fClientRequestType = REQUEST_TEST_STREAM;
+    private String fRequestType = REQUEST_TEST_STREAM;
     private String fKeyStorePath = "";
 
     public BaseRestServiceRunnable(Object request, String target, String... customSettings) {
@@ -156,9 +149,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            ResponseData responseData =
-                    getResponseIntr(
-                            requestText, fWebTarget, fClientType, fClientVersion, fClientRequestType);
+            WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
+            ResponseData responseData = webServiceClient.getServerResponse(fRequestType, requestText);
 
             fResponseStatus = responseData.getResponseStatus();
             fResponseBufferedReader = responseData.getResponseBufferedReader();
@@ -169,33 +161,12 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
     }
 
-    private static ResponseData getResponseIntr(
-            String requestText,
-            WebTarget webTarget,
-            String clientType,
-            String clientVersion,
-            String clientRequestType) {
-
-        Response response = webTarget
-                .queryParam(NAME_CLIENT_VERSION, clientVersion)
-                .queryParam(NAME_CLIENT_TYPE, clientType)
-                .queryParam(NAME_CLIENT_REQUEST_TYPE, clientRequestType)
-                .request()
-                .post(Entity.entity(requestText, MediaType.APPLICATION_JSON));
-
-        int responseStatus = response.getStatus();
-        BufferedReader responseBufferedReader =
-                new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)));
-
-        return new ResponseData(responseStatus, responseBufferedReader);
-    }
-
     private void getServerUpdateResponse() {
         closeBufferedReader();
 
         fRequest = sendUpdatedRequest();
 
-        String value = null;
+        String requestText = null;
         String requestType = null;
 
         if (fRequest instanceof RequestChunkSchema) {
@@ -208,20 +179,18 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            value = mapper.writer().writeValueAsString(fRequest);
+            requestText = mapper.writer().writeValueAsString(fRequest);
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);
             handleException(exception);
         }
 
-        Response response = fWebTarget
-                .queryParam(NAME_CLIENT_REQUEST_TYPE, requestType)
-                .request()
-                .post(Entity.entity(value, MediaType.APPLICATION_JSON));
+        WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
+        ResponseData responseData = webServiceClient.getServerResponse(requestType, requestText);
 
-        fResponseStatus = response.getStatus();
-        fResponseBufferedReader = new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)));
+        fResponseStatus = responseData.getResponseStatus();
+        fResponseBufferedReader = responseData.getResponseBufferedReader();
     }
 
     private void processTestStream() throws IOException {
