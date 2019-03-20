@@ -1,8 +1,10 @@
 package localhost;
 
 import com.ecfeed.junit.annotation.*;
+import localhost.utils.ServerAvailableCondition;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @EcFeedService("https://localhost:8090/testCaseService")
 @EcFeedKeyStore("src/test/resources/security")
 @EcFeedModel("TestUuid1")
+@ExtendWith(ServerAvailableCondition.class)
 public class ShouldGenerateAdaptiveRandomGenerator {
 
     private static int fActualCallCounter;
@@ -26,7 +29,6 @@ public class ShouldGenerateAdaptiveRandomGenerator {
 
     @EcFeedTest
     @EcFeedInput("'dataSource':'genAdaptiveRandom', 'depth':'10', 'length':'10', 'candidates':'10', 'duplicates':'false', 'method':'test.Class1.testMethod'")
-    public void test(String arg1, String arg2) {
-        fActualCallCounter++;
-    }
+    public void test(String arg1, String arg2) { fActualCallCounter++; }
+
 }
