@@ -2,14 +2,6 @@ package com.ecfeed.junit.runner.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
@@ -28,8 +20,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private Object fRequest;
 
-
-    private WebServiceClient fWebServiceClient;
+    private IWebServiceClient fWebServiceClient;
 
     private BufferedReader fResponseBufferedReader;
     private int fResponseStatus;
@@ -49,7 +40,9 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         adjustParameters(customSettings); // TODO
 
         String keyStorePath = customSettings[0];
-        fWebServiceClient = new WebServiceClient(target, COMMUNICATION_PROTOCOL, keyStorePath);
+        fWebServiceClient =
+                new WebServiceClient(
+                        target, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
     }
 
     @Override
@@ -106,9 +99,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            ResponseData responseData =
-                    fWebServiceClient.getServerResponse(
-                            fClientType, fClientVersion,fRequestType, requestText);
+            WebServiceResponseData responseData =
+                    fWebServiceClient.getServerResponse(fRequestType, requestText);
 
             fResponseStatus = responseData.getResponseStatus();
             fResponseBufferedReader = responseData.getResponseBufferedReader();
@@ -144,9 +136,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             throw exception;
         }
 
-        ResponseData responseData =
-                fWebServiceClient.getServerResponse(
-                        fClientVersion, fClientVersion, requestType, requestText);
+        WebServiceResponseData responseData =
+                fWebServiceClient.getServerResponse(requestType, requestText);
 
         fResponseStatus = responseData.getResponseStatus();
         fResponseBufferedReader = responseData.getResponseBufferedReader();

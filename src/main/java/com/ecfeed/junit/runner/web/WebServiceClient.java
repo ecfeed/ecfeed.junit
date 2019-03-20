@@ -23,24 +23,32 @@ public class WebServiceClient implements IWebServiceClient {
     static final private String TAG_REQUEST_TYPE = "requestType";
 
     private Client fClient;
+    private String fClientType;
+    private String fClientVersion;
     private WebTarget fWebTarget;
 
-    public WebServiceClient(String targetStr, String communicationProtocol, String keyStorePath) {
+    public WebServiceClient(
+            String targetStr,
+            String communicationProtocol,
+            String keyStorePath,
+            String clientType,
+            String clientVersion) {
+
+        fClientType = clientType;
+        fClientVersion = clientVersion;
 
         fClient = createConnectionClient(communicationProtocol, keyStorePath);
         fWebTarget = fClient.target(targetStr);
     }
 
     @Override
-    public ResponseData getServerResponse(
-            String clientType,
-            String clientVersion,
+    public WebServiceResponseData getServerResponse(
             String requestType,
             String requestText) {
 
         Response response = fWebTarget
-                .queryParam(TAG_CLIENT_TYPE, clientType)
-                .queryParam(TAG_CLIENT_VERSION, clientVersion)
+                .queryParam(TAG_CLIENT_TYPE, fClientType)
+                .queryParam(TAG_CLIENT_VERSION, fClientVersion)
                 .queryParam(TAG_REQUEST_TYPE, requestType)
                 .request()
                 .post(Entity.entity(requestText, MediaType.APPLICATION_JSON));
@@ -50,10 +58,10 @@ public class WebServiceClient implements IWebServiceClient {
         BufferedReader responseBufferedReader =
                 new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)));
 
-        return new ResponseData(responseStatus, responseBufferedReader);
+        return new WebServiceResponseData(responseStatus, responseBufferedReader);
     }
 
-    public void close() { // TODO - TO INTERFACE
+    public void close() {
 
         if (fClient != null) {
             fClient.close();

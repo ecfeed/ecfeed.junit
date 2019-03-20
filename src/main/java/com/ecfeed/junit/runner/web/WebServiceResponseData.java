@@ -2,12 +2,12 @@ package com.ecfeed.junit.runner.web;
 
 import java.io.BufferedReader;
 
-public class ResponseData {
+public class WebServiceResponseData {
 
     private int fResponseStatus;
     private BufferedReader fResponseBufferedReader;
 
-    public ResponseData(int responseStatus, BufferedReader responseBufferedReader) {
+    public WebServiceResponseData(int responseStatus, BufferedReader responseBufferedReader) {
         fResponseStatus = responseStatus;
         fResponseBufferedReader = responseBufferedReader;
     }
