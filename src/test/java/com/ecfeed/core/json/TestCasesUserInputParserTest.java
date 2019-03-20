@@ -4,8 +4,7 @@ import com.ecfeed.core.parser.DataSource;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class TestCasesUserInputParserTest {
 

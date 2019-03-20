@@ -45,13 +45,13 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 	
 	private ObjectMapper mapper;
 	
-	protected String fClientVersion = "1.0";
-	protected String fClientType = "regular";
+	private String fClientVersion = "1.0";
+	private String fClientType = "regular";
 	
-	protected String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
-	protected String fClientInitialReqeust = REQUEST_TEST_STREAM;
-	protected String fTrustStorePath = "";
-	protected String fKeyStorePath = "";
+	private String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
+	private String fClientInitialReqeust = REQUEST_TEST_STREAM;
+	private String fTrustStorePath = "";
+	private String fKeyStorePath = "";
 	
 	public BaseRestServiceRunnable(Object request, String target, String... customSettings) {	
 		mapper = new ObjectMapper();
@@ -80,9 +80,21 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 
 	abstract protected void waitForStreamEnd();
 
-	abstract protected void lifecycleStart();
+	abstract protected void startLifeCycle();
 
-	abstract protected void lifecycleEnd();
+	abstract protected void finishLifeCycle();
+
+	protected void setClientType(String clientType) {
+		fClientType = clientType;
+	}
+
+	protected void setTrustStorePath(String trustStorePath) {
+		fTrustStorePath = trustStorePath;
+	}
+
+	protected void setKeyStorePath(String keyStorePath) {
+		fKeyStorePath = keyStorePath;
+	}
 
 	private void createConnection(String target) {
 		fClient = createConnectionClient();
@@ -90,7 +102,7 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 	}
 
 	private void startRestClient() {
-		lifecycleStart();
+		startLifeCycle();
 
 		getServerResponse();
 
@@ -105,7 +117,7 @@ static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
 			closeClient();
 		}
 
-		lifecycleEnd();
+		finishLifeCycle();
 	}
 
 	private Client createConnectionClient() {

@@ -22,17 +22,17 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	
 	@Override
 	protected void adjustParameters(String... customSettings) {
-		fTrustStorePath = customSettings[0];
-		fKeyStorePath = customSettings[0];
+		setTrustStorePath(customSettings[0]);
+		setKeyStorePath(customSettings[0]);
 		
 		if (customSettings[1].equals("TestUuid1")) {
-			fClientType = "localTestRunner";
+			setClientType("localTestRunner");
 		} 
 		
 	}
 
 	@Override
-	protected void lifecycleStart() {
+	protected void startLifeCycle() {
 		Logger.message("");
 	}
 
@@ -42,7 +42,7 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	}
 
 	@Override
-	protected void lifecycleEnd() {
+	protected void finishLifeCycle() {
 		fResponseQueue.offer("");
 	}
 
