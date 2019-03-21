@@ -12,44 +12,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BaseRestServiceRunnable implements Runnable {
 
-    static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
-
     static final String REQUEST_TEST_STREAM = "requestData";
     static final String REQUEST_UPDATE_CHUNK = "requestChunk";
     static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
 
-    private Object fRequest;
 
     private IWebServiceClient fWebServiceClient;
+    private Object fRequest;
 
     private BufferedReader fResponseBufferedReader;
     private int fResponseStatus;
-
-    private ObjectMapper mapper;
-
-    private String fClientVersion = "1.0";
-    private String fClientType = "regular";
+    private ObjectMapper fMapper;
 
     private String fRequestType = REQUEST_TEST_STREAM;
 
-    public BaseRestServiceRunnable(
-            IWebServiceClient webServiceClient, // TODO
-            Object request,
-            String serviceUrl,
-            String... customSettings) { // TODO customSettings divide into parameters
+    public BaseRestServiceRunnable(IWebServiceClient webServiceClient, Object request) {
 
-        mapper = new ObjectMapper();
+        fMapper = new ObjectMapper();
         fRequest = request;
-
-        adjustParameters(customSettings); // TODO
-
-        String keyStorePath = customSettings[0];
-
         fWebServiceClient = webServiceClient;
-
-//        fWebServiceClient =
-//                new GenWebServiceClient(
-//                        serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
     }
 
     @Override
@@ -63,17 +44,11 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     abstract protected Object sendUpdatedRequest();
 
-    abstract protected void adjustParameters(String... customSettings);
-
     abstract protected void waitForStreamEnd();
 
     abstract protected void startLifeCycle();
 
     abstract protected void finishLifeCycle();
-
-    protected void setClientType(String clientType) { // TODO - REMOVE ??
-        fClientType = clientType;
-    }
 
     private void startRestClient() {
         startLifeCycle();
@@ -98,7 +73,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         String requestText = null;
 
         try {
-            requestText = mapper.writer().writeValueAsString(fRequest);
+            requestText = fMapper.writer().writeValueAsString(fRequest);
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);
@@ -137,7 +112,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         String requestText;
 
         try {
-            requestText = mapper.writer().writeValueAsString(fRequest);
+            requestText = fMapper.writer().writeValueAsString(fRequest);
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);

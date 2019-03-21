@@ -15,22 +15,13 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	
 	public JunitRestServiceRunnable(
 			IWebServiceClient webServiceClient, BlockingQueue<String> responseQueue,
-			TestCasesRequest request, String serviceUrl, EcFeedExtensionStore store,
-			String... customSettings) {
-		super(webServiceClient, request, serviceUrl, customSettings);
+			TestCasesRequest request, EcFeedExtensionStore store) {
+		super(webServiceClient, request);
 		
 		fResponseQueue = responseQueue;
 		fStore = store;
 	}
 	
-	@Override
-	protected void adjustParameters(String... customSettings) { // TODO - REMOVE IN BASE CLASS
-
-//		if (customSettings[1].equals("TestUuid1")) { // TODO !! MOVE TO CALLER
-//			setClientType("localTestRunner");
-//		}
-	}
-
 	@Override
 	protected void startLifeCycle() {
 		Logger.message("");
