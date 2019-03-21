@@ -11,6 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.ecfeed.junit.runner.web.GenWebServiceClient;
+import com.ecfeed.junit.runner.web.IWebServiceClient;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,20 +48,42 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 		return testStream;
 	}
 
-	private Runnable createRunnable(ExtensionContext context, EcFeedExtensionStore store) {
+	private Runnable createRunnable(
+			ExtensionContext extensionContext,
+			EcFeedExtensionStore ecFeedExtensionStore) {
 
-		TestCasesRequest restRequest = getTestCaseRequest(context);
-		String targetAnnotation = AnnotationProcessor.processService(context);
-		String restKeyStore = AnnotationProcessor.processKeyStore(context);
+		TestCasesRequest restRequest = getTestCaseRequest(extensionContext);
+		String serviceUrl = AnnotationProcessor.processService(extensionContext);
+		String keyStorePath = AnnotationProcessor.processKeyStore(extensionContext);
 
-		if (!targetAnnotation.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
-			return new JunitRestServiceRunnable(dataBlockingQueue, restRequest, targetAnnotation, store, restKeyStore, restRequest.getModel());
+		String COMMUNICATION_PROTOCOL = "TLSv1.2";
+
+
+		String fClientType = "regular";
+
+		if (restRequest.getModel().equals("TestUuid1")) {
+			fClientType = "localTestRunner"; // TODO
+		}
+
+		String fClientVersion = "1.0";
+
+		if (!serviceUrl.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
+
+			IWebServiceClient webServiceClient = null;
+
+			webServiceClient = // TODO
+				new GenWebServiceClient(
+						serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
+
+			return new JunitRestServiceRunnable(
+					webServiceClient, dataBlockingQueue, restRequest,
+					serviceUrl, ecFeedExtensionStore, keyStorePath, restRequest.getModel());
 		}
 
 		if (restRequest.getModel().equals("auto") || isModelFile(restRequest.getModel())) { // TODO
 
-			TestCasesUserInput restUserInput = getTestCasesUserInput(context);
-			Method restMethod = context.getTestMethod().get();
+			TestCasesUserInput restUserInput = getTestCasesUserInput(extensionContext);
+			Method restMethod = extensionContext.getTestMethod().get();
 
 			if (restRequest.getModel().equals("auto")) { // TODO
 				return 
@@ -78,10 +102,19 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 			}
 
 		} else {
-			return 
+
+			IWebServiceClient webServiceClient = null;
+
+			webServiceClient = // TODO
+					new GenWebServiceClient(
+							serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
+
+			return
+
 					new JunitRestServiceRunnable(
+							webServiceClient,
 							dataBlockingQueue, restRequest, 
-							AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE_ON_LOCALHOST, store, restKeyStore, restRequest.getModel());
+							AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE_ON_LOCALHOST, ecFeedExtensionStore, keyStorePath, restRequest.getModel());
 		}
 	}
 

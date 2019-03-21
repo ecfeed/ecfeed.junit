@@ -32,7 +32,11 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private String fRequestType = REQUEST_TEST_STREAM;
 
-    public BaseRestServiceRunnable(Object request, String serviceUrl, String... customSettings) { // TODO customSettings divide into parameters
+    public BaseRestServiceRunnable(
+            IWebServiceClient webServiceClient, // TODO
+            Object request,
+            String serviceUrl,
+            String... customSettings) { // TODO customSettings divide into parameters
 
         mapper = new ObjectMapper();
         fRequest = request;
@@ -40,9 +44,12 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         adjustParameters(customSettings); // TODO
 
         String keyStorePath = customSettings[0];
-        fWebServiceClient =
-                new GenWebServiceClient(
-                        serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
+
+        fWebServiceClient = webServiceClient;
+
+//        fWebServiceClient =
+//                new GenWebServiceClient(
+//                        serviceUrl, COMMUNICATION_PROTOCOL, keyStorePath, fClientType, fClientVersion);
     }
 
     @Override
@@ -64,7 +71,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     abstract protected void finishLifeCycle();
 
-    protected void setClientType(String clientType) {
+    protected void setClientType(String clientType) { // TODO - REMOVE ??
         fClientType = clientType;
     }
 
