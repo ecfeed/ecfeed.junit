@@ -13,23 +13,15 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	private volatile BlockingQueue<String> fResponseQueue;
 	private volatile EcFeedExtensionStore fStore;
 	
-	public JunitRestServiceRunnable(BlockingQueue<String> responseQueue, TestCasesRequest request, String target, EcFeedExtensionStore store, String... customSettings) {
-		super(request, target, customSettings);
+	public JunitRestServiceRunnable(
+			IWebServiceClient webServiceClient, BlockingQueue<String> responseQueue,
+			TestCasesRequest request, EcFeedExtensionStore store, ServiceObjectMapper serviceObjectMapper) {
+		super(webServiceClient, request, serviceObjectMapper);
 		
 		fResponseQueue = responseQueue;
 		fStore = store;
 	}
 	
-	@Override
-	protected void adjustParameters(String... customSettings) {
-		setKeyStorePath(customSettings[0]);
-
-		if (customSettings[1].equals("TestUuid1")) {
-			setClientType("localTestRunner");
-		} 
-		
-	}
-
 	@Override
 	protected void startLifeCycle() {
 		Logger.message("");
@@ -82,11 +74,4 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 		return request;
 	}
 
-	@Override
-	protected void handleException(Exception e) {
-		Logger.exception(e);
-		
-		new RuntimeException(e);
-	}
-	
 }

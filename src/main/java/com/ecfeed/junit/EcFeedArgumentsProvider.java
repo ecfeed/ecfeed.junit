@@ -11,6 +11,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.ecfeed.junit.runner.web.GenWebServiceClient;
+import com.ecfeed.junit.runner.web.IWebServiceClient;
+import com.ecfeed.junit.runner.web.ServiceObjectMapper;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,83 +29,150 @@ import com.ecfeed.junit.runner.web.JunitRestServiceRunnable;
 
 public class EcFeedArgumentsProvider implements ArgumentsProvider {
 
-	private volatile BlockingQueue<String> dataBlockingQueue = new LinkedBlockingQueue<>();
+    private volatile BlockingQueue<String> dataBlockingQueue = new LinkedBlockingQueue<>();
 
-	@Override
-	public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
 
-		EcFeedExtensionStore store = new EcFeedExtensionStore();
-		context.getStore(Namespace.create("ecFeed")).put("ecFeedStore", store);
+        EcFeedExtensionStore store = new EcFeedExtensionStore();
+        context.getStore(Namespace.create("ecFeed")).put("ecFeedStore", store);
 
-		new Thread(createRunnable(context, store)).start();
+        new Thread(createRunnable(context, store)).start();
 
-		Stream<Arguments> testStream = 
-				StreamSupport.stream(
-						Spliterators.spliteratorUnknownSize(
-								EcFeedArgumentsProviderIterator.create(dataBlockingQueue, context), 
-								Spliterator.IMMUTABLE), 
-						false);
+        Stream<Arguments> testStream =
+                StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(
+                                EcFeedArgumentsProviderIterator.create(dataBlockingQueue, context),
+                                Spliterator.IMMUTABLE),
+                        false);
 
-		return testStream;
-	}
+        return testStream;
+    }
 
-	private Runnable createRunnable(ExtensionContext context, EcFeedExtensionStore store) {
+    private Runnable createRunnable(
+            ExtensionContext extensionContext,
+            EcFeedExtensionStore ecFeedExtensionStore) {
 
-		TestCasesRequest restRequest = getTestCaseRequest(context);
-		String targetAnnotation = AnnotationProcessor.processService(context);
-		String restKeyStore = AnnotationProcessor.processKeyStore(context);
+        TestCasesRequest restRequest = getTestCaseRequest(extensionContext);
 
-		if (!targetAnnotation.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
-			return new JunitRestServiceRunnable(dataBlockingQueue, restRequest, targetAnnotation, store, restKeyStore, restRequest.getModel());
-		}
+        String serviceUrl = AnnotationProcessor.processService(extensionContext);
+        String keyStorePath = AnnotationProcessor.processKeyStore(extensionContext);
+        String clientType = getCreateClientType(restRequest);
 
-		if (restRequest.getModel().equals("auto") || isModelFile(restRequest.getModel())) { // TODO
+        return createJunitRestServiceRunnable(
+                extensionContext, ecFeedExtensionStore,
+                restRequest,
+                serviceUrl, keyStorePath, clientType);
+    }
 
-			TestCasesUserInput restUserInput = getTestCasesUserInput(context);
-			Method restMethod = context.getTestMethod().get();
+    private Runnable createJunitRestServiceRunnable(
+            ExtensionContext extensionContext,
+            EcFeedExtensionStore ecFeedExtensionStore,
+            TestCasesRequest testCasesRequest,
+            String serviceUrl, String keyStorePath, String clientType) {
 
-			if (restRequest.getModel().equals("auto")) { // TODO
-				return 
-						new ServiceLocalDynamicRunnable(
-								dataBlockingQueue, restMethod, restUserInput, restRequest.getModel());
-			}
+        if (!serviceUrl.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
 
-			if (restUserInput.getDataSource().equalsIgnoreCase("static")) { // TODO
-				return 
-						new ServiceLocalTestSuiteRunnable(
-								dataBlockingQueue, restMethod, restUserInput, restRequest.getModel());
-			} else {
-				return 
-						new ServiceLocalDynamicRunnable(
-								dataBlockingQueue, restMethod, restUserInput, restRequest.getModel());
-			}
+            IWebServiceClient webServiceClient =
+                    createWebServiceClient(serviceUrl, keyStorePath, clientType);
 
-		} else {
-			return 
-					new JunitRestServiceRunnable(
-							dataBlockingQueue, restRequest, 
-							AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE_ON_LOCALHOST, store, restKeyStore, restRequest.getModel());
-		}
-	}
+            ServiceObjectMapper serviceObjectMapper = new ServiceObjectMapper();
 
-	private TestCasesUserInput getTestCasesUserInput(ExtensionContext context) {
-		return AnnotationProcessor.processInputSchema(context);
-	}
+            return new JunitRestServiceRunnable(
+                    webServiceClient, dataBlockingQueue, testCasesRequest,
+                    ecFeedExtensionStore, serviceObjectMapper);
+        }
 
-	private TestCasesRequest getTestCaseRequest(ExtensionContext context) {
-		TestCasesRequest restRequest = new TestCasesRequest();
+        String model = testCasesRequest.getModel();
 
-		restRequest.setModelName(AnnotationProcessor.processModelName(context));
-		restRequest.setMethod(AnnotationProcessor.extractMethodName(context));
-		restRequest.setUserData("{" + AnnotationProcessor.processInput(context) + "}");
+        if (model.equals("auto") || isModelFile(model)) {
+            return createRunnableForAutoOrFileModel(extensionContext, model);
+        }
 
-		return restRequest;
-	}
+        // TODO
+        return createRunnableForDefaultServiceOnLocalhost(
+                ecFeedExtensionStore,
+                testCasesRequest,
+                keyStorePath,
+                clientType);
+    }
 
-	private boolean isModelFile(String filePath) {
-		Path path = Paths.get(filePath);
+    private Runnable createRunnableForDefaultServiceOnLocalhost(
+            EcFeedExtensionStore ecFeedExtensionStore,
+            TestCasesRequest testCasesRequest,
+            String keyStorePath, String clientType) {
 
-		return Files.exists(path) && Files.isRegularFile(path) && Files.isReadable(path);
-	}
+        IWebServiceClient webServiceClient =
+                createWebServiceClient(
+                        AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE_ON_LOCALHOST,
+                        keyStorePath,
+                        clientType);
+
+        ServiceObjectMapper serviceObjectMapper = new ServiceObjectMapper();
+
+        return new JunitRestServiceRunnable(
+                webServiceClient,
+                dataBlockingQueue, testCasesRequest,
+                ecFeedExtensionStore, serviceObjectMapper);
+    }
+
+    private Runnable createRunnableForAutoOrFileModel(ExtensionContext extensionContext, String model) {
+
+        TestCasesUserInput restUserInput = getTestCasesUserInput(extensionContext);
+        Method restMethod = extensionContext.getTestMethod().get();
+
+        if (model.equals("auto")) { // TODO
+            return new ServiceLocalDynamicRunnable( dataBlockingQueue, restMethod, restUserInput, model);
+        }
+
+        if (restUserInput.getDataSource().equalsIgnoreCase("static")) { // TODO
+            return new ServiceLocalTestSuiteRunnable(dataBlockingQueue, restMethod, restUserInput, model);
+        }
+
+        return new ServiceLocalDynamicRunnable(dataBlockingQueue, restMethod, restUserInput, model);
+
+    }
+
+    private String getCreateClientType(TestCasesRequest restRequest) {
+        String clientType = "regular";
+
+        if (restRequest.getModel().equals("TestUuid1")) {
+            clientType = "localTestRunner"; // TODO
+        }
+        return clientType;
+    }
+
+    private IWebServiceClient createWebServiceClient(
+            String serviceUrl, String keyStorePath, String clientType) {
+
+        String COMMUNICATION_PROTOCOL = "TLSv1.2";
+        String clientVersion = "1.0";
+
+        return new GenWebServiceClient(
+                serviceUrl,
+                COMMUNICATION_PROTOCOL, keyStorePath,
+                clientType, clientVersion);
+
+    }
+
+    private TestCasesUserInput getTestCasesUserInput(ExtensionContext context) {
+        return AnnotationProcessor.processInputSchema(context);
+    }
+
+    private TestCasesRequest getTestCaseRequest(ExtensionContext context) {
+        TestCasesRequest restRequest = new TestCasesRequest();
+
+        restRequest.setModelName(AnnotationProcessor.processModelName(context));
+        restRequest.setMethod(AnnotationProcessor.extractMethodName(context));
+        restRequest.setUserData("{" + AnnotationProcessor.processInput(context) + "}");
+
+        return restRequest;
+    }
+
+    private boolean isModelFile(String filePath) {
+        Path path = Paths.get(filePath);
+
+        return Files.exists(path) && Files.isRegularFile(path) && Files.isReadable(path);
+    }
 
 }

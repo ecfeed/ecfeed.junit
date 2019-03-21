@@ -2,12 +2,12 @@ package com.ecfeed.junit.runner.web;
 
 import java.io.BufferedReader;
 
-public class ResponseData {
+public class WebServiceResponse {
 
     private int fResponseStatus;
     private BufferedReader fResponseBufferedReader;
 
-    public ResponseData(int responseStatus, BufferedReader responseBufferedReader) {
+    public WebServiceResponse(int responseStatus, BufferedReader responseBufferedReader) {
         fResponseStatus = responseStatus;
         fResponseBufferedReader = responseBufferedReader;
     }
@@ -16,7 +16,12 @@ public class ResponseData {
         return fResponseStatus;
     }
 
+    public boolean isResponseStatusOk() {
+        return (fResponseStatus / 100) == 2;
+    }
+
     public BufferedReader getResponseBufferedReader() {
         return fResponseBufferedReader;
     }
+
 }

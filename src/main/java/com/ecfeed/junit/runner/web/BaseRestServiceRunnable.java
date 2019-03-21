@@ -2,62 +2,40 @@ package com.ecfeed.junit.runner.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
+import com.ecfeed.core.utils.ExceptionHelper;
+import com.ecfeed.core.utils.SystemLogger;
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
-import com.ecfeed.junit.utils.Localization;
-import com.ecfeed.junit.utils.Logger;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.ecfeed.junit.utils.Localization;
 
 public abstract class BaseRestServiceRunnable implements Runnable {
 
-    static final private String COMMUNICATION_PROTOCOL = "TLSv1.2";
+    private static final String REQUEST_DATA = "requestData";
+    private static final String REQUEST_CHUNK = "requestChunk";
+    private static final String REQUEST_UPDATE = "requestUpdate";
 
-    static final private String NAME_CLIENT_REQUEST_TYPE = "requestType"; // TODO - REMOVE
 
-    static final String REQUEST_TEST_STREAM = "requestData";
-    static final String REQUEST_UPDATE_CHUNK = "requestChunk";
-    static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
+    private IWebServiceClient fWebServiceClient;
+    ServiceObjectMapper fServiceObjectMapper;
 
-    private Object fRequest;
+    private String fRequestStr;
+    private String fRequestType = REQUEST_DATA;
 
-    private WebTarget fWebTarget;
-    private Client fClient;
+    public BaseRestServiceRunnable(
+            IWebServiceClient webServiceClient,
+            Object request,
+            ServiceObjectMapper serviceObjectMapper) {
 
-    private BufferedReader fResponseBufferedReader;
-    private int fResponseStatus;
-
-    private ObjectMapper mapper;
-
-    private String fClientVersion = "1.0";
-    private String fClientType = "regular";
-
-    private String fCommunicationProtocol = COMMUNICATION_PROTOCOL;
-    private String fRequestType = REQUEST_TEST_STREAM;
-    private String fKeyStorePath = "";
-
-    public BaseRestServiceRunnable(Object request, String target, String... customSettings) {
-        mapper = new ObjectMapper();
-
-        fRequest = request;
-
-        adjustParameters(customSettings);
-
-        createConnection(target);
+        fWebServiceClient = webServiceClient;
+        fServiceObjectMapper = serviceObjectMapper;
+        fRequestStr = fServiceObjectMapper.mapRequestToString(request);
     }
 
     @Override
     final public void run() {
-        startRestClient();
+
+        startRestClient(fRequestStr);
     }
 
     abstract protected void consumeReceivedMessage(String message);
@@ -66,197 +44,129 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     abstract protected Object sendUpdatedRequest();
 
-    abstract protected void handleException(Exception e);
-
-    abstract protected void adjustParameters(String... customSettings);
-
     abstract protected void waitForStreamEnd();
 
     abstract protected void startLifeCycle();
 
     abstract protected void finishLifeCycle();
 
-    protected void setClientType(String clientType) {
-        fClientType = clientType;
-    }
+    private void startRestClient(String requestText) {
 
-    protected void setKeyStorePath(String keyStorePath) {
-        fKeyStorePath = keyStorePath;
-    }
-
-    private void createConnection(String target) {
-        fClient = createConnectionClient();
-        fWebTarget = fClient.target(target);
-    }
-
-    private void startRestClient() {
         startLifeCycle();
 
-        getServerResponse();
+        WebServiceResponse webServiceResponse = getServerResponse(requestText);
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException(
+                    "Request failed. Response status: " + webServiceResponse.getResponseStatus());
+        }
 
         try {
-            processTestStream();
-        } catch (Exception e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
+            processTestStream(webServiceResponse.getResponseBufferedReader());
         } finally {
-            closeBufferedReader();
+            closeBufferedReader(webServiceResponse.getResponseBufferedReader());
             closeClient();
         }
 
         finishLifeCycle();
     }
 
-    private Client createConnectionClient() {
-        ClientBuilder client = ClientBuilder.newBuilder();
+    private WebServiceResponse getServerResponse(String requestText) {
 
-        client.hostnameVerifier(ServiceWebHostnameVerifier.noSecurity());
-        client.sslContext(createConnectionClientSecurityContext());
-
-        return client.build();
+        return fWebServiceClient.postRequest(fRequestType, requestText);
     }
 
-    private SSLContext createConnectionClientSecurityContext() {
-        SSLContext securityContext = null;
+    private void getServerUpdateResponse(BufferedReader responseBufferedReader) {
 
-        try {
-            securityContext = SSLContext.getInstance(fCommunicationProtocol);
-            securityContext.init(ServiceRestKeyManager.useKeyManagerCustom(fKeyStorePath), ServiceRestTrustManager.useTrustManagerCustom(fKeyStorePath), new SecureRandom());
-        } catch (KeyManagementException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestSecureConnectionError"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
+        closeBufferedReader(responseBufferedReader);
 
-        } catch (NoSuchAlgorithmException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNoProtocolProvider"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
+        Object request = sendUpdatedRequest(); // TODO - are we sending anything here?
+
+        String requestType = getRequestType(request);
+        if (requestType == null) {
+            return;
         }
 
-        return securityContext;
-    }
+        String requestText = fServiceObjectMapper.mapRequestToString(request);
+        WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
 
-    private void getServerResponse() {
-        String requestText = null;
-
-        try {
-            requestText = mapper.writer().writeValueAsString(fRequest);
-        } catch (JsonProcessingException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
-        }
-
-        try {
-            WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
-            ResponseData responseData = webServiceClient.getServerResponse(fRequestType, requestText);
-
-            fResponseStatus = responseData.getResponseStatus();
-            fResponseBufferedReader = responseData.getResponseBufferedReader();
-        } catch (Exception e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonConnectionException"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
+        if (!webServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException("Failed to send update request.");
         }
     }
 
-    private void getServerUpdateResponse() {
-        closeBufferedReader();
+    private String getRequestType(Object request) {
+        String requestType;
 
-        fRequest = sendUpdatedRequest();
-
-        String requestText = null;
-        String requestType = null;
-
-        if (fRequest instanceof RequestChunkSchema) {
-            requestType = REQUEST_UPDATE_CHUNK;
-        } else if (fRequest instanceof RequestUpdateSchema) {
-            requestType = REQUEST_UPDATE_CONFIRMATION;
+        if (request instanceof RequestChunkSchema) {
+            requestType = REQUEST_CHUNK;
+        } else if (request instanceof RequestUpdateSchema) {
+            requestType = REQUEST_UPDATE;
         } else {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNotRecognizedRequestType"));
-            handleException(exception);
+            ExceptionHelper.reportRuntimeException("Request type not recognized.");
+            return null;
         }
-
-        try {
-            requestText = mapper.writer().writeValueAsString(fRequest);
-        } catch (JsonProcessingException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
-            exception.addSuppressed(e);
-            handleException(exception);
-        }
-
-        WebServiceClient webServiceClient = new WebServiceClient(fWebTarget, fClientType, fClientVersion);
-        ResponseData responseData = webServiceClient.getServerResponse(requestType, requestText);
-
-        fResponseStatus = responseData.getResponseStatus();
-        fResponseBufferedReader = responseData.getResponseBufferedReader();
+        return requestType;
     }
 
-    private void processTestStream() throws IOException {
+    private void processTestStream(BufferedReader responseBufferedReader) {
 
         while (true) {
-            if (processTestSuite()) {
+            if (processTestSuite(responseBufferedReader)) {
                 break;
             } else {
-                getServerUpdateResponse();
+                getServerUpdateResponse(responseBufferedReader);
             }
         }
-
     }
 
-    private boolean processTestSuite() throws IOException {
-        String message;
+    private boolean processTestSuite(BufferedReader responseBufferedReader) {
 
-        if (isServerResponseCorrect()) {
+        String line;
 
-            while ((message = fResponseBufferedReader.readLine()) != null) {
-                consumeReceivedMessage(message);
-
-                if (cancelExecution()) {
-                    return true;
-                }
-
-            }
-
-            waitForStreamEnd();
+        while ((line = readLine(responseBufferedReader)) != null) {
+            consumeReceivedMessage(line);
 
             if (cancelExecution()) {
                 return true;
             }
+        }
 
-        } else {
-            Logger.message(Localization.bundle.getString("serviceRestServerResponse") + " " + ServiceRestErrorCodes.getCode(fResponseStatus));
+        waitForStreamEnd();
+
+        if (cancelExecution()) {
             return true;
         }
 
         return false;
     }
 
-    private boolean isServerResponseCorrect() {
-        return (fResponseStatus / 100) == 2;
+    private String readLine(BufferedReader responseBufferedReader) {
+
+        try {
+            return responseBufferedReader.readLine();
+        } catch (IOException e) {
+            ExceptionHelper.reportRuntimeException("Cannot read line from response.", e);
+        }
+        return null;
     }
 
-    private void closeBufferedReader() {
+    private void closeBufferedReader(BufferedReader responseBufferedReader) {
 
-        if (fResponseBufferedReader != null) {
-            try {
-                fResponseBufferedReader.close();
-            } catch (IOException e) {
-                Exception exception = new Exception(Localization.bundle.getString("serviceRestConnctionCloseError"), e);
-                exception.addSuppressed(e);
-                handleException(exception);
-            }
+        if (responseBufferedReader == null) {
+            return;
         }
 
+        try {
+            responseBufferedReader.close();
+        } catch (IOException e) {
+            SystemLogger.logCatch("Cannot close response stream.");
+        }
     }
 
     private void closeClient() {
 
-        if (fClient != null) {
-            fClient.close();
-        }
-
+        fWebServiceClient.close();
     }
 
 }
