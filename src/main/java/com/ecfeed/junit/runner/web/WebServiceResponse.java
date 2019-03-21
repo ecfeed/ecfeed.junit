@@ -16,7 +16,12 @@ public class WebServiceResponse {
         return fResponseStatus;
     }
 
+    public boolean isResponseStatusOk() {
+        return (fResponseStatus / 100) == 2;
+    }
+
     public BufferedReader getResponseBufferedReader() {
         return fResponseBufferedReader;
     }
+
 }

@@ -3,26 +3,24 @@ package com.ecfeed.junit.runner.web;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
 import com.ecfeed.junit.utils.Localization;
-import com.ecfeed.junit.utils.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BaseRestServiceRunnable implements Runnable {
 
-    static final String REQUEST_TEST_STREAM = "requestData";
-    static final String REQUEST_UPDATE_CHUNK = "requestChunk";
-    static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
+    private static final String REQUEST_TEST_STREAM = "requestData";
+    private static final String REQUEST_UPDATE_CHUNK = "requestChunk";
+    private static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
 
 
     private IWebServiceClient fWebServiceClient;
-    private Object fRequest;
 
-    private BufferedReader fResponseBufferedReader;
-    private int fResponseStatus;
-    private ObjectMapper fMapper;
+    private Object fRequest;
+    private ObjectMapper fMapper; // TODO - extract Json fMapper out of this class
 
     private String fRequestType = REQUEST_TEST_STREAM;
 
@@ -51,29 +49,38 @@ public abstract class BaseRestServiceRunnable implements Runnable {
     abstract protected void finishLifeCycle();
 
     private void startRestClient() {
+
         startLifeCycle();
 
-        getServerResponse();
+        WebServiceResponse webServiceResponse = getServerResponse();
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException(
+                    "Request failed. Response status: " + webServiceResponse.getResponseStatus());
+        }
 
         try {
-            processTestStream();
+            processTestStream(webServiceResponse.getResponseBufferedReader());
+
         } catch (Exception e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
             exception.addSuppressed(e);
             throw exception;
         } finally {
-            closeBufferedReader();
+            closeBufferedReader(webServiceResponse.getResponseBufferedReader());
             closeClient();
         }
 
         finishLifeCycle();
     }
 
-    private void getServerResponse() {
+    private WebServiceResponse getServerResponse() {
+
         String requestText = null;
 
         try {
             requestText = fMapper.writer().writeValueAsString(fRequest);
+
         } catch (JsonProcessingException e) {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
             exception.addSuppressed(e);
@@ -81,20 +88,19 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
 
         try {
-            WebServiceResponse responseData =
-                    fWebServiceClient.postRequest(fRequestType, requestText);
+            return fWebServiceClient.postRequest(fRequestType, requestText);
 
-            fResponseStatus = responseData.getResponseStatus();
-            fResponseBufferedReader = responseData.getResponseBufferedReader();
         } catch (Exception e) {
+            // TODO - exception handling
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonConnectionException"), e);
             exception.addSuppressed(e);
             throw exception;
         }
     }
 
-    private void getServerUpdateResponse() {
-        closeBufferedReader();
+    private void getServerUpdateResponse(BufferedReader responseBufferedReader) {
+
+        closeBufferedReader(responseBufferedReader);
 
         fRequest = sendUpdatedRequest();
 
@@ -119,68 +125,58 @@ public abstract class BaseRestServiceRunnable implements Runnable {
             throw exception;
         }
 
-        WebServiceResponse responseData =
-                fWebServiceClient.postRequest(requestType, requestText);
+        WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
 
-        fResponseStatus = responseData.getResponseStatus();
-        fResponseBufferedReader = responseData.getResponseBufferedReader();
+        if (!webServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException("Failed to send update request.");
+        }
     }
 
-    private void processTestStream() throws IOException {
+    private void processTestStream(BufferedReader responseBufferedReader) throws IOException {
 
         while (true) {
-            if (processTestSuite()) {
+            if (processTestSuite(responseBufferedReader)) {
                 break;
             } else {
-                getServerUpdateResponse();
+                getServerUpdateResponse(responseBufferedReader);
             }
         }
-
     }
 
-    private boolean processTestSuite() throws IOException {
+    private boolean processTestSuite(BufferedReader responseBufferedReader) throws IOException {
+
         String message;
 
-        if (isServerResponseCorrect()) {
 
-            while ((message = fResponseBufferedReader.readLine()) != null) {
-                consumeReceivedMessage(message);
-
-                if (cancelExecution()) {
-                    return true;
-                }
-
-            }
-
-            waitForStreamEnd();
+        while ((message = responseBufferedReader.readLine()) != null) {
+            consumeReceivedMessage(message);
 
             if (cancelExecution()) {
                 return true;
             }
+        }
 
-        } else {
-            Logger.message(Localization.bundle.getString("serviceRestServerResponse") + " " + ServiceRestErrorCodes.getCode(fResponseStatus));
+        waitForStreamEnd();
+
+        if (cancelExecution()) {
             return true;
         }
 
         return false;
     }
 
-    private boolean isServerResponseCorrect() {
-        return (fResponseStatus / 100) == 2;
-    }
+    private void closeBufferedReader(BufferedReader responseBufferedReader) {
 
-    private void closeBufferedReader() {
-
-        if (fResponseBufferedReader != null) {
-            try {
-                fResponseBufferedReader.close();
-            } catch (IOException e) {
-                Exception exception = new Exception(Localization.bundle.getString("serviceRestConnctionCloseError"), e);
-                exception.addSuppressed(e);
-            }
+        if (responseBufferedReader == null) {
+            return;
         }
 
+        try {
+            responseBufferedReader.close();
+        } catch (IOException e) {
+            Exception exception = new Exception(Localization.bundle.getString("serviceRestConnctionCloseError"), e);
+            exception.addSuppressed(e);
+        }
     }
 
     private void closeClient() {
