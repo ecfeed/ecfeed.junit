@@ -13,28 +13,41 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BaseRestServiceRunnable implements Runnable {
 
-    private static final String REQUEST_TEST_STREAM = "requestData";
-    private static final String REQUEST_UPDATE_CHUNK = "requestChunk";
-    private static final String REQUEST_UPDATE_CONFIRMATION = "requestUpdate";
+    private static final String REQUEST_DATA = "requestData";
+    private static final String REQUEST_CHUNK = "requestChunk";
+    private static final String REQUEST_UPDATE = "requestUpdate";
 
 
     private IWebServiceClient fWebServiceClient;
 
-    private Object fRequest;
-    private ObjectMapper fMapper; // TODO - extract Json fMapper out of this class
+    private String fRequestStr;
+    private String fRequestType = REQUEST_DATA;
 
-    private String fRequestType = REQUEST_TEST_STREAM;
+    public BaseRestServiceRunnable(
+            IWebServiceClient webServiceClient,
+            Object request) {
 
-    public BaseRestServiceRunnable(IWebServiceClient webServiceClient, Object request) {
-
-        fMapper = new ObjectMapper();
-        fRequest = request;
         fWebServiceClient = webServiceClient;
+        fRequestStr = mapRequestToString(request);
+    }
+
+    private String mapRequestToString(Object request) {
+
+        ObjectMapper fMapper = new ObjectMapper();
+
+        try {
+            return fMapper.writer().writeValueAsString(request);
+
+        } catch (JsonProcessingException e) {
+            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
+            return null;
+        }
     }
 
     @Override
     final public void run() {
-        startRestClient();
+
+        startRestClient(fRequestStr);
     }
 
     abstract protected void consumeReceivedMessage(String message);
@@ -49,11 +62,11 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     abstract protected void finishLifeCycle();
 
-    private void startRestClient() {
+    private void startRestClient(String requestText) {
 
         startLifeCycle();
 
-        WebServiceResponse webServiceResponse = getServerResponse();
+        WebServiceResponse webServiceResponse = getServerResponse(requestText);
 
         if (!webServiceResponse.isResponseStatusOk()) {
             ExceptionHelper.reportRuntimeException(
@@ -70,17 +83,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         finishLifeCycle();
     }
 
-    private WebServiceResponse getServerResponse() {
-
-        String requestText;
-
-        try {
-            requestText = fMapper.writer().writeValueAsString(fRequest);
-
-        } catch (JsonProcessingException e) {
-            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
-            return null;
-        }
+    private WebServiceResponse getServerResponse(String requestText) {
 
         return fWebServiceClient.postRequest(fRequestType, requestText);
     }
@@ -89,28 +92,20 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
         closeBufferedReader(responseBufferedReader);
 
-        fRequest = sendUpdatedRequest();
+        Object request = sendUpdatedRequest();
 
         String requestType;
 
-        if (fRequest instanceof RequestChunkSchema) {
-            requestType = REQUEST_UPDATE_CHUNK;
-        } else if (fRequest instanceof RequestUpdateSchema) {
-            requestType = REQUEST_UPDATE_CONFIRMATION;
+        if (request instanceof RequestChunkSchema) {
+            requestType = REQUEST_CHUNK;
+        } else if (request instanceof RequestUpdateSchema) {
+            requestType = REQUEST_UPDATE;
         } else {
             RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNotRecognizedRequestType"));
             throw exception;
         }
 
-        String requestText;
-
-        try {
-            requestText = fMapper.writer().writeValueAsString(fRequest);
-        } catch (JsonProcessingException e) {
-            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
-            return;
-        }
-
+        String requestText = mapRequestToString(request);
         WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
 
         if (!webServiceResponse.isResponseStatusOk()) {
