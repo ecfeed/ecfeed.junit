@@ -7,9 +7,7 @@ import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.SystemLogger;
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
-import com.ecfeed.junit.utils.Localization;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.ecfeed.junit.utils.Localization;
 
 public abstract class BaseRestServiceRunnable implements Runnable {
 
@@ -19,29 +17,19 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
 
     private IWebServiceClient fWebServiceClient;
+    ServiceObjectMapper fServiceObjectMapper;
 
     private String fRequestStr;
     private String fRequestType = REQUEST_DATA;
 
     public BaseRestServiceRunnable(
             IWebServiceClient webServiceClient,
-            Object request) {
+            Object request,
+            ServiceObjectMapper serviceObjectMapper) {
 
         fWebServiceClient = webServiceClient;
-        fRequestStr = mapRequestToString(request);
-    }
-
-    private String mapRequestToString(Object request) {
-
-        ObjectMapper fMapper = new ObjectMapper();
-
-        try {
-            return fMapper.writer().writeValueAsString(request);
-
-        } catch (JsonProcessingException e) {
-            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
-            return null;
-        }
+        fServiceObjectMapper = serviceObjectMapper;
+        fRequestStr = fServiceObjectMapper.mapRequestToString(request);
     }
 
     @Override
@@ -92,8 +80,22 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
         closeBufferedReader(responseBufferedReader);
 
-        Object request = sendUpdatedRequest();
+        Object request = sendUpdatedRequest(); // TODO - are we sending anything here?
 
+        String requestType = getRequestType(request);
+        if (requestType == null) {
+            return;
+        }
+
+        String requestText = fServiceObjectMapper.mapRequestToString(request);
+        WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException("Failed to send update request.");
+        }
+    }
+
+    private String getRequestType(Object request) {
         String requestType;
 
         if (request instanceof RequestChunkSchema) {
@@ -101,16 +103,10 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         } else if (request instanceof RequestUpdateSchema) {
             requestType = REQUEST_UPDATE;
         } else {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestNotRecognizedRequestType"));
-            throw exception;
+            ExceptionHelper.reportRuntimeException("Request type not recognized.");
+            return null;
         }
-
-        String requestText = mapRequestToString(request);
-        WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
-
-        if (!webServiceResponse.isResponseStatusOk()) {
-            ExceptionHelper.reportRuntimeException("Failed to send update request.");
-        }
+        return requestType;
     }
 
     private void processTestStream(BufferedReader responseBufferedReader) {

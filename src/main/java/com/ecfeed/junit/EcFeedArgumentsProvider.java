@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
 
 import com.ecfeed.junit.runner.web.GenWebServiceClient;
 import com.ecfeed.junit.runner.web.IWebServiceClient;
+import com.ecfeed.junit.runner.web.ServiceObjectMapper;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.params.provider.Arguments;
@@ -75,9 +76,11 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
             IWebServiceClient webServiceClient =
                     createWebServiceClient(serviceUrl, keyStorePath, clientType);
 
+            ServiceObjectMapper serviceObjectMapper = new ServiceObjectMapper();
+
             return new JunitRestServiceRunnable(
                     webServiceClient, dataBlockingQueue, testCasesRequest,
-                    ecFeedExtensionStore);
+                    ecFeedExtensionStore, serviceObjectMapper);
         }
 
         String model = testCasesRequest.getModel();
@@ -105,10 +108,12 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
                         keyStorePath,
                         clientType);
 
+        ServiceObjectMapper serviceObjectMapper = new ServiceObjectMapper();
+
         return new JunitRestServiceRunnable(
                 webServiceClient,
                 dataBlockingQueue, testCasesRequest,
-                ecFeedExtensionStore);
+                ecFeedExtensionStore, serviceObjectMapper);
     }
 
     private Runnable createRunnableForAutoOrFileModel(ExtensionContext extensionContext, String model) {

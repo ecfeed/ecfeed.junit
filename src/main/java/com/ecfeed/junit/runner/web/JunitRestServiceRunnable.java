@@ -15,8 +15,8 @@ public final class JunitRestServiceRunnable extends BaseRestServiceRunnable {
 	
 	public JunitRestServiceRunnable(
 			IWebServiceClient webServiceClient, BlockingQueue<String> responseQueue,
-			TestCasesRequest request, EcFeedExtensionStore store) {
-		super(webServiceClient, request);
+			TestCasesRequest request, EcFeedExtensionStore store, ServiceObjectMapper serviceObjectMapper) {
+		super(webServiceClient, request, serviceObjectMapper);
 		
 		fResponseQueue = responseQueue;
 		fStore = store;
