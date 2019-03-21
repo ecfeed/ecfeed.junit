@@ -37,7 +37,6 @@ public class UserInputHelper {
 	
 	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, String modelPath, Optional<String> testName) throws GeneratorException {
 		RootNode model = loadEcFeedModelFromDirectory(modelPath);
-		
 		List<MethodNode> modelMethods = new ArrayList<>();
 		
 		for (ClassNode classNode : model.getClasses()) {
@@ -151,7 +150,13 @@ public class UserInputHelper {
 	private static boolean isMethodIdentical(Method test, Optional<String> remoteName, MethodNode model) {
 		
 		if (remoteName.isPresent()) {
+
+			if (test == null) {
+				return remoteName.get().equals(model.getLongSignature());
+			}
+
 			String nameModel =  ((ClassNode) model.getParent()).getFullName() + "." + model.getFullName();
+
 			return nameModel.equals(remoteName.get()) && isMethodParameterListIdentical(test, model);
 		}
 		
@@ -176,7 +181,7 @@ public class UserInputHelper {
 		return false;
 	}
 	
-	private static boolean isMethodParameterListIdentical(Method test, MethodNode model) { 
+	private static boolean isMethodParameterListIdentical(Method test, MethodNode model) {
 		Parameter[] parameterListTest = test.getParameters();
 		List<AbstractParameterNode> parameterListModel = model.getParameters();
 		

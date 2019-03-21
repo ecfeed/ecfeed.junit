@@ -56,7 +56,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 			case GEN_CARTESIAN :
 				fAlgorithm = new CartesianProductAlgorithm<>();
 				break;
-			case GEN_RAMDOM :
+			case GEN_RANDOM:
 				fAlgorithm = new RandomAlgorithm<>(Integer.parseInt(fRequest.getLength()), Boolean.parseBoolean(fRequest.getDuplicates()));
 				break;
 			case GEN_ADAPTIVE_RANDOM :

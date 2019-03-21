@@ -15,6 +15,12 @@ test {
     useJUnitPlatform()
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.ecfeed.junit.main.Main'
+    }
+}
+
 dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.61'
@@ -39,6 +45,10 @@ dependencies {
     implementation 'com.io7m.xom:xom:1.2.10'
     implementation 'dk.brics.automaton:automaton:1.11-8'
 
+    implementation 'org.springframework:spring-core:5.1.5.RELEASE'
+    implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
+
+
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 }
 
@@ -57,8 +67,12 @@ sourceSets {
 
 task jarWithDependencies(type: Jar) {
     classifier = 'ALL'
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest { attributes 'Main-Class': 'com.ecfeed.junit.main.Main' }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
+    {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
     }
     with jar
 }
