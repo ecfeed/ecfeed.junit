@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.ecfeed.core.utils.ExceptionHelper;
+import com.ecfeed.core.utils.SystemLogger;
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
 import com.ecfeed.junit.utils.Localization;
@@ -61,11 +62,6 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
         try {
             processTestStream(webServiceResponse.getResponseBufferedReader());
-
-        } catch (Exception e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestConnectionLost"), e);
-            exception.addSuppressed(e);
-            throw exception;
         } finally {
             closeBufferedReader(webServiceResponse.getResponseBufferedReader());
             closeClient();
@@ -76,26 +72,17 @@ public abstract class BaseRestServiceRunnable implements Runnable {
 
     private WebServiceResponse getServerResponse() {
 
-        String requestText = null;
+        String requestText;
 
         try {
             requestText = fMapper.writer().writeValueAsString(fRequest);
 
         } catch (JsonProcessingException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
-            exception.addSuppressed(e);
-            throw exception;
+            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
+            return null;
         }
 
-        try {
-            return fWebServiceClient.postRequest(fRequestType, requestText);
-
-        } catch (Exception e) {
-            // TODO - exception handling
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonConnectionException"), e);
-            exception.addSuppressed(e);
-            throw exception;
-        }
+        return fWebServiceClient.postRequest(fRequestType, requestText);
     }
 
     private void getServerUpdateResponse(BufferedReader responseBufferedReader) {
@@ -120,9 +107,8 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         try {
             requestText = fMapper.writer().writeValueAsString(fRequest);
         } catch (JsonProcessingException e) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestJsonProcessingException"), e);
-            exception.addSuppressed(e);
-            throw exception;
+            ExceptionHelper.reportRuntimeException("Cannot convert request to string.", e);
+            return;
         }
 
         WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
@@ -132,7 +118,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
     }
 
-    private void processTestStream(BufferedReader responseBufferedReader) throws IOException {
+    private void processTestStream(BufferedReader responseBufferedReader) {
 
         while (true) {
             if (processTestSuite(responseBufferedReader)) {
@@ -143,13 +129,12 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         }
     }
 
-    private boolean processTestSuite(BufferedReader responseBufferedReader) throws IOException {
+    private boolean processTestSuite(BufferedReader responseBufferedReader) {
 
-        String message;
+        String line;
 
-
-        while ((message = responseBufferedReader.readLine()) != null) {
-            consumeReceivedMessage(message);
+        while ((line = readLine(responseBufferedReader)) != null) {
+            consumeReceivedMessage(line);
 
             if (cancelExecution()) {
                 return true;
@@ -165,6 +150,16 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         return false;
     }
 
+    private String readLine(BufferedReader responseBufferedReader) {
+
+        try {
+            return responseBufferedReader.readLine();
+        } catch (IOException e) {
+            ExceptionHelper.reportRuntimeException("Cannot read line from response.", e);
+        }
+        return null;
+    }
+
     private void closeBufferedReader(BufferedReader responseBufferedReader) {
 
         if (responseBufferedReader == null) {
@@ -174,8 +169,7 @@ public abstract class BaseRestServiceRunnable implements Runnable {
         try {
             responseBufferedReader.close();
         } catch (IOException e) {
-            Exception exception = new Exception(Localization.bundle.getString("serviceRestConnctionCloseError"), e);
-            exception.addSuppressed(e);
+            SystemLogger.logCatch("Cannot close response stream.");
         }
     }
 
