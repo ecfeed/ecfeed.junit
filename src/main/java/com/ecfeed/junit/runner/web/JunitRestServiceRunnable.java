@@ -18,7 +18,6 @@ public class JunitRestServiceRunnable implements Runnable {
     private static final String REQUEST_CHUNK = "requestChunk";
     private static final String REQUEST_UPDATE = "requestUpdate";
 
-
     private IWebServiceClient fWebServiceClient;
     ServiceObjectMapper fServiceObjectMapper;
 
@@ -46,40 +45,37 @@ public class JunitRestServiceRunnable implements Runnable {
     final public void run() {
 
         try {
-            transferTestCasesFromWebServiceIntoQueue();
+            transferDataFromWebServiceToQueue();
         } finally {
             fWebServiceClient.close();
         }
     }
 
-    private void transferTestCasesFromWebServiceIntoQueue() {
+    private void transferDataFromWebServiceToQueue() {
 
-        tcProviderInitialize();
+        initialize();
 
         try {
-            BufferedReader responseBufferedReader =
-                    fTCProviderWebServiceResponse.getResponseBufferedReader();
-
             while (true) {
-                if (processTestSuite(responseBufferedReader)) {
+                if (processTestSuite()) {
                     insertEndOfDataIntoQueue();
                     break;
                 } else {
-                    getServerUpdateResponse(responseBufferedReader);
+                    getServerUpdateResponse();
                 }
             }
 
         } finally {
 
-            tcProviderClose();
+            closeReader();
         }
     }
 
-    private boolean processTestSuite(BufferedReader responseBufferedReader) {
+    private boolean processTestSuite() {
 
         String line;
 
-        while ((line = readLine(responseBufferedReader)) != null) {
+        while ((line = readLine(fTCProviderWebServiceResponse.getResponseBufferedReader())) != null) {
             insertMessageIntoQueue(line);
 
             if (cancelExecution()) {
@@ -96,7 +92,7 @@ public class JunitRestServiceRunnable implements Runnable {
         return false;
     }
 
-    private void tcProviderInitialize() {
+    private void initialize() {
 
         fTCProviderWebServiceResponse = getServerResponse(fRequestStr);
 
@@ -106,7 +102,7 @@ public class JunitRestServiceRunnable implements Runnable {
         }
     }
 
-    private void tcProviderClose() {
+    private void closeReader() {
         closeBufferedReader(fTCProviderWebServiceResponse.getResponseBufferedReader());
     }
 
@@ -115,9 +111,9 @@ public class JunitRestServiceRunnable implements Runnable {
         return fWebServiceClient.postRequest(fRequestType, requestText);
     }
 
-    private void getServerUpdateResponse(BufferedReader responseBufferedReader) {
+    private void getServerUpdateResponse() {
 
-        closeBufferedReader(responseBufferedReader);
+        closeBufferedReader(fTCProviderWebServiceResponse.getResponseBufferedReader());
 
         Object request = sendUpdatedRequest(); // TODO - are we sending anything here?
 

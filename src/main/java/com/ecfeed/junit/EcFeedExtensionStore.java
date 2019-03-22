@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.ecfeed.junit.message.schema.RequestUpdateErrorSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
 
-public final class EcFeedExtensionStore {
+public final class EcFeedExtensionStore { // TODO - rename ? does function match name ?
 	
 	private volatile String fStreamId = "";
 	private volatile String fTestId = "";
