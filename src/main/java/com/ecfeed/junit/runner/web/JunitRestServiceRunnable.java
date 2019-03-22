@@ -8,8 +8,8 @@ import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.SystemLogger;
 import com.ecfeed.core.utils.TestCasesRequest;
 import com.ecfeed.junit.EcFeedExtensionStore;
-import com.ecfeed.junit.message.schema.RequestChunkSchema;
-import com.ecfeed.junit.message.schema.RequestUpdateSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestChunkSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestUpdateSchema;
 
 
 public class JunitRestServiceRunnable implements Runnable {

@@ -2,8 +2,8 @@ package com.ecfeed.junit;
 
 import java.util.ArrayList;
 
-import com.ecfeed.junit.message.schema.RequestUpdateErrorSchema;
-import com.ecfeed.junit.message.schema.RequestUpdateSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestUpdateErrorSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestUpdateSchema;
 
 public final class EcFeedExtensionStore { // TODO - rename ? does function match name ?
 	

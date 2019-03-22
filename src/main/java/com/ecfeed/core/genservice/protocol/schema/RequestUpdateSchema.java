@@ -1,4 +1,4 @@
-package com.ecfeed.junit.message.schema;
+package com.ecfeed.core.genservice.protocol.schema;
 
 import java.util.ArrayList;
 

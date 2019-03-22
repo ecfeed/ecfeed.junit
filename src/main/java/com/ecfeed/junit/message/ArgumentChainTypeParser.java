@@ -11,8 +11,8 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.core.model.AbstractParameterNode;
 import com.ecfeed.core.model.ChoiceNode;
-import com.ecfeed.junit.message.schema.ChoiceSchema;
-import com.ecfeed.junit.message.schema.ResultTestSchema;
+import com.ecfeed.core.genservice.protocol.schema.ChoiceSchema;
+import com.ecfeed.core.genservice.protocol.schema.ResultTestSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 

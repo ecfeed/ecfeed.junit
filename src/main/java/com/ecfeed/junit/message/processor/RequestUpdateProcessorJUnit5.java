@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;
 import com.ecfeed.junit.message.ArgumentChainJUnit5;
-import com.ecfeed.junit.message.schema.RequestUpdateSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestUpdateSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 

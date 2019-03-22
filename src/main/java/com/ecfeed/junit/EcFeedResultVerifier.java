@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
-import com.ecfeed.junit.message.schema.RequestUpdateErrorSchema;
+import com.ecfeed.core.genservice.protocol.schema.RequestUpdateErrorSchema;
 
 public class EcFeedResultVerifier implements AfterTestExecutionCallback {
 
