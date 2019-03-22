@@ -10,8 +10,6 @@ import com.ecfeed.core.utils.TestCasesRequest;
 import com.ecfeed.junit.EcFeedExtensionStore;
 import com.ecfeed.junit.message.schema.RequestChunkSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
-import com.ecfeed.junit.utils.Localization;
-import com.ecfeed.junit.utils.Logger;
 
 
 public class JunitRestServiceRunnable implements Runnable {
@@ -30,13 +28,12 @@ public class JunitRestServiceRunnable implements Runnable {
     private volatile BlockingQueue<String> fResponseQueue;
     private volatile EcFeedExtensionStore fStore;
 
+    WebServiceResponse fTCProviderWebServiceResponse;
+
 
     public JunitRestServiceRunnable(
             IWebServiceClient webServiceClient, BlockingQueue<String> responseQueue,
-            TestCasesRequest request, EcFeedExtensionStore store, ServiceObjectMapper serviceObjectMapper)
-
-    {
-
+            TestCasesRequest request, EcFeedExtensionStore store, ServiceObjectMapper serviceObjectMapper) {
         fWebServiceClient = webServiceClient;
         fServiceObjectMapper = serviceObjectMapper;
         fRequestStr = fServiceObjectMapper.mapRequestToString(request);
@@ -45,77 +42,72 @@ public class JunitRestServiceRunnable implements Runnable {
         fStore = store;
     }
 
-    private void startLifeCycle() {
-        Logger.message("");
-    }
-
-    private void consumeReceivedMessage(String message) {
-        fResponseQueue.offer(message);
-    }
-
-    private void finishLifeCycle() {
-        fResponseQueue.offer("");
-    }
-
-    private boolean cancelExecution() {
-        return fStore.getTerminate();
-    }
-
-    private void waitForStreamEnd() {
-
-        while(fResponseQueue.size() > 0) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (fStore.getChunkProgress()) {
-            RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceRestFlagEndMissingError"));
-            Logger.exception(exception);
-            throw exception;
-        }
-
-    }
-
-    private Object sendUpdatedRequest() {
-        if (fStore.getCollectStats() && !fStore.getAcknowledge()) {
-            fStore.setAcknowledge(false);
-            return fStore.getTestResults();
-        }
-
-        RequestChunkSchema request = new RequestChunkSchema();
-        request.setId(fStore.getStreamId());
-
-        return request;
-    }
-
     @Override
     final public void run() {
 
-        startRestClient(fRequestStr);
+        try {
+            transferTestCasesFromWebServiceIntoQueue();
+        } finally {
+            fWebServiceClient.close();
+        }
     }
 
-    private void startRestClient(String requestText) {
+    private void transferTestCasesFromWebServiceIntoQueue() {
 
-        startLifeCycle();
-
-        WebServiceResponse webServiceResponse = getServerResponse(requestText);
-
-        if (!webServiceResponse.isResponseStatusOk()) {
-            ExceptionHelper.reportRuntimeException(
-                    "Request failed. Response status: " + webServiceResponse.getResponseStatus());
-        }
+        tcProviderInitialize();
 
         try {
-            processTestStream(webServiceResponse.getResponseBufferedReader());
+            BufferedReader responseBufferedReader =
+                    fTCProviderWebServiceResponse.getResponseBufferedReader();
+
+            while (true) {
+                if (processTestSuite(responseBufferedReader)) {
+                    insertEndOfDataIntoQueue();
+                    break;
+                } else {
+                    getServerUpdateResponse(responseBufferedReader);
+                }
+            }
+
         } finally {
-            closeBufferedReader(webServiceResponse.getResponseBufferedReader());
-            closeClient();
+
+            tcProviderClose();
+        }
+    }
+
+    private boolean processTestSuite(BufferedReader responseBufferedReader) {
+
+        String line;
+
+        while ((line = readLine(responseBufferedReader)) != null) {
+            insertMessageIntoQueue(line);
+
+            if (cancelExecution()) {
+                return true;
+            }
         }
 
-        finishLifeCycle();
+        waitForStreamEnd();
+
+        if (cancelExecution()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void tcProviderInitialize() {
+
+        fTCProviderWebServiceResponse = getServerResponse(fRequestStr);
+
+        if (!fTCProviderWebServiceResponse.isResponseStatusOk()) {
+            ExceptionHelper.reportRuntimeException(
+                    "Request failed. Response status: " + fTCProviderWebServiceResponse.getResponseStatus());
+        }
+    }
+
+    private void tcProviderClose() {
+        closeBufferedReader(fTCProviderWebServiceResponse.getResponseBufferedReader());
     }
 
     private WebServiceResponse getServerResponse(String requestText) {
@@ -142,6 +134,19 @@ public class JunitRestServiceRunnable implements Runnable {
         }
     }
 
+    private Object sendUpdatedRequest() {
+
+        if (fStore.getCollectStats() && !fStore.getAcknowledge()) {
+            fStore.setAcknowledge(false);
+            return fStore.getTestResults();
+        }
+
+        RequestChunkSchema request = new RequestChunkSchema();
+        request.setId(fStore.getStreamId());
+
+        return request;
+    }
+
     private String getRequestType(Object request) {
         String requestType;
 
@@ -154,38 +159,6 @@ public class JunitRestServiceRunnable implements Runnable {
             return null;
         }
         return requestType;
-    }
-
-    private void processTestStream(BufferedReader responseBufferedReader) {
-
-        while (true) {
-            if (processTestSuite(responseBufferedReader)) {
-                break;
-            } else {
-                getServerUpdateResponse(responseBufferedReader);
-            }
-        }
-    }
-
-    private boolean processTestSuite(BufferedReader responseBufferedReader) {
-
-        String line;
-
-        while ((line = readLine(responseBufferedReader)) != null) {
-            consumeReceivedMessage(line);
-
-            if (cancelExecution()) {
-                return true;
-            }
-        }
-
-        waitForStreamEnd();
-
-        if (cancelExecution()) {
-            return true;
-        }
-
-        return false;
     }
 
     private String readLine(BufferedReader responseBufferedReader) {
@@ -211,9 +184,32 @@ public class JunitRestServiceRunnable implements Runnable {
         }
     }
 
-    private void closeClient() {
+    private void insertMessageIntoQueue(String message) {
+        fResponseQueue.offer(message);
+    }
 
-        fWebServiceClient.close();
+    private void insertEndOfDataIntoQueue() {
+        final String END_OF_DATA = "";
+        fResponseQueue.offer(END_OF_DATA);
+    }
+
+    private boolean cancelExecution() {
+        return fStore.getTerminate();
+    }
+
+    private void waitForStreamEnd() {
+
+        while (fResponseQueue.size() > 0) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (fStore.getChunkProgress()) {
+            ExceptionHelper.reportRuntimeException("Missing end flag.");
+        }
     }
 
 }

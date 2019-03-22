@@ -1,6 +1,6 @@
 package com.ecfeed.junit.utils;
 
-public final class Logger {
+public final class Logger { // TODO - REMOVE AND USE SystemLogger
 
 	volatile private static boolean printToStream = true;
 	
