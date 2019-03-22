@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.FixedChoiceValueFactory;
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
 import com.ecfeed.junit.message.schema.ChoiceSchema;
 import com.ecfeed.junit.message.schema.RequestUpdateSchema;
 import com.ecfeed.junit.message.schema.ResultErrorSchema;
@@ -30,7 +31,7 @@ public final class MessageHelper {
 	
 	public static String resultStartDataSchema(String sessionId, boolean collectStats) {
 		ResultStatusSchema result = new ResultStatusSchema();
-		result.setStatus("BEG_DATA");
+		result.setStatus(GenServiceProtocolHelper.TAG_BEG_DATA);
 		result.setId(sessionId);
 		result.setCollectStats(collectStats);
 
@@ -46,7 +47,7 @@ public final class MessageHelper {
 	
 	public static String resultStartChunkSchema(String sessionId) {
 		ResultStatusSchema result = new ResultStatusSchema();
-		result.setStatus("BEG_CHUNK");
+		result.setStatus(GenServiceProtocolHelper.TAG_BEG_CHUNK);
 		result.setId(sessionId);
 
 		try {
@@ -61,7 +62,7 @@ public final class MessageHelper {
 	
 	public static String resultEndDataSchema(String sessionId) {
 		ResultStatusSchema result = new ResultStatusSchema();
-		result.setStatus("END_DATA");
+		result.setStatus(GenServiceProtocolHelper.TAG_END_DATA);
 		result.setId(sessionId);
 
 		try {
@@ -76,7 +77,7 @@ public final class MessageHelper {
 	
 	public static String resultEndChunkSchema() {
 		ResultStatusSchema result = new ResultStatusSchema();
-		result.setStatus("END_CHUNK");
+		result.setStatus(GenServiceProtocolHelper.TAG_END_CHUNK);
 
 		try {
 			return fMapper.writeValueAsString(result);
@@ -118,7 +119,7 @@ public final class MessageHelper {
 	
 	public static String resultAcknowledgeSchema() {
 		ResultStatusSchema result = new ResultStatusSchema();
-		result.setStatus("ACKNOWLEDGED");
+		result.setStatus(GenServiceProtocolHelper.TAG_ACKNOWLEDGED);
 		
 		try {
 			return fMapper.writeValueAsString(result);

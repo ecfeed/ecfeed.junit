@@ -3,6 +3,7 @@ package com.ecfeed.junit.message.processor;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;
@@ -33,16 +34,16 @@ public final class ResultStatusProcessorJUnit5 implements ArgumentChainJUnit5 {
 		try {
 			ResultStatusSchema response = fMapper.reader().forType(ResultStatusSchema.class).readValue(json);
 				
-			if (response.getStatus().equals("BEG_DATA")) {
+			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_BEG_DATA)) {
 				fStore.setStreamId(response.getId());
 				fStore.setCollectStats(response.getCollectStats());
 			}
 				
-			if (response.getStatus().equals("END_DATA")) {
+			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_END_DATA)) {
 				fStore.setTerminate(true);
 			}
 				
-			if (response.getStatus().equals("BEG_CHUNK")) {
+			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_BEG_CHUNK)) {
 				
 				if (response.getId().equals(fStore.getStreamId())) {
 					fStore.setChunkProgress(true);
@@ -55,11 +56,11 @@ public final class ResultStatusProcessorJUnit5 implements ArgumentChainJUnit5 {
 				
 			}
 				
-			if (response.getStatus().equals("END_CHUNK")) {
+			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_END_CHUNK)) {
 				fStore.setChunkProgress(false);
 			}
 			
-			if (response.getStatus().equals("ACKNOWLEDGED")) {
+			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_ACKNOWLEDGED)) {
 				fStore.setAcknowledge(true);
 			}
 			
