@@ -11,7 +11,7 @@ import com.ecfeed.core.genservice.protocol.schema.ResultErrorSchema;
 import com.ecfeed.core.genservice.protocol.schema.ResultInfoSchema;
 import com.ecfeed.core.genservice.protocol.schema.ResultProgressSchema;
 import com.ecfeed.core.genservice.protocol.schema.ResultStatusSchema;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestSchema;
+import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
 import com.ecfeed.core.genservice.protocol.schema.ResultTotalProgressSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
@@ -173,7 +173,7 @@ public final class MessageHelper {
 	}
 	
 	public static String resultTestSchema(List<ChoiceNode> tuple, String parameterId) {
-		ResultTestSchema result = new ResultTestSchema();
+		ResultTestCaseSchema result = new ResultTestCaseSchema();
 		
 		ChoiceSchema[] parameter = new ChoiceSchema[tuple.size()];
 		

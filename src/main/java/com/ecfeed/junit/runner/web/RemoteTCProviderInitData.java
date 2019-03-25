@@ -1,14 +1,18 @@
 package com.ecfeed.junit.runner.web;
 
+import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.provider.ITCProviderInitData;
 
 public class RemoteTCProviderInitData implements ITCProviderInitData {
 
-    public RemoteTCProviderInitData(String requestTypeArg, String requestTextArg) {
+    public MethodNode methodNode;
+    public String requestType;
+    public String requestText;
+
+    public RemoteTCProviderInitData(MethodNode methodNodeArg, String requestTypeArg, String requestTextArg) {
+        methodNode = methodNodeArg;
         requestType = requestTypeArg;
         requestText = requestTextArg;
     }
 
-    public String requestType;
-    public String requestText;
 }

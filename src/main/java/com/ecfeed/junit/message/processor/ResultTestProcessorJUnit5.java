@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;
 import com.ecfeed.junit.message.ArgumentChainJUnit5;
 import com.ecfeed.junit.message.ArgumentChainTypeParser;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestSchema;
+import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 
@@ -29,7 +30,7 @@ public final class ResultTestProcessorJUnit5 implements ArgumentChainJUnit5 {
 	public Optional<Arguments> process(String json) {
 		
 		try {
-			ResultTestSchema response = fMapper.reader().forType(ResultTestSchema.class).readValue(json);
+			ResultTestCaseSchema response = GenServiceProtocolHelper.parseTestCase(json);
 			
 			if (!fStore.getChunkProgress()) {
 				RuntimeException exception = new RuntimeException(Localization.bundle.getString("argumentChainFlagStartMissingError"));
@@ -47,7 +48,7 @@ public final class ResultTestProcessorJUnit5 implements ArgumentChainJUnit5 {
 		}
 		
 	}
-	
+
 	@Override
 	public String toString( ) {
 		return getClass().getSimpleName();

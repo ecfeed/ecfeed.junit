@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import com.ecfeed.core.model.AbstractParameterNode;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.genservice.protocol.schema.ChoiceSchema;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestSchema;
+import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 
@@ -24,7 +24,7 @@ public final class ArgumentChainTypeParser {
 		throw exception;
 	}
 	
-	public static Optional<Arguments> parseJUnit5(ResultTestSchema jsonResult, Parameter[] parameters) {
+	public static Optional<Arguments> parseJUnit5(ResultTestCaseSchema jsonResult, Parameter[] parameters) {
 		
 		validateArguments(jsonResult, Arrays.asList(parameters));
 		
@@ -38,7 +38,7 @@ public final class ArgumentChainTypeParser {
 		return Optional.of(Arguments.of(arguments));
 	}
 	
-	public static Optional<List<ChoiceNode>> parseRap(ResultTestSchema jsonResult, List<AbstractParameterNode> parameters) {
+	public static Optional<List<ChoiceNode>> parseRap(ResultTestCaseSchema jsonResult, List<AbstractParameterNode> parameters) {
 		
 		validateArguments(jsonResult, parameters);
 		
@@ -54,7 +54,7 @@ public final class ArgumentChainTypeParser {
 		return Optional.of(arguments);
 	}
 	
-	private static void validateArguments(ResultTestSchema jsonResult, List<?> parameters) {
+	private static void validateArguments(ResultTestCaseSchema jsonResult, List<?> parameters) {
 		
 		if (jsonResult == null || jsonResult.getTestCase() == null) {
 			RuntimeException exception = new NullPointerException(Localization.bundle.getString("argumentChainTypeParserEmptyArgumentListError"));

@@ -3,6 +3,8 @@ package com.ecfeed.junit.message.processor;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.message.ArgumentChainJUnit5;
@@ -28,16 +30,15 @@ public class ResultInfoProcessorJUnit5 implements ArgumentChainJUnit5 {
 		}
 		
 		try {
-			ResultInfoSchema infoMessage = fMapper.reader().forType(ResultInfoSchema.class).readValue(json);
+			ResultInfoSchema infoMessage = GenServiceProtocolHelper.parseInfo(json);
 			
 			Logger.message(Localization.bundle.getString("argumentChainJsonDataInfo") + " " + infoMessage);
 			return Optional.empty();
 		} catch (IOException e) {
 			return fChain.process(json);
 		}
-		
 	}
-	
+
 	@Override
 	public String toString( ) {
 		return getClass().getSimpleName();

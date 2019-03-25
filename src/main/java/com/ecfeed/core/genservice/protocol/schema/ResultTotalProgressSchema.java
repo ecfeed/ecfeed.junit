@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResultTotalProgressSchema {
+public class ResultTotalProgressSchema implements IMainSchema {
 
 	private int totalProgress;
 	

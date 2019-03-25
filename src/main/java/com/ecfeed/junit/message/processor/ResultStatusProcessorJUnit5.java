@@ -32,7 +32,7 @@ public final class ResultStatusProcessorJUnit5 implements ArgumentChainJUnit5 {
 		}
 		
 		try {
-			ResultStatusSchema response = fMapper.reader().forType(ResultStatusSchema.class).readValue(json);
+			ResultStatusSchema response = GenServiceProtocolHelper.parseStatus(json);
 				
 			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_BEG_DATA)) {
 				fStore.setStreamId(response.getId());
@@ -71,7 +71,7 @@ public final class ResultStatusProcessorJUnit5 implements ArgumentChainJUnit5 {
 		}
 		
 	}
-	
+
 	@Override
 	public String toString( ) {
 		return getClass().getSimpleName();

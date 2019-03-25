@@ -6,12 +6,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResultTestSchema {
+public class ResultTestCaseSchema implements IMainSchema {
+
+	// TODO - add field annotations (now renaming a method or field results in parsing exception) - also similar classes.
 
 	private String id;
 	private ChoiceSchema[] testCase;
 
-	public ResultTestSchema() {};
+	public ResultTestCaseSchema() {};
 	
 	public ChoiceSchema[] getTestCase() {
 		return testCase;

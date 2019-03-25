@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResultStatusSchema {
+public class ResultStatusSchema implements IMainSchema {
 	
 	private String id;
 	private String status;
