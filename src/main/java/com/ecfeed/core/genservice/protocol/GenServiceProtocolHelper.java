@@ -30,4 +30,40 @@ public class GenServiceProtocolHelper {
         return mapper.reader().forType(ResultInfoSchema.class).readValue(json);
     }
 
+    public static boolean isTagBegData(String tag) {
+
+        if (tag.equals(TAG_BEG_DATA)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isTagBegChunk(String tag) {
+
+        if (tag.equals(TAG_BEG_CHUNK)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isTagEndChunk(String tag) {
+
+        if (tag.equals(TAG_END_CHUNK)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isTagEndData(String tag) {
+
+        if (tag.equals(TAG_END_DATA)) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

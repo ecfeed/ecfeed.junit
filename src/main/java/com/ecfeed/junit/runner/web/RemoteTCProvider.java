@@ -1,9 +1,8 @@
 package com.ecfeed.junit.runner.web;
 
-import com.ecfeed.core.genservice.protocol.schema.ChoiceSchema;
-import com.ecfeed.core.genservice.protocol.schema.IMainSchema;
-import com.ecfeed.core.genservice.protocol.schema.MainSchemaParser;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.GenServiceProtocolState;
+import com.ecfeed.core.genservice.protocol.schema.*;
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.provider.ITCProvider;
 import com.ecfeed.core.provider.ITCProviderInitData;
@@ -16,11 +15,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO - move to genservice package
+
 public class RemoteTCProvider implements ITCProvider {
 
     IWebServiceClient fWebServiceClient;
     WebServiceResponse fWebServiceResponse;
     MethodNode fMethodNode;
+    GenServiceProtocolState fGenServiceProtocolState;
+
 
     public RemoteTCProvider(IWebServiceClient webServiceClient) {
         fWebServiceClient = webServiceClient;
@@ -40,6 +43,8 @@ public class RemoteTCProvider implements ITCProvider {
             ExceptionHelper.reportRuntimeException(
                     "Request failed. Response status: " + fWebServiceResponse.getResponseStatus());
         }
+
+        fGenServiceProtocolState = GenServiceProtocolState.AFTER_INITIALIZE;
     }
 
     private String readLine(BufferedReader responseBufferedReader) {
@@ -70,6 +75,8 @@ public class RemoteTCProvider implements ITCProvider {
         return fMethodNode;
     }
 
+    // TODO - ADD totalProgress and progress
+
     @Override
     public TestCaseNode getNextTestCase() throws Exception {
 
@@ -77,16 +84,128 @@ public class RemoteTCProvider implements ITCProvider {
 
             String line = readLine(fWebServiceResponse.getResponseBufferedReader());
 
+            System.out.println(line);
+
             if (line == null) {
                 return null;
             }
 
             IMainSchema mainSchema = MainSchemaParser.parse(line);
 
+            fGenServiceProtocolState = processProtocolState(mainSchema, fGenServiceProtocolState);
+
+            if (fGenServiceProtocolState == GenServiceProtocolState.AFTER_END_DATA) {
+                return null;
+            }
+
             if (mainSchema instanceof ResultTestCaseSchema) {
                 return createTestCase((ResultTestCaseSchema)mainSchema);
             }
         }
+    }
+
+    private static GenServiceProtocolState processProtocolState(
+            IMainSchema mainSchema,
+            GenServiceProtocolState currentGenServiceProtocolState) {
+
+        if (mainSchema instanceof ResultInfoSchema) {
+            return currentGenServiceProtocolState;
+        }
+
+        if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_INITIALIZE) {
+            return processStateAfterInitialize(mainSchema);
+        }
+
+        if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_BEG_DATA) {
+            return processStateAfterBegData(mainSchema);
+        }
+
+        if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_BEG_CHUNK) {
+            return processStateAfterBegChunk(mainSchema);
+        }
+
+        if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_END_CHUNK) {
+            return processStateAfterEndChunk(mainSchema);
+        }
+
+        ExceptionHelper.reportRuntimeException("Invalid protocol state.");
+        return null;
+    }
+
+    private static GenServiceProtocolState processStateAfterInitialize(IMainSchema mainSchema) {
+
+        if (!(mainSchema instanceof ResultStatusSchema)) {
+            ExceptionHelper.reportRuntimeException("Status line expected.");
+        }
+
+        ResultStatusSchema resultStatusSchema = (ResultStatusSchema)mainSchema;
+
+        String status = resultStatusSchema.getStatus();
+
+        if (!GenServiceProtocolHelper.isTagBegData(status)) {
+            ExceptionHelper.reportRuntimeException("Expected status: " + GenServiceProtocolHelper.TAG_BEG_DATA);
+        }
+
+        return GenServiceProtocolState.AFTER_BEG_DATA;
+    }
+
+    private static GenServiceProtocolState processStateAfterBegData(
+            IMainSchema mainSchema) {
+
+        if (!(mainSchema instanceof ResultStatusSchema)) {
+            ExceptionHelper.reportRuntimeException("Status line expected.");
+        }
+
+        ResultStatusSchema resultStatusSchema = (ResultStatusSchema)mainSchema;
+
+        String status = resultStatusSchema.getStatus();
+
+        if (!GenServiceProtocolHelper.isTagBegChunk(status)) {
+            ExceptionHelper.reportRuntimeException("Expected status: " + GenServiceProtocolHelper.TAG_BEG_CHUNK);
+        }
+
+        return GenServiceProtocolState.AFTER_BEG_CHUNK;
+    }
+
+    private static GenServiceProtocolState processStateAfterBegChunk(
+            IMainSchema mainSchema) {
+
+        if (mainSchema instanceof ResultTestCaseSchema) {
+            return GenServiceProtocolState.AFTER_BEG_CHUNK;
+        }
+
+        if (mainSchema instanceof ResultStatusSchema) {
+
+            ResultStatusSchema resultStatusSchema = (ResultStatusSchema)mainSchema;
+
+            String status = resultStatusSchema.getStatus();
+
+            if (!GenServiceProtocolHelper.isTagEndChunk(status)) {
+                ExceptionHelper.reportRuntimeException("Expected status: " + GenServiceProtocolHelper.TAG_END_CHUNK);
+            }
+
+            return GenServiceProtocolState.AFTER_END_CHUNK;
+        }
+
+        ExceptionHelper.reportRuntimeException("Invalid command line.");
+        return null;
+    }
+
+    private static GenServiceProtocolState processStateAfterEndChunk(IMainSchema mainSchema) {
+
+        if (!(mainSchema instanceof ResultStatusSchema)) {
+            ExceptionHelper.reportRuntimeException("Status line expected.");
+        }
+
+        ResultStatusSchema resultStatusSchema = (ResultStatusSchema)mainSchema;
+
+        String status = resultStatusSchema.getStatus();
+
+        if (!GenServiceProtocolHelper.isTagEndData(status)) {
+            ExceptionHelper.reportRuntimeException("Expected status: " + GenServiceProtocolHelper.TAG_END_DATA);
+        }
+
+        return GenServiceProtocolState.AFTER_END_DATA;
     }
 
     private TestCaseNode createTestCase(ResultTestCaseSchema testCaseSchema) {
