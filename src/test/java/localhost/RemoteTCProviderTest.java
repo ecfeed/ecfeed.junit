@@ -9,6 +9,7 @@ import com.ecfeed.junit.runner.web.GenWebServiceClient;
 import com.ecfeed.junit.runner.web.RemoteTCProvider;
 import com.ecfeed.junit.runner.web.IWebServiceClient;
 import com.ecfeed.junit.runner.web.RemoteTCProviderInitData;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,24 +19,55 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class RemoteTCProviderTest {
 
+    TestProgressMonitor fEcfProgressMonitor;
+
     @Test
-    public void testTCP() {
+    @DisplayName("testGenerator")
+    public void testGenerator() {
 
         try {
-            runTestTCP();
+            runGeneratorTest();
         } catch (Exception e) {
             fail();
         }
     }
 
-    private void runTestTCP() throws Exception {
+    private void runGeneratorTest() throws Exception {
 
         MethodNode methodNode = getMethodNode();
 
-        RemoteTCProvider remoteTCProvider = createTCProvider(methodNode);
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
+
+        RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
 
         try {
-            getAndCheckTestCases(remoteTCProvider);
+            getAndCheckGeneratedTestCases(remoteTCProvider);
+        } finally {
+            remoteTCProvider.close();
+        }
+    }
+
+    @Test
+    @DisplayName("testStatic")
+    public void testStatic() {
+
+        try {
+            runStaticTest();
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    private void runStaticTest() throws Exception {
+
+        MethodNode methodNode = getMethodNode();
+
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
+
+        RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
+
+        try {
+            getAndCheckStaticTestCases(remoteTCProvider);
         } finally {
             remoteTCProvider.close();
         }
@@ -51,24 +83,22 @@ public class RemoteTCProviderTest {
         return methodNode;
     }
 
-    private RemoteTCProvider createTCProvider(MethodNode methodNode) throws Exception {
+    private RemoteTCProvider createTCProvider(MethodNode methodNode, String requestText) throws Exception {
 
         IWebServiceClient webServiceClient = createWebServiceClient();
         RemoteTCProvider remoteTCProvider = new RemoteTCProvider(webServiceClient);
 
-        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
-
         RemoteTCProviderInitData remoteTCProviderInitData =
                 new RemoteTCProviderInitData(methodNode, "requestData", requestText);
 
-        EcfProgressMonitor ecfProgressMonitor = new EcfProgressMonitor();
+        fEcfProgressMonitor = new TestProgressMonitor();
 
-        remoteTCProvider.initialize(remoteTCProviderInitData, ecfProgressMonitor);
+        remoteTCProvider.initialize(remoteTCProviderInitData, fEcfProgressMonitor);
 
         return remoteTCProvider;
     }
 
-    private void getAndCheckTestCases(RemoteTCProvider remoteTCProvider) throws Exception {
+    private void getAndCheckGeneratedTestCases(RemoteTCProvider remoteTCProvider) throws Exception {
 
         int counter = 0;
 
@@ -85,6 +115,27 @@ public class RemoteTCProviderTest {
         }
 
         assertEquals(4, counter);
+    }
+
+    private void getAndCheckStaticTestCases(RemoteTCProvider remoteTCProvider) throws Exception {
+
+        int counter = 0;
+
+        while (true) {
+
+            TestCaseNode testCaseNode = remoteTCProvider.getNextTestCase();
+
+            if (testCaseNode == null) {
+                break;
+            }
+
+            counter++;
+            checkTestCase(testCaseNode);
+        }
+
+        assertEquals(4, counter);
+        assertEquals(4, fEcfProgressMonitor.getTotalProgress());
+        assertEquals(true, fEcfProgressMonitor.wasEndTask());
     }
 
     private void checkTestCase(TestCaseNode testCaseNode) {
@@ -138,16 +189,19 @@ public class RemoteTCProviderTest {
                 "1.0");
     }
 
-    private static class EcfProgressMonitor implements IEcfProgressMonitor {
+    private static class TestProgressMonitor implements IEcfProgressMonitor {
+
+        int fTotalProgress = 0;
+        boolean fWasEndTask = false;
 
         @Override
         public void setTaskBegin(String name, int totalProgress) {
-
+            fTotalProgress = totalProgress;
         }
 
         @Override
         public void setTaskEnd() {
-
+            fWasEndTask = true;
         }
 
         @Override
@@ -158,6 +212,14 @@ public class RemoteTCProviderTest {
         @Override
         public boolean isCanceled() {
             return false;
+        }
+
+        public int getTotalProgress() {
+            return fTotalProgress;
+        }
+
+        public boolean wasEndTask() {
+            return fWasEndTask;
         }
     }
 }

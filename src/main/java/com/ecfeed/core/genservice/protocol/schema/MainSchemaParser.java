@@ -26,6 +26,16 @@ public class MainSchemaParser {
             return result;
         }
 
+        result = parseTotalProgress(json);
+        if (result != null) {
+            return result;
+        }
+
+        result = parseProgress(json);
+        if (result != null) {
+            return result;
+        }
+
         ExceptionHelper.reportRuntimeException("Can not parse json.");
         return null;
     }
@@ -52,6 +62,24 @@ public class MainSchemaParser {
 
         try {
             return GenServiceProtocolHelper.parseInfo(json);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static IMainSchema parseTotalProgress(String json) {
+
+        try {
+            return GenServiceProtocolHelper.parseTotalProgress(json);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static IMainSchema parseProgress(String json) {
+
+        try {
+            return GenServiceProtocolHelper.parseProgress(json);
         } catch (IOException e) {
             return null;
         }

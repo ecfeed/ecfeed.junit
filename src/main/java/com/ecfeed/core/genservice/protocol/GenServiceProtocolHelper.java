@@ -1,11 +1,11 @@
 package com.ecfeed.core.genservice.protocol;
 
-import com.ecfeed.core.genservice.protocol.schema.ResultInfoSchema;
-import com.ecfeed.core.genservice.protocol.schema.ResultStatusSchema;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
+import com.ecfeed.core.genservice.protocol.schema.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+
+import static com.ecfeed.junit.message.ArgumentChainJUnit5.fMapper;
 
 public class GenServiceProtocolHelper {
 
@@ -28,6 +28,16 @@ public class GenServiceProtocolHelper {
     public static ResultInfoSchema parseInfo(String json) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.reader().forType(ResultInfoSchema.class).readValue(json);
+    }
+
+    public static ResultTotalProgressSchema parseTotalProgress(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.reader().forType(ResultTotalProgressSchema.class).readValue(json);
+    }
+
+    public static ResultProgressSchema parseProgress(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.reader().forType(ResultProgressSchema.class).readValue(json);
     }
 
     public static boolean isTagBegData(String tag) {

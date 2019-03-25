@@ -19,14 +19,19 @@ import java.util.List;
 
 public class RemoteTCProvider implements ITCProvider {
 
-    IWebServiceClient fWebServiceClient;
-    WebServiceResponse fWebServiceResponse;
-    MethodNode fMethodNode;
-    GenServiceProtocolState fGenServiceProtocolState;
+    private static final int PROGRESS_UNKNOWN = -1;
+    private IWebServiceClient fWebServiceClient;
+    private WebServiceResponse fWebServiceResponse;
+    private MethodNode fMethodNode;
+    private GenServiceProtocolState fGenServiceProtocolState;
+    private IEcfProgressMonitor fEcfProgressMonitor;
+    private String fBufferedLine;
+    private int fTotalProgress;
 
 
     public RemoteTCProvider(IWebServiceClient webServiceClient) {
         fWebServiceClient = webServiceClient;
+        fGenServiceProtocolState = GenServiceProtocolState.BEFORE_BEG_DATA;
     }
 
     @Override
@@ -35,6 +40,9 @@ public class RemoteTCProvider implements ITCProvider {
         RemoteTCProviderInitData remoteTCProviderInitData = (RemoteTCProviderInitData)initData;
         String requestType = remoteTCProviderInitData.requestType;
         String requestText = remoteTCProviderInitData.requestText;
+
+        fEcfProgressMonitor = progressMonitor;
+
         fMethodNode = remoteTCProviderInitData.methodNode;
 
         fWebServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
@@ -44,17 +52,11 @@ public class RemoteTCProvider implements ITCProvider {
                     "Request failed. Response status: " + fWebServiceResponse.getResponseStatus());
         }
 
-        fGenServiceProtocolState = GenServiceProtocolState.AFTER_INITIALIZE;
-    }
+        fTotalProgress = PROGRESS_UNKNOWN;
 
-    private String readLine(BufferedReader responseBufferedReader) {
+        processInitialTags();
 
-        try {
-            return responseBufferedReader.readLine();
-        } catch (IOException e) {
-            ExceptionHelper.reportRuntimeException("Cannot read line from response.", e);
-        }
-        return null;
+        fEcfProgressMonitor.setTaskBegin("Remote test cases provider", fTotalProgress);
     }
 
     @Override
@@ -87,14 +89,19 @@ public class RemoteTCProvider implements ITCProvider {
             System.out.println(line);
 
             if (line == null) {
-                return null;
+                ExceptionHelper.reportRuntimeException("Truncated data from remote testcases provider."); // TODO
             }
 
             IMainSchema mainSchema = MainSchemaParser.parse(line);
 
+            if (processProgress(mainSchema)) {
+                continue;
+            }
+
             fGenServiceProtocolState = processProtocolState(mainSchema, fGenServiceProtocolState);
 
             if (fGenServiceProtocolState == GenServiceProtocolState.AFTER_END_DATA) {
+                fEcfProgressMonitor.setTaskEnd();
                 return null;
             }
 
@@ -102,6 +109,96 @@ public class RemoteTCProvider implements ITCProvider {
                 return createTestCase((ResultTestCaseSchema)mainSchema);
             }
         }
+    }
+
+    @Override
+    public boolean canCalculateProgress() {
+
+        verifyProtocolStateForProgress();
+        // TODO
+        return false;
+    }
+
+    @Override
+    public int getTotalProgress() {
+
+        verifyProtocolStateForProgress();
+        // TODO
+        return 0;
+    }
+
+    @Override
+    public int getActualProgress() {
+
+        verifyProtocolStateForProgress();
+        // TODO
+        return 0;
+    }
+
+
+    public void processInitialTags() throws Exception {
+
+        fBufferedLine = null;
+
+        while(true) {
+
+            String line = readLine(fWebServiceResponse.getResponseBufferedReader());
+
+            System.out.println(line);
+
+            if (line == null) {
+                ExceptionHelper.reportRuntimeException("Truncated data from remote testcases provider."); // TODO
+            }
+
+            IMainSchema mainSchema = MainSchemaParser.parse(line);
+
+            if (processProgress(mainSchema)) {
+                continue;
+            }
+
+            fGenServiceProtocolState = processProtocolState(mainSchema, fGenServiceProtocolState);
+
+            if (mainSchema instanceof ResultTestCaseSchema) {
+                fBufferedLine = line;
+                return;
+            }
+        }
+    }
+
+    private String readLine(BufferedReader responseBufferedReader) {
+
+        if (fBufferedLine != null) {
+            String tmpLine = new String(fBufferedLine);
+            fBufferedLine = null;
+            return tmpLine;
+        }
+
+        try {
+            return responseBufferedReader.readLine();
+        } catch (IOException e) {
+            ExceptionHelper.reportRuntimeException("Cannot read line from response.", e);
+        }
+
+        return null;
+    }
+
+    private boolean processProgress(IMainSchema mainSchema) {
+
+        if (mainSchema instanceof ResultTotalProgressSchema) {
+
+            ResultTotalProgressSchema resultTotalProgressSchema = (ResultTotalProgressSchema)mainSchema;
+            fTotalProgress = resultTotalProgressSchema.getTotalProgress();
+            return true;
+        }
+
+        if (mainSchema instanceof ResultProgressSchema) {
+
+            ResultProgressSchema resultProgressSchema = (ResultProgressSchema)mainSchema;
+            fEcfProgressMonitor.setCurrentProgress(resultProgressSchema.getProgress());
+            return true;
+        }
+
+        return false;
     }
 
     private static GenServiceProtocolState processProtocolState(
@@ -112,8 +209,8 @@ public class RemoteTCProvider implements ITCProvider {
             return currentGenServiceProtocolState;
         }
 
-        if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_INITIALIZE) {
-            return processStateAfterInitialize(mainSchema);
+        if (currentGenServiceProtocolState == GenServiceProtocolState.BEFORE_BEG_DATA) {
+            return processStateBeforeBegData(mainSchema);
         }
 
         if (currentGenServiceProtocolState == GenServiceProtocolState.AFTER_BEG_DATA) {
@@ -132,7 +229,7 @@ public class RemoteTCProvider implements ITCProvider {
         return null;
     }
 
-    private static GenServiceProtocolState processStateAfterInitialize(IMainSchema mainSchema) {
+    private static GenServiceProtocolState processStateBeforeBegData(IMainSchema mainSchema) {
 
         if (!(mainSchema instanceof ResultStatusSchema)) {
             ExceptionHelper.reportRuntimeException("Status line expected.");
@@ -231,19 +328,12 @@ public class RemoteTCProvider implements ITCProvider {
         return new TestCaseNode(choiceNodes);
     }
 
-    @Override
-    public boolean canCalculateProgress() {
-        return false;
-    }
+    private void verifyProtocolStateForProgress() {
 
-    @Override
-    public int getTotalProgress() {
-        return 0;
+        if (fGenServiceProtocolState == GenServiceProtocolState.BEFORE_BEG_DATA
+                || fGenServiceProtocolState == GenServiceProtocolState.AFTER_BEG_DATA) {
+            ExceptionHelper.reportRuntimeException("Can not calculate progress.");
+        }
     }
-
-    @Override
-    public int getActualProgress() {
-        return 0;
-    } // TODO - move to another package
 
 }
