@@ -56,6 +56,10 @@ public class RemoteTCProvider implements ITCProvider {
 
         processInitialTags();
 
+        if (fEcfProgressMonitor.isCanceled()) {
+            return;
+        }
+
         fEcfProgressMonitor.setTaskBegin("Remote test cases provider", fTotalProgress);
     }
 
@@ -77,12 +81,14 @@ public class RemoteTCProvider implements ITCProvider {
         return fMethodNode;
     }
 
-    // TODO - ADD totalProgress and progress
-
     @Override
     public TestCaseNode getNextTestCase() throws Exception {
 
         while(true) {
+
+            if (fEcfProgressMonitor.isCanceled()) {
+                return null;
+            }
 
             String line = readLine(fWebServiceResponse.getResponseBufferedReader());
 
@@ -111,36 +117,15 @@ public class RemoteTCProvider implements ITCProvider {
         }
     }
 
-    @Override
-    public boolean canCalculateProgress() {
-
-        verifyProtocolStateForProgress();
-        // TODO
-        return false;
-    }
-
-    @Override
-    public int getTotalProgress() {
-
-        verifyProtocolStateForProgress();
-        // TODO
-        return 0;
-    }
-
-    @Override
-    public int getActualProgress() {
-
-        verifyProtocolStateForProgress();
-        // TODO
-        return 0;
-    }
-
-
     public void processInitialTags() throws Exception {
 
         fBufferedLine = null;
 
         while(true) {
+
+            if (fEcfProgressMonitor.isCanceled()) {
+                return ;
+            }
 
             String line = readLine(fWebServiceResponse.getResponseBufferedReader());
 

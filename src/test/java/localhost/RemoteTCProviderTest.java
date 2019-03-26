@@ -189,14 +189,16 @@ public class RemoteTCProviderTest {
                 "1.0");
     }
 
-    private static class TestProgressMonitor implements IEcfProgressMonitor {
+    private static class TestProgressMonitor implements IEcfProgressMonitor { // TODO rename and MOVE TO CORE ?
 
-        int fTotalProgress = 0;
+        int fTotalProgress = IEcfProgressMonitor.PROGRESS_UNKNOWN;
+        int fCurrentProgress;
         boolean fWasEndTask = false;
 
         @Override
         public void setTaskBegin(String name, int totalProgress) {
             fTotalProgress = totalProgress;
+            fCurrentProgress = 0;
         }
 
         @Override
@@ -205,13 +207,23 @@ public class RemoteTCProviderTest {
         }
 
         @Override
-        public void setCurrentProgress(int work) {
-
+        public void setCurrentProgress(int currentProgress) {
+            fCurrentProgress = currentProgress;
         }
 
         @Override
         public boolean isCanceled() {
             return false;
+        }
+
+        @Override
+        public boolean canCalculateProgress() {
+
+            if (fTotalProgress == IEcfProgressMonitor.PROGRESS_UNKNOWN) {
+                return false;
+            }
+
+            return true;
         }
 
         public int getTotalProgress() {
