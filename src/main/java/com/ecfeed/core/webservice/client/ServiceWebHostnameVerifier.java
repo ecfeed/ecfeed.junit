@@ -1,4 +1,4 @@
-package com.ecfeed.junit.runner.web;
+package com.ecfeed.core.webservice.client;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;

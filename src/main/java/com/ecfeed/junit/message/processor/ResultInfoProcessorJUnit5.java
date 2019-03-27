@@ -3,8 +3,7 @@ package com.ecfeed.junit.message.processor;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.message.ArgumentChainJUnit5;

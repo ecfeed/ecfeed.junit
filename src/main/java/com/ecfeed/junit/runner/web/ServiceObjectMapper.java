@@ -4,7 +4,7 @@ import com.ecfeed.core.utils.ExceptionHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-// TODO - move to core ? interface ?
+// TODO - move to core ?
 public class ServiceObjectMapper {
 
     public String mapRequestToString(Object request) {

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;

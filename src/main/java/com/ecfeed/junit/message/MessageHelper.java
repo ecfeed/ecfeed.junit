@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.FixedChoiceValueFactory;
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
 import com.ecfeed.core.genservice.protocol.schema.ChoiceSchema;
 import com.ecfeed.core.genservice.protocol.schema.RequestUpdateSchema;
 import com.ecfeed.core.genservice.protocol.schema.ResultErrorSchema;

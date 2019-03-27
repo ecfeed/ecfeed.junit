@@ -13,7 +13,9 @@ public class ResultTestCaseSchema implements IMainSchema {
 	private String id;
 	private ChoiceSchema[] testCase;
 
-	public ResultTestCaseSchema() {};
+	public ResultTestCaseSchema() {
+		id = "0";
+	};
 	
 	public ChoiceSchema[] getTestCase() {
 		return testCase;

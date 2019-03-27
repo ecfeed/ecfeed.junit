@@ -12,7 +12,9 @@ public class ResultStatusSchema implements IMainSchema {
 	private String status;
 	private boolean collectStats;
 	
-	public ResultStatusSchema() {}
+	public ResultStatusSchema() {
+		id = "0";
+	}
 	
 	public String getId() {
 		return id;

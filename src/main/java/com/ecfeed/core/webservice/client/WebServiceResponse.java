@@ -1,4 +1,4 @@
-package com.ecfeed.junit.runner.web;
+package com.ecfeed.core.webservice.client;
 
 import java.io.BufferedReader;
 

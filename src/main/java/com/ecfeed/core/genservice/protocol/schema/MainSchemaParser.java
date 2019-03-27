@@ -1,6 +1,6 @@
 package com.ecfeed.core.genservice.protocol.schema;
 
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
 import com.ecfeed.core.utils.ExceptionHelper;
 
 import java.io.IOException;

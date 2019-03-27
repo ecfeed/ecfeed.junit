@@ -5,10 +5,10 @@ import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
 import com.ecfeed.core.utils.IEcfProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
-import com.ecfeed.junit.runner.web.GenWebServiceClient;
-import com.ecfeed.junit.runner.web.RemoteTCProvider;
-import com.ecfeed.junit.runner.web.IWebServiceClient;
-import com.ecfeed.junit.runner.web.RemoteTCProviderInitData;
+import com.ecfeed.core.webservice.client.GenWebServiceClient;
+import com.ecfeed.core.genservice.protocol.provider.RemoteTCProvider;
+import com.ecfeed.core.webservice.client.IWebServiceClient;
+import com.ecfeed.core.genservice.protocol.provider.RemoteTCProviderInitData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

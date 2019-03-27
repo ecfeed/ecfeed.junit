@@ -12,7 +12,9 @@ public class RequestUpdateErrorSchema {
 	private String errorClass;
 	private String errorMessage;
 	
-	public RequestUpdateErrorSchema() {}
+	public RequestUpdateErrorSchema() {
+		id = "0";
+	}
 
 	public String getId() {
 		return id;

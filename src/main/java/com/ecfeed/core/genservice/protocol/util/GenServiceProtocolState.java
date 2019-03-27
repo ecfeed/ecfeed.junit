@@ -1,4 +1,4 @@
-package com.ecfeed.core.genservice.protocol;
+package com.ecfeed.core.genservice.protocol.util;
 
 public enum GenServiceProtocolState {
 

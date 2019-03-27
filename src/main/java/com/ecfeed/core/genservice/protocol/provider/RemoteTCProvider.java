@@ -1,7 +1,7 @@
-package com.ecfeed.junit.runner.web;
+package com.ecfeed.core.genservice.protocol.provider;
 
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolState;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolState;
 import com.ecfeed.core.genservice.protocol.schema.*;
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.provider.ITCProvider;
@@ -9,6 +9,8 @@ import com.ecfeed.core.provider.ITCProviderInitData;
 import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.IEcfProgressMonitor;
 import com.ecfeed.core.utils.SystemLogger;
+import com.ecfeed.core.webservice.client.WebServiceResponse;
+import com.ecfeed.core.webservice.client.IWebServiceClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;

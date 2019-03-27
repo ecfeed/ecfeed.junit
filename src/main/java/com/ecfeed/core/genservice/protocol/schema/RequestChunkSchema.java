@@ -9,6 +9,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class RequestChunkSchema {
 
 	private String id;
+
+	public RequestChunkSchema() {
+		id = "0";
+	}
 	
 	public String getId() {
 		return id;

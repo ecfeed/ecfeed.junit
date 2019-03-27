@@ -1,4 +1,4 @@
-package com.ecfeed.junit.runner.web;
+package com.ecfeed.core.genservice.protocol.provider;
 
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.provider.ITCProviderInitData;

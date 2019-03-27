@@ -3,7 +3,7 @@ package com.ecfeed.junit.message.processor;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.ecfeed.core.genservice.protocol.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;
@@ -44,7 +44,7 @@ public final class ResultStatusProcessorJUnit5 implements ArgumentChainJUnit5 {
 			}
 				
 			if (response.getStatus().equals(GenServiceProtocolHelper.TAG_BEG_CHUNK)) {
-				
+
 				if (response.getId().equals(fStore.getStreamId())) {
 					fStore.setChunkProgress(true);
 					fStore.getTestResults().getTestReport().clear();

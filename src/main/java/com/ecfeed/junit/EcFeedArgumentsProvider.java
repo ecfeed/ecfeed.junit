@@ -11,8 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.ecfeed.junit.runner.web.GenWebServiceClient;
-import com.ecfeed.junit.runner.web.IWebServiceClient;
+import com.ecfeed.core.webservice.client.GenWebServiceClient;
+import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.junit.runner.web.ServiceObjectMapper;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;

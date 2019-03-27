@@ -13,7 +13,9 @@ public class RequestUpdateSchema {
 	private String id;
 	private ArrayList<RequestUpdateErrorSchema> testReport;
 	
-	public RequestUpdateSchema() {}
+	public RequestUpdateSchema() {
+		id = "0";
+	}
 
 	public String getId() {
 		return id;

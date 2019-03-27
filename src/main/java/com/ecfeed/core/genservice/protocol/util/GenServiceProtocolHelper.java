@@ -1,11 +1,10 @@
-package com.ecfeed.core.genservice.protocol;
+package com.ecfeed.core.genservice.protocol.util;
 
 import com.ecfeed.core.genservice.protocol.schema.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-import static com.ecfeed.junit.message.ArgumentChainJUnit5.fMapper;
 
 public class GenServiceProtocolHelper {
 
