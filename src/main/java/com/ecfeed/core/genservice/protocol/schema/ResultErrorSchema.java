@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class ResultErrorSchema {
+public final class ResultErrorSchema implements IMainSchema {
 
 	private String error;
 

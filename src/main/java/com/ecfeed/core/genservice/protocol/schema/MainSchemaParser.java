@@ -36,6 +36,11 @@ public class MainSchemaParser {
             return result;
         }
 
+        result = parseError(json);
+        if (result != null) {
+            return result;
+        }
+
         ExceptionHelper.reportRuntimeException("Can not parse json.");
         return null;
     }
@@ -80,6 +85,15 @@ public class MainSchemaParser {
 
         try {
             return GenServiceProtocolHelper.parseProgress(json);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static IMainSchema parseError(String json) {
+
+        try {
+            return GenServiceProtocolHelper.parseError(json);
         } catch (IOException e) {
             return null;
         }

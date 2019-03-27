@@ -39,6 +39,11 @@ public class GenServiceProtocolHelper {
         return mapper.reader().forType(ResultProgressSchema.class).readValue(json);
     }
 
+    public static ResultErrorSchema parseError(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.reader().forType(ResultErrorSchema.class).readValue(json);
+    }
+
     public static boolean isTagBegData(String tag) {
 
         if (tag.equals(TAG_BEG_DATA)) {

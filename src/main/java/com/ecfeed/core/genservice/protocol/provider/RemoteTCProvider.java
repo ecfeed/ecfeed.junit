@@ -196,6 +196,11 @@ public class RemoteTCProvider implements ITCProvider {
             return currentGenServiceProtocolState;
         }
 
+        if (mainSchema instanceof ResultErrorSchema) {
+            ResultErrorSchema resultErrorSchema = (ResultErrorSchema)mainSchema;
+            ExceptionHelper.reportRuntimeException("Server responded with error: " + resultErrorSchema.getError());
+        }
+
         if (currentGenServiceProtocolState == GenServiceProtocolState.BEFORE_BEG_DATA) {
             return processStateBeforeBegData(mainSchema);
         }
