@@ -3,26 +3,31 @@ package localhost;
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
-import com.ecfeed.core.utils.IEcfProgressMonitor;
+import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.genservice.protocol.provider.RemoteTCProvider;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.protocol.provider.RemoteTCProviderInitData;
+import localhost.utils.ExecutionConditionLocalHostAvailable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+// TODO - add tests with WebServiceClientStub
+
 public class RemoteTCProviderTest {
 
-    TestProgressMonitor fEcfProgressMonitor;
+    SimpleProgressMonitor fSimpleProgressMonitor;
 
     @Test
     @DisplayName("testGenerator")
+    @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void testGenerator() {
 
         try {
@@ -49,6 +54,7 @@ public class RemoteTCProviderTest {
 
     @Test
     @DisplayName("testStatic")
+    @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void testStatic() {
 
         try {
@@ -91,9 +97,9 @@ public class RemoteTCProviderTest {
         RemoteTCProviderInitData remoteTCProviderInitData =
                 new RemoteTCProviderInitData(methodNode, "requestData", requestText);
 
-        fEcfProgressMonitor = new TestProgressMonitor();
+        fSimpleProgressMonitor = new SimpleProgressMonitor();
 
-        remoteTCProvider.initialize(remoteTCProviderInitData, fEcfProgressMonitor);
+        remoteTCProvider.initialize(remoteTCProviderInitData, fSimpleProgressMonitor);
 
         return remoteTCProvider;
     }
@@ -134,8 +140,8 @@ public class RemoteTCProviderTest {
         }
 
         assertEquals(4, counter);
-        assertEquals(4, fEcfProgressMonitor.getTotalProgress());
-        assertEquals(true, fEcfProgressMonitor.wasEndTask());
+        assertEquals(4, fSimpleProgressMonitor.getTotalProgress());
+        assertEquals(false, fSimpleProgressMonitor.isTaskRunning());
     }
 
     private void checkTestCase(TestCaseNode testCaseNode) {
@@ -189,49 +195,4 @@ public class RemoteTCProviderTest {
                 "1.0");
     }
 
-    private static class TestProgressMonitor implements IEcfProgressMonitor { // TODO rename and MOVE TO CORE ?
-
-        int fTotalProgress = IEcfProgressMonitor.PROGRESS_UNKNOWN;
-        int fCurrentProgress;
-        boolean fWasEndTask = false;
-
-        @Override
-        public void setTaskBegin(String name, int totalProgress) {
-            fTotalProgress = totalProgress;
-            fCurrentProgress = 0;
-        }
-
-        @Override
-        public void setTaskEnd() {
-            fWasEndTask = true;
-        }
-
-        @Override
-        public void setCurrentProgress(int currentProgress) {
-            fCurrentProgress = currentProgress;
-        }
-
-        @Override
-        public boolean isCanceled() {
-            return false;
-        }
-
-        @Override
-        public boolean canCalculateProgress() {
-
-            if (fTotalProgress == IEcfProgressMonitor.PROGRESS_UNKNOWN) {
-                return false;
-            }
-
-            return true;
-        }
-
-        public int getTotalProgress() {
-            return fTotalProgress;
-        }
-
-        public boolean wasEndTask() {
-            return fWasEndTask;
-        }
-    }
 }

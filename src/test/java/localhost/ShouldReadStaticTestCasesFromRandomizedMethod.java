@@ -2,7 +2,7 @@ package localhost;
 
 
 import com.ecfeed.junit.annotation.*;
-import localhost.utils.ServerAvailableCondition;
+import localhost.utils.ExecutionConditionLocalHostAvailable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @EcFeedService("https://localhost:8090/testCaseService")
 @EcFeedKeyStore("src/test/resources/security")
 @EcFeedModel("TestUuid1")
-@ExtendWith(ServerAvailableCondition.class)
+@ExtendWith(ExecutionConditionLocalHostAvailable.class)
 public class ShouldReadStaticTestCasesFromRandomizedMethod {
 
     private static int fActualCallCounter;

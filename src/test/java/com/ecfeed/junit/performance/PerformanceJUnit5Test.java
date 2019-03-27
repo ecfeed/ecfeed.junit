@@ -1,7 +1,7 @@
 package com.ecfeed.junit.performance;
 
 import com.ecfeed.junit.annotation.*;
-import localhost.utils.ServerAvailableCondition;
+import localhost.utils.ExecutionConditionLocalHostAvailable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @Disabled("This test is not compatible with IDE")
 @EcFeedService("https://localhost:8090/testCaseService")
 @EcFeedKeyStore("src/test/resources/security")
-@ExtendWith(ServerAvailableCondition.class)
+@ExtendWith(ExecutionConditionLocalHostAvailable.class)
 public class PerformanceJUnit5Test {
 
     private static int fLocalCount = 0;
