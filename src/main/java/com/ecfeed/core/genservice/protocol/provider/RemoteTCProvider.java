@@ -94,8 +94,6 @@ public class RemoteTCProvider implements ITCProvider {
 
             String line = readLine(fWebServiceResponse.getResponseBufferedReader());
 
-            System.out.println(line);
-
             if (line == null) {
                 ExceptionHelper.reportRuntimeException("Truncated data from remote testcases provider."); // TODO
             }
@@ -131,8 +129,6 @@ public class RemoteTCProvider implements ITCProvider {
 
             String line = readLine(fWebServiceResponse.getResponseBufferedReader());
 
-            System.out.println(line);
-
             if (line == null) {
                 ExceptionHelper.reportRuntimeException("Truncated data from remote testcases provider."); // TODO
             }
@@ -161,7 +157,10 @@ public class RemoteTCProvider implements ITCProvider {
         }
 
         try {
-            return responseBufferedReader.readLine();
+            String line = responseBufferedReader.readLine();
+            System.out.println(line);
+            return line;
+
         } catch (IOException e) {
             ExceptionHelper.reportRuntimeException("Cannot read line from response.", e);
         }

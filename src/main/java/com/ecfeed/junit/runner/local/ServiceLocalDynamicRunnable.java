@@ -18,6 +18,7 @@ import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.parser.DataSource;
 import com.ecfeed.core.utils.ExceptionHelper;
+import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.message.MessageHelper;
 import com.ecfeed.junit.runner.UserInputHelper;
@@ -88,8 +89,9 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
 				generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
 			}
-			
-			fAlgorithm.initialize(generatorDataInput, generatorDataConstraints, null);
+
+			SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
+			fAlgorithm.initialize(generatorDataInput, generatorDataConstraints, simpleProgressMonitor);
 
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
