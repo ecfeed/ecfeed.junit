@@ -10,8 +10,8 @@ import com.ecfeed.core.utils.TestCasesRequest;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.webservice.client.WebServiceResponse;
 import com.ecfeed.junit.EcFeedExtensionStore;
-import com.ecfeed.core.genservice.protocol.schema.RequestChunkSchema;
-import com.ecfeed.core.genservice.protocol.schema.RequestUpdateSchema;
+import com.ecfeed.core.genservice.schema.RequestChunkSchema;
+import com.ecfeed.core.genservice.schema.RequestUpdateSchema;
 
 
 public class JunitRestServiceRunnable implements Runnable {

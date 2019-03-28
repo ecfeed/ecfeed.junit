@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.message.ArgumentChainJUnit5;
-import com.ecfeed.core.genservice.protocol.schema.ResultProgressSchema;
+import com.ecfeed.core.genservice.schema.ResultProgressSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 

@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
-import com.ecfeed.core.genservice.protocol.util.GenServiceProtocolHelper;
+import com.ecfeed.core.genservice.util.GenServiceProtocolHelper;
 import org.junit.jupiter.params.provider.Arguments;
 
 import com.ecfeed.junit.EcFeedExtensionStore;
 import com.ecfeed.junit.message.ArgumentChainJUnit5;
 import com.ecfeed.junit.message.ArgumentChainTypeParser;
-import com.ecfeed.core.genservice.protocol.schema.ResultTestCaseSchema;
+import com.ecfeed.core.genservice.schema.ResultTestCaseSchema;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 
