@@ -41,7 +41,7 @@ public class SecurityTest {
 	@DisplayName("Load erroneous keystore")
 	void getErroneousKeyStoreTest() {
 		
-		assertThrows(IllegalArgumentException.class, 
+		assertThrows(RuntimeException.class,
 				() -> SecurityHelper.getKeyStore("default"),
 				() -> "The path to the store is invalid, and therefore, the store should not be loaded");
 		
