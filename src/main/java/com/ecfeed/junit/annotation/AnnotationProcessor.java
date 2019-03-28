@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.ecfeed.core.json.TestCasesUserInputParser;
 import com.ecfeed.core.utils.TestCasesUserInput;
-import com.ecfeed.junit.runner.SecurityHelper;
+import com.ecfeed.core.webservice.client.SecurityHelper;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 

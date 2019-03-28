@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.ecfeed.junit.runner.CryptographyHelper;
-import com.ecfeed.junit.runner.SecurityHelper;
+import com.ecfeed.core.webservice.client.SecurityHelper;
 
 @Tag("Security")
 @DisplayName("Security methods")
