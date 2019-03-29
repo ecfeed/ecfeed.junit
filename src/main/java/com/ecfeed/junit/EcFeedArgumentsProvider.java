@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.BlockingQueue;
@@ -56,7 +57,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
         TestCasesRequest restRequest = getTestCaseRequest(extensionContext);
 
         String serviceUrl = AnnotationProcessor.processService(extensionContext);
-        String keyStorePath = AnnotationProcessor.processKeyStore(extensionContext);
+        Optional<String> keyStorePath = Optional.of(AnnotationProcessor.processKeyStore(extensionContext));
         String clientType = getCreateClientType(restRequest);
 
         return createJunitRestServiceRunnable(
@@ -69,7 +70,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
             ExtensionContext extensionContext,
             EcFeedExtensionStore ecFeedExtensionStore,
             TestCasesRequest testCasesRequest,
-            String serviceUrl, String keyStorePath, String clientType) {
+            String serviceUrl, Optional<String> keyStorePath, String clientType) {
 
         if (!serviceUrl.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
 
@@ -100,7 +101,8 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
     private Runnable createRunnableForDefaultServiceOnLocalhost(
             EcFeedExtensionStore ecFeedExtensionStore,
             TestCasesRequest testCasesRequest,
-            String keyStorePath, String clientType) {
+            Optional<String> keyStorePath,
+            String clientType) {
 
         IWebServiceClient webServiceClient =
                 createWebServiceClient(
@@ -143,7 +145,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
     }
 
     private IWebServiceClient createWebServiceClient(
-            String serviceUrl, String keyStorePath, String clientType) {
+            String serviceUrl, Optional<String> keyStorePath, String clientType) {
 
         String COMMUNICATION_PROTOCOL = "TLSv1.2";
         String clientVersion = "1.0";

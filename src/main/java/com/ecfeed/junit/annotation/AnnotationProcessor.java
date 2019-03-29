@@ -213,7 +213,8 @@ public final class AnnotationProcessor {
 		PublicKey publicKey = null;
 		
 		try {
-			SecurityHelper.getKeyStore(processKeyStore(context));
+			Optional<String> path = Optional.of(processKeyStore(context));
+			SecurityHelper.getKeyStore(path);
 			publicKey = SecurityHelper.getPublicKey(null, SecurityHelper.ALIAS_CLIENT);
 			
 			Logger.message(
@@ -238,7 +239,8 @@ public final class AnnotationProcessor {
 		PrivateKey privateKey = null;
 			
 		try {
-			SecurityHelper.getKeyStore(processKeyStore(context));
+			Optional<String> path = Optional.of(processKeyStore(context));
+			SecurityHelper.getKeyStore(path);
 			privateKey = SecurityHelper.getPrivateKey(SecurityHelper.ALIAS_CLIENT, SecurityHelper.UNIVERSAL_PASSWORD);
 			Logger.message(
 					Localization.bundle.getString("annotationProcessorPrivateKeyRetrieved") 

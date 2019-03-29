@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -187,10 +188,12 @@ public class RemoteTCProviderTest {
 
     private IWebServiceClient createWebServiceClient() {
 
+        Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+
         return new GenWebServiceClient(
                 "https://localhost:8090/testCaseService", // TODO
                 "TLSv1.2", // TODO
-                "src/test/resources/security", // TODO
+                keyStorePath, // TODO
                 "localTestRunner",
                 "1.0");
     }

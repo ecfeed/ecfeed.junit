@@ -11,6 +11,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -34,15 +35,17 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Load keystore")
 	void getKeyStoreTest() {
-		SecurityHelper.getKeyStore("src/test/resources/security");
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getKeyStore(keyStorePath);
 	}
 
 	@Test
 	@DisplayName("Load erroneous keystore")
 	void getErroneousKeyStoreTest() {
-		
+
+		Optional<String> keyStorePath = Optional.of("default");
 		assertThrows(RuntimeException.class,
-				() -> SecurityHelper.getKeyStore("default"),
+				() -> SecurityHelper.getKeyStore(keyStorePath),
 				() -> "The path to the store is invalid, and therefore, the store should not be loaded");
 		
 	}
@@ -50,15 +53,19 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Get certificate from store")
 	void getCertificateFromKeyStoreTest() {
-		SecurityHelper.getCertificate("src/test/resources/security", "ca");
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getCertificate(keyStorePath, "ca");
 	}
 	
 	@Test
 	@DisplayName("Get invalid certificate from store")
 	void getInvalidCertificateFromKeyStoreTest() {
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 		
 		assertThrows(RuntimeException.class,
-				() -> SecurityHelper.getCertificate("src/test/resources/security", "default"),
+				() -> SecurityHelper.getCertificate(keyStorePath, "default"),
 				() -> "The certificate alias is invalid, and therefore, it should not be retrieved");
 		
 	}
@@ -72,7 +79,7 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Get certificate from file (wrong file)")
 	void getCertificateFromFileWrongFileTest() {
-		
+
 		assertThrows(RuntimeException.class,
 				() -> SecurityHelper.getCertificateFromFile("src/test/resources/dummy.pub"),
 				() -> "The certificate file is erroneous and therefore, it should not be retrieved");
@@ -93,16 +100,21 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Get public key from store")
 	void getPublicKeyFromKeyStoreTest() {
-		SecurityHelper.getPublicKey("src/test/resources/security", "connection");
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getPublicKey(keyStorePath, "connection");
 	}
 	
 	@Test
 	@DisplayName("Get invalid public key from store")
 	void getInvalidPublicKeyFromKeyStoreTest() {
-		SecurityHelper.getKeyStore("src/test/resources/security");
-		
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getKeyStore(keyStorePath);
+
+		Optional<String> keyStorePathEmpty = Optional.of("");
 		assertThrows(RuntimeException.class,
-				() -> SecurityHelper.getPublicKey("", "default"),
+				() -> SecurityHelper.getPublicKey(keyStorePathEmpty, "default"),
 				() -> "The public key alias is invalid, and therefore, it should not be retrieved");
 		
 	}
@@ -137,14 +149,17 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Get private key from store")
 	void getPrivateKeyFromKeyStoreTest() {
-		SecurityHelper.getKeyStore("src/test/resources/security");
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getKeyStore(keyStorePath);
 		SecurityHelper.getPrivateKey("connection", "changeit");	
 	}
 	
 	@Test
 	@DisplayName("Get invalid private key from store (alias)")
 	void getInvalidAliasPrivateKeyFromKeyStoreTest() {
-		SecurityHelper.getKeyStore("src/test/resources/security");
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getKeyStore(keyStorePath);
 		
 		assertThrows(RuntimeException.class,
 				() -> SecurityHelper.getPrivateKey("default", "changeit"),
@@ -155,7 +170,9 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Get invalid private key from store (password)")
 	void getInvalidPasswordPrivateKeyFromKeyStoreTest() {
-		SecurityHelper.getKeyStore("src/test/resources/security");
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		SecurityHelper.getKeyStore(keyStorePath);
 		
 		assertThrows(RuntimeException.class,
 				() -> SecurityHelper.getPrivateKey("client", "default"),
@@ -194,7 +211,8 @@ public class SecurityTest {
 	@DisplayName("Get and validate key pair from store")
 	void getKeyPairFromKeyStoreAndValidateThemTest() {
 
-		PublicKey publicKey = SecurityHelper.getPublicKey("src/test/resources/security", "connection");
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		PublicKey publicKey = SecurityHelper.getPublicKey(keyStorePath, "connection");
 		PrivateKey privateKey = SecurityHelper.getPrivateKey("connection", "changeit");
 		 
 		try {
@@ -207,9 +225,10 @@ public class SecurityTest {
 	@Test
 	@DisplayName("Validate certificate")
 	void getAndValidateCertificate() {
-		
-		Certificate certificate = SecurityHelper.getCertificate("src/test/resources/security", "ca");
-		PublicKey publicKey = SecurityHelper.getPublicKey("src/test/resources/security", "ca");
+
+		Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+		Certificate certificate = SecurityHelper.getCertificate(keyStorePath, "ca");
+		PublicKey publicKey = SecurityHelper.getPublicKey(keyStorePath, "ca");
 		
 		try {
 			certificate.verify(publicKey);
