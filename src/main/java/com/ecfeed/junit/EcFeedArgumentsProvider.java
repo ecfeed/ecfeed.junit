@@ -147,14 +147,10 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
     private IWebServiceClient createWebServiceClient(
             String serviceUrl, Optional<String> keyStorePath, String clientType) {
 
-        String COMMUNICATION_PROTOCOL = "TLSv1.2";
-        String clientVersion = "1.0";
-
         return new GenWebServiceClient(
                 serviceUrl,
-                COMMUNICATION_PROTOCOL, keyStorePath,
-                clientType, clientVersion);
-
+                clientType,
+                keyStorePath);
     }
 
     private TestCasesUserInput getTestCasesUserInput(ExtensionContext context) {

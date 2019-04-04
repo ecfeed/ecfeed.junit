@@ -191,11 +191,9 @@ public class RemoteTCProviderTest {
         Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 
         return new GenWebServiceClient(
-                "https://localhost:8090/testCaseService", // TODO
-                "TLSv1.2", // TODO
-                keyStorePath, // TODO
-                "localTestRunner",
-                "1.0");
+                "https://localhost:8090", // TODO
+                "localTestRunner", // TODO
+                keyStorePath);
     }
 
 }

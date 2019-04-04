@@ -16,7 +16,7 @@ import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
-import com.ecfeed.core.parser.DataSource;
+import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;

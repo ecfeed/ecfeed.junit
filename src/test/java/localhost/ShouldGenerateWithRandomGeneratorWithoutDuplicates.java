@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @EcFeed
-@EcFeedService("https://localhost:8090/testCaseService")
+@EcFeedService("https://localhost:8090")
 @EcFeedKeyStore("src/test/resources/security")
 @EcFeedModel("TestUuid1")
 @ExtendWith(ExecutionConditionLocalHostAvailable.class)
