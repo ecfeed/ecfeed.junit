@@ -19,7 +19,7 @@ public final class ExecutionConditionLocalHostAvailable implements ExecutionCond
         return ConditionEvaluationResult.disabled("The local server is not available");
     }
 
-    public boolean pingHost(String host, int port, int timeout) {
+    public boolean pingHost(String host, int port, int timeout) { // TODO - get from core
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(host, port), timeout);
             return true;
