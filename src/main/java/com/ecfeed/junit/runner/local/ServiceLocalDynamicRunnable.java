@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
+import com.ecfeed.core.evaluator.HomebrewConstraintEvaluator;
+import com.ecfeed.core.evaluator.Sat4jEvaluator;
 import com.ecfeed.core.generators.algorithms.AbstractAlgorithm;
 import com.ecfeed.core.generators.algorithms.AdaptiveRandomAlgorithm;
 import com.ecfeed.core.generators.algorithms.CartesianProductAlgorithm;
 import com.ecfeed.core.generators.algorithms.RandomAlgorithm;
 import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
 import com.ecfeed.core.generators.api.GeneratorException;
+import com.ecfeed.core.generators.api.IConstraintEvaluator;
 import com.ecfeed.core.model.ChoiceNode;
+import com.ecfeed.core.model.Constraint;
 import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
@@ -75,24 +79,23 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 	}
 	
 	private void initializeAlgorithm(Method testMethod) {
-		Collection<IConstraint<ChoiceNode>> generatorDataConstraints;
+		Collection<Constraint> generatorDataConstraints;
 		List<List<ChoiceNode>> generatorDataInput;
 		
 		try {
-			
+			MethodNode methodNode = null;
+
 			if (fModel.equals("auto")) {
 				generatorDataConstraints = new ArrayList<>();
 				generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
 			} else {
-				MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, fModel, Optional.ofNullable(fRequest.getMethod()));
-				
+				methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, fModel, Optional.ofNullable(fRequest.getMethod()));
 				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
 				generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
 			}
-
 			SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
-			fAlgorithm.initialize(generatorDataInput, generatorDataConstraints, simpleProgressMonitor);
-
+			IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
+			fAlgorithm.initialize(generatorDataInput, constraintEvaluator, null);
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
 			exception.addSuppressed(e);

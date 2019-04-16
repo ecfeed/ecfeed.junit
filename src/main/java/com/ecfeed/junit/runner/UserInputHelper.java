@@ -99,7 +99,7 @@ public class UserInputHelper {
 		
 	}
 	
-	public static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModel(MethodNode methodNode, Optional<Object> constraintName) throws GeneratorException {
+	public static List<Constraint> getConstraintsFromEcFeedModel(MethodNode methodNode, Optional<Object> constraintName) throws GeneratorException {
 		
 		if (constraintName.isPresent()) {
 			Object constraintObject = constraintName.get();
@@ -231,7 +231,7 @@ public class UserInputHelper {
 		return testSuite;
 	}
 	
-	private static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModelString(MethodNode methodNode, String constraintData) throws GeneratorException {
+	private static List<Constraint> getConstraintsFromEcFeedModelString(MethodNode methodNode, String constraintData) throws GeneratorException {
 
 		if (constraintData.equals("ALL")) {
 			return methodNode.getAllConstraints();
@@ -244,12 +244,12 @@ public class UserInputHelper {
 		
 	}
 	
-	private static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModelList(MethodNode methodNode, List<?> constraintData) throws GeneratorException {
-		List<IConstraint<ChoiceNode>> constraint = new ArrayList<>();
-		List<IConstraint<ChoiceNode>> constraintList = new ArrayList<>();
+	private static List<Constraint> getConstraintsFromEcFeedModelList(MethodNode methodNode, List<?> constraintData) throws GeneratorException {
+		List<Constraint> constraint = new ArrayList<>();
+		List<Constraint> constraintList = new ArrayList<>();
 		
 		for (Object constraintObject : constraintData) {
-			for (IConstraint<ChoiceNode> constraintMethod : methodNode.getAllConstraints()) {
+			for (Constraint constraintMethod : methodNode.getAllConstraints()) {
 				if (((Constraint) constraintMethod).getName().equals(constraintObject.toString())) {
 					constraintList.add(constraintMethod);
 				}
