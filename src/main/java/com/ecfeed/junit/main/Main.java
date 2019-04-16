@@ -1,8 +1,12 @@
 package com.ecfeed.junit.main;
 
+import com.ecfeed.core.evaluator.HomebrewConstraintEvaluator;
+import com.ecfeed.core.evaluator.Sat4jEvaluator;
 import com.ecfeed.core.generators.algorithms.*;
+import com.ecfeed.core.generators.api.IConstraintEvaluator;
 import com.ecfeed.core.json.TestCasesUserInputParser;
 import com.ecfeed.core.model.ChoiceNode;
+import com.ecfeed.core.model.Constraint;
 import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.parser.DataSource;
@@ -90,7 +94,7 @@ public class Main {
 
 		switch (dataSource) {
 			case GEN_N_WISE :
-				return Optional.of(new RandomizedNWiseAlgorithm<>(
+				return Optional.of(new AwesomeNWiseAlgorithm<>(
 						Integer.parseInt(userData.getN()),
 						Integer.parseInt(userData.getCoverage())));
 			case GEN_CARTESIAN :
@@ -117,14 +121,16 @@ public class Main {
 	private static void setGenerator(AbstractAlgorithm<ChoiceNode> generator, TestCasesUserInput userData) throws Exception {
 		MethodNode methodNode = getMethodNode(userData);
 
-		Collection<IConstraint<ChoiceNode>> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
+		Collection<Constraint> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
 				methodNode,
 				Optional.ofNullable(userData.getConstraints()));
+		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
+//		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new HomebrewConstraintEvaluator<ChoiceNode>(generatorDataConstraints);
 		List<List<ChoiceNode>> generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(
 				methodNode,
 				Optional.ofNullable(userData.getChoices()));
 
-		generator.initialize(generatorDataInput, generatorDataConstraints, null);
+		generator.initialize(generatorDataInput, constraintEvaluator, null);
 	}
 
 	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
