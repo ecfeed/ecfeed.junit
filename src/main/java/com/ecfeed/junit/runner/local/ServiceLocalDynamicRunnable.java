@@ -16,11 +16,15 @@ import com.ecfeed.core.generators.algorithms.RandomAlgorithm;
 import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
+
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
 import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
+
+import com.ecfeed.core.model.*;
+
 import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
@@ -89,7 +93,8 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 				generatorDataConstraints = new ArrayList<>();
 				generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
 			} else {
-				methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, fModel, Optional.ofNullable(fRequest.getMethod()));
+				RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(fModel));
+				methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()));
 				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
 				generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
 			}

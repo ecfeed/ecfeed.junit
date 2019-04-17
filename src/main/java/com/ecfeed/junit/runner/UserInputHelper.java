@@ -2,6 +2,7 @@ package com.ecfeed.junit.runner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
@@ -35,8 +36,7 @@ public class UserInputHelper {
 	
 	private static FixedChoiceValueFactory fFactory = new FixedChoiceValueFactory(null, false);
 	
-	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, String modelPath, Optional<String> testName) throws GeneratorException {
-		RootNode model = loadEcFeedModelFromDirectory(modelPath);
+	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, RootNode model, Optional<String> testName) throws GeneratorException {
 		List<MethodNode> modelMethods = new ArrayList<>();
 		
 		for (ClassNode classNode : model.getClasses()) {
@@ -382,11 +382,14 @@ public class UserInputHelper {
 			
 	}
 	
- 	private static RootNode loadEcFeedModelFromDirectory(String path) throws GeneratorException {
+ 	public static RootNode loadEcFeedModelFromDirectory(Optional<String> path) throws GeneratorException {
 		InputStream modelStream = null;
-		
+
 		try {
-			modelStream = Files.newInputStream(Paths.get(path));
+			if(path.isPresent())
+				modelStream = Files.newInputStream(Paths.get(path.get()));
+			else
+				modelStream = System.in;
 		} catch (IOException e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModel"));
 		}
@@ -395,7 +398,7 @@ public class UserInputHelper {
 		
 		try {
 			ModelParser modelParser = new ModelParser();
-			
+
 			model = modelParser.parseModel(modelStream, null);
 			model = ModelConverter.convertToCurrentVersion(model);
 		} catch (ParserException e) {
