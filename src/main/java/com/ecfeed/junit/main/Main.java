@@ -11,6 +11,7 @@ import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 
+import com.ecfeed.core.utils.GeneratorType;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.annotation.AnnotationDefaultValue;
@@ -75,6 +76,15 @@ public class Main {
 		userDataString = "{" + userDataString.replaceAll("'", "\"") + "}";
 
 		fUserInput = TestCasesUserInputParser.parseRequest(userDataString);
+
+		if(fUserInput.getCoverage()==null)
+			fUserInput.setCoverage(DEFAULT_COVERAGE);
+
+		if(fUserInput.getDataSource()==null)
+			fUserInput.setDataSource(DEFAULT_DATA_SOURCE);
+
+		if(fUserInput.getConstraints()==null)
+			fUserInput.setAllConstraints();
 	}
 
 	private static Optional<AbstractAlgorithm<ChoiceNode>> initializeGenerator(TestCasesUserInput userData) throws Exception {
