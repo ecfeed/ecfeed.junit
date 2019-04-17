@@ -383,6 +383,7 @@ public class UserInputHelper {
 	}
 	
  	public static RootNode loadEcFeedModelFromDirectory(Optional<String> path) throws GeneratorException {
+		System.out.println("dupadupadupa");
 		InputStream modelStream = null;
 
 		try {

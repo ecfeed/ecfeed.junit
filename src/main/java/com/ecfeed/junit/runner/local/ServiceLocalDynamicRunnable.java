@@ -92,9 +92,11 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 			MethodNode methodNode = null;
 
 			if (fModel.equals("auto")) {
+				System.out.println("bbbb");
 				generatorDataConstraints = new ArrayList<>();
 				generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
 			} else {
+				System.out.println("cccc");
 				RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(fModel));
 				methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()));
 				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));

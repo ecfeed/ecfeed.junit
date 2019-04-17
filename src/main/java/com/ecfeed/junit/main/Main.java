@@ -11,6 +11,7 @@ import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 
+import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.annotation.AnnotationDefaultValue;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;
@@ -32,9 +33,11 @@ public class Main {
 	private static Optional<Path> fFileInput;
 	private static TestCasesUserInput fUserInput;
 	private static boolean fVerbose;
+	private static RootNode fModel;
 
 	public static void main(String[] args) throws Exception {
 		processConsoleInput(parseConsoleInput(args));
+		fModel = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
 		Optional<AbstractAlgorithm<ChoiceNode>> generator = initializeGenerator(fUserInput);
 		Optional<List<List<ChoiceNode>>> list = initializeList(fUserInput);
 
@@ -130,13 +133,11 @@ public class Main {
 				methodNode,
 				Optional.ofNullable(userData.getChoices()));
 
-		generator.initialize(generatorDataInput, constraintEvaluator, null);
+		generator.initialize(generatorDataInput, constraintEvaluator, new SimpleProgressMonitor());
 	}
 
 	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
-
-		RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
-		return UserInputHelper.getMethodNodeFromEcFeedModel(null, model
+		return UserInputHelper.getMethodNodeFromEcFeedModel(null, fModel
 				, Optional.ofNullable(userData.getMethod()));
 	}
 

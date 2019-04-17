@@ -25,6 +25,7 @@ public class ServiceLocalTestSuiteRunnable implements Runnable {
 		fResponseQueue = responseQueue;
 		
 		try {
+			System.out.println("aaaaaa");
 			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(modelPath));
 			MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(request.getMethod()));
 			testCases = UserInputHelper.getTestsFromEcFeedModel(methodNode, Optional.ofNullable(request.getTestSuites()));
