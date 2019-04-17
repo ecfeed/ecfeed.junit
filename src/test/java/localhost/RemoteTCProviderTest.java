@@ -12,6 +12,7 @@ import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -28,12 +29,9 @@ public class RemoteTCProviderTest {
     SimpleProgressMonitor fSimpleProgressMonitor;
 
     @Test
-
     @DisplayName("testGenerator")
     @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void testGenerator() {
-
-
         try {
             runGeneratorTest();
         } catch (Exception e) {
@@ -167,6 +165,7 @@ public class RemoteTCProviderTest {
             return;
         }
 
+
         if (name.equals("choice12")) {
             return;
         }
@@ -179,10 +178,10 @@ public class RemoteTCProviderTest {
 
         String name = theFirstChoice.getQualifiedName();
 
-
         if (name.equals("choice21")) {
             return;
         }
+
 
         if (name.equals("choice22")) {
             return;

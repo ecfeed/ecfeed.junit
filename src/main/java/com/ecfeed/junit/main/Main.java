@@ -7,6 +7,7 @@ import com.ecfeed.core.json.TestCasesUserInputParser;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
 import com.ecfeed.core.model.MethodNode;
+
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 

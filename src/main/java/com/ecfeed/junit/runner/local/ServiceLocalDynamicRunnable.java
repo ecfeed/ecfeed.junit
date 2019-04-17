@@ -17,13 +17,15 @@ import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
 
+
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
-import com.ecfeed.core.model.IConstraint;
+
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 
 import com.ecfeed.core.model.*;
+
 
 import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
@@ -98,9 +100,12 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
 				generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
 			}
+
 			SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
+
 			IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
-			fAlgorithm.initialize(generatorDataInput, constraintEvaluator, null);
+			fAlgorithm.initialize(generatorDataInput, constraintEvaluator, simpleProgressMonitor);
+
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
 			exception.addSuppressed(e);
