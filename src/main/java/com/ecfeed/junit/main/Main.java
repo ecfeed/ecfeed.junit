@@ -1,14 +1,13 @@
 package com.ecfeed.junit.main;
 
-import com.ecfeed.core.evaluator.HomebrewConstraintEvaluator;
 import com.ecfeed.core.evaluator.Sat4jEvaluator;
 import com.ecfeed.core.generators.algorithms.*;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
 import com.ecfeed.core.json.TestCasesUserInputParser;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
-import com.ecfeed.core.model.IConstraint;
 import com.ecfeed.core.model.MethodNode;
+import com.ecfeed.core.model.RootNode;
 import com.ecfeed.core.parser.DataSource;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.annotation.AnnotationDefaultValue;
@@ -28,7 +27,7 @@ import static com.ecfeed.junit.main.CommandLineConstants.*;
 
 public class Main {
 
-	private static Path fFileInput;
+	private static Optional<Path> fFileInput;
 	private static TestCasesUserInput fUserInput;
 	private static boolean fVerbose;
 
@@ -65,7 +64,7 @@ public class Main {
 	private static void processConsoleInput(OptionSet options) {
 		fVerbose = InputProcessor.extractVerbose(options);
 
-		fFileInput = InputProcessor.extractFileInputPath(options).orElse(DEFAULT_FILE_INPUT_PATH);
+		fFileInput = InputProcessor.extractFileInputPath(options);
 
 		String userDataString = InputProcessor.extractUserData(options).orElse(AnnotationDefaultValue.DEFAULT_INPUT);
 		userDataString = "{" + userDataString.replaceAll("'", "\"") + "}";
@@ -125,7 +124,6 @@ public class Main {
 				methodNode,
 				Optional.ofNullable(userData.getConstraints()));
 		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
-//		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new HomebrewConstraintEvaluator<ChoiceNode>(generatorDataConstraints);
 		List<List<ChoiceNode>> generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(
 				methodNode,
 				Optional.ofNullable(userData.getChoices()));
@@ -134,8 +132,10 @@ public class Main {
 	}
 
 	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
-		return UserInputHelper.getMethodNodeFromEcFeedModel(null,
-				fFileInput.toAbsolutePath().toString(), Optional.ofNullable(userData.getMethod()));
+
+		RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
+		return UserInputHelper.getMethodNodeFromEcFeedModel(null, model
+				, Optional.ofNullable(userData.getMethod()));
 	}
 
 }

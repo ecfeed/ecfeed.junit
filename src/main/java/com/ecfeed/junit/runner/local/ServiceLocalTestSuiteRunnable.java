@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.MethodNode;
+import com.ecfeed.core.model.RootNode;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.message.MessageHelper;
 import com.ecfeed.junit.runner.UserInputHelper;
@@ -20,10 +21,11 @@ public class ServiceLocalTestSuiteRunnable implements Runnable {
 	
 	private List<List<ChoiceNode>> testCases;
 
-	public ServiceLocalTestSuiteRunnable(BlockingQueue<String> responseQueue, Method testMethod, TestCasesUserInput request, String model) {
+	public ServiceLocalTestSuiteRunnable(BlockingQueue<String> responseQueue, Method testMethod, TestCasesUserInput request, String modelPath) {
 		fResponseQueue = responseQueue;
 		
 		try {
+			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(modelPath));
 			MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(request.getMethod()));
 			testCases = UserInputHelper.getTestsFromEcFeedModel(methodNode, Optional.ofNullable(request.getTestSuites()));
 		} catch (GeneratorException e) {
