@@ -73,19 +73,4 @@ public class RemoteTCProvider implements ITCProvider {
         return null;
     }
 
-    @Override
-    public boolean canCalculateProgress() {
-        return false;
-    }
-
-    @Override
-    public int getTotalProgress() {
-        return 0;
-    }
-
-    @Override
-    public int getActualProgress() {
-        return 0;
-    } // TODO - move to another package
-
 }

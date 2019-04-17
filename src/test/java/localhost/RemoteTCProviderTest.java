@@ -5,6 +5,7 @@ import com.ecfeed.junit.runner.web.GenWebServiceClient;
 import com.ecfeed.junit.runner.web.RemoteTCProvider;
 import com.ecfeed.junit.runner.web.IWebServiceClient;
 import com.ecfeed.junit.runner.web.RemoteTCProviderInitData;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -12,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class RemoteTCProviderTest {
 
     @Test
+    @Disabled
     public void testTCP() {
         System.out.println("TEST");
 
@@ -61,13 +63,50 @@ public class RemoteTCProviderTest {
         }
 
         @Override
-        public void setCurrentProgress(int work) {
+        public void setCurrentProgress(int currentProgress) {
 
         }
 
         @Override
+        public int getCurrentProgress()
+        {
+            return 0;
+        }
+
+        @Override
+        public int getTotalProgress()
+        {
+            return 0;
+        }
+
+        @Override
+        public void incrementProgress(int increment)
+        {
+
+        }
+
+
+        @Override
         public boolean isCanceled() {
             return false;
+        }
+
+        @Override
+        public void setCanceled()
+        {
+
+        }
+
+        @Override
+        public boolean isTaskRunning()
+        {
+            return true;
+        }
+
+        @Override
+        public boolean canCalculateProgress()
+        {
+            return true;
         }
     }
 }

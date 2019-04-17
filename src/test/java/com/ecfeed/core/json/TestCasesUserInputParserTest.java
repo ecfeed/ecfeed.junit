@@ -1,6 +1,6 @@
 package com.ecfeed.core.json;
 
-import com.ecfeed.core.parser.DataSource;
+import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import org.junit.jupiter.api.Test;
 

@@ -17,7 +17,7 @@ import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
 import com.ecfeed.core.model.*;
-import com.ecfeed.core.parser.DataSource;
+import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.message.MessageHelper;

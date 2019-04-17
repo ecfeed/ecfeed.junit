@@ -8,7 +8,7 @@ import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.model.RootNode;
-import com.ecfeed.core.parser.DataSource;
+import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.annotation.AnnotationDefaultValue;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;
