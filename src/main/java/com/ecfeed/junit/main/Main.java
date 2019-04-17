@@ -10,7 +10,6 @@ import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 
-
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.annotation.AnnotationDefaultValue;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;

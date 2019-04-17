@@ -1,5 +1,6 @@
 package localhost;
 
+
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
@@ -27,9 +28,11 @@ public class RemoteTCProviderTest {
     SimpleProgressMonitor fSimpleProgressMonitor;
 
     @Test
+
     @DisplayName("testGenerator")
     @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void testGenerator() {
+
 
         try {
             runGeneratorTest();
@@ -168,12 +171,14 @@ public class RemoteTCProviderTest {
             return;
         }
 
+
         fail("Invalid choice name: " + name);
     }
 
     private void checkTheSecondChoice(ChoiceNode theFirstChoice) {
 
         String name = theFirstChoice.getQualifiedName();
+
 
         if (name.equals("choice21")) {
             return;
@@ -194,6 +199,7 @@ public class RemoteTCProviderTest {
                 "https://localhost:8090", // TODO
                 "localTestRunner", // TODO
                 keyStorePath);
+
     }
 
 }
