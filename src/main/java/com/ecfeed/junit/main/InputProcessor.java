@@ -1,5 +1,6 @@
 package com.ecfeed.junit.main;
 
+import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.junit.utils.Localization;
 import joptsimple.OptionSet;
 
@@ -65,6 +66,29 @@ public final class InputProcessor {
         }
 
         return false;
+    }
+
+    static Optional<String> extractMethod(OptionSet options)
+    {
+        if(options.hasArgument(METHOD_LONG))
+            return Optional.of(options.valueOf(METHOD_LONG).toString());
+        if(options.hasArgument(METHOD_SHORT))
+            return Optional.of(options.valueOf(METHOD_SHORT).toString());
+        return Optional.empty();
+    }
+
+    static Integer extractN(OptionSet options) {
+        Integer N = null;
+        if (options.hasArgument(TUPLE_ARITY_SHORT)) {
+            try {
+                N = Integer.parseInt(options.valueOf(TUPLE_ARITY_SHORT).toString());
+            }
+            catch (NumberFormatException e)
+            {
+                ExceptionHelper.reportRuntimeException("Value of N provided must be an integer.");
+            }
+        }
+        return N;
     }
 
 }

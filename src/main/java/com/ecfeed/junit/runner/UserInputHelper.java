@@ -57,6 +57,21 @@ public class UserInputHelper {
 		
 		return modelMethods.get(0);
 	}
+
+	public static List<MethodNode> getAllMatchingMethodNodesFromEcFeedModel(RootNode model, String methodPrefix)
+	{
+		List<MethodNode> modelMethods = new ArrayList<>();
+
+		for (ClassNode classNode : model.getClasses()) {
+			for (MethodNode methodNode : classNode.getMethods()) {
+				if (isMethodNamePrefix(methodPrefix, methodNode)) {
+					modelMethods.add(methodNode);
+				}
+			}
+		}
+
+		return modelMethods;
+	}
 	
 	public static List<List<ChoiceNode>> getChoicesFromEcFeedModel(MethodNode methodNode, Optional<Object> choiceRestrictions) throws GeneratorException {
 		List<List<ChoiceNode>> generatorChoices = new ArrayList<>();
@@ -161,6 +176,11 @@ public class UserInputHelper {
 		}
 		
 		return isMethodClassNameIdentical(test, model) && isMethodNameIdentical(test, model);
+	}
+
+	private static boolean isMethodNamePrefix(String methodName, MethodNode modelMethod)
+	{
+		return modelMethod.getLongSignature().startsWith(methodName);
 	}
 	
 	private static boolean isMethodClassNameIdentical(Method test, MethodNode model) {

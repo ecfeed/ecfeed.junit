@@ -39,17 +39,20 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		processConsoleInput(parseConsoleInput(args));
 		fModel = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
-		Optional<AbstractAlgorithm<ChoiceNode>> generator = initializeGenerator(fUserInput);
-		Optional<List<List<ChoiceNode>>> list = initializeList(fUserInput);
+		for(MethodNode methodNode : getAllMethodNodes(fUserInput)) {
+			System.out.println(methodNode.getLongSignature());
+			Optional<AbstractAlgorithm<ChoiceNode>> generator = initializeGenerator(fUserInput, methodNode);
+			Optional<List<List<ChoiceNode>>> list = initializeList(fUserInput, methodNode);
 
-		if (fVerbose) {
-			new TupleProcessorDynamic(generator, System.out::println).process();
-			new TupleProcessorStatic(list, System.out::println).process();
-		} else {
-			int[] counter = new int[2];
-			new TupleProcessorDynamic(generator, t -> counter[0]++).process();
-			new TupleProcessorStatic(list, t -> counter[1]++).process();
-			System.out.println(counter[0] + " : " + counter[1]);
+			if (fVerbose) {
+				new TupleProcessorDynamic(generator, System.out::println).process();
+				new TupleProcessorStatic(list, System.out::println).process();
+			} else {
+				int[] counter = new int[2];
+				new TupleProcessorDynamic(generator, t -> counter[0]++).process();
+				new TupleProcessorStatic(list, t -> counter[1]++).process();
+				System.out.println(counter[0] + " : " + counter[1]);
+			}
 		}
 
 	}
@@ -63,6 +66,9 @@ public class Main {
 		parser.accepts(USER_INPUT_SHORT).withRequiredArg();
 		parser.accepts(VERBOSE_LONG);
 		parser.accepts(VERBOSE_SHORT);
+		parser.accepts(TUPLE_ARITY_SHORT).withRequiredArg();
+		parser.accepts(METHOD_LONG).withRequiredArg();
+		parser.accepts(METHOD_SHORT).withRequiredArg();
 
 		return parser.parse(args);
 	}
@@ -72,34 +78,43 @@ public class Main {
 
 		fFileInput = InputProcessor.extractFileInputPath(options);
 
-		String userDataString = InputProcessor.extractUserData(options).orElse(AnnotationDefaultValue.DEFAULT_INPUT);
+		String userDataString = InputProcessor.extractUserData(options).orElse(DEFAULT_USER_INPUT);
 		userDataString = "{" + userDataString.replaceAll("'", "\"") + "}";
 
 		fUserInput = TestCasesUserInputParser.parseRequest(userDataString);
 
-		if(fUserInput.getCoverage()==null)
+		Optional<String> methodName = InputProcessor.extractMethod(options);
+		if (methodName.isPresent())
+			fUserInput.setMethod(methodName.get());
+		else
+			fUserInput.setMethod(DEFAULT_METHOD);
+
+		if (fUserInput.getCoverage() == null)
 			fUserInput.setCoverage(DEFAULT_COVERAGE);
 
-		if(fUserInput.getDataSource()==null)
+		if (fUserInput.getDataSource() == null)
 			fUserInput.setDataSource(DEFAULT_DATA_SOURCE);
 
-		if(fUserInput.getConstraints()==null)
+		if (fUserInput.getConstraints() == null)
 			fUserInput.setAllConstraints();
+
+		Integer N = InputProcessor.extractN(options);
+		if (N != null)
+			fUserInput.setN(N);
 	}
 
-	private static Optional<AbstractAlgorithm<ChoiceNode>> initializeGenerator(TestCasesUserInput userData) throws Exception {
+	private static Optional<AbstractAlgorithm<ChoiceNode>> initializeGenerator(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
 		Optional<AbstractAlgorithm<ChoiceNode>> generator = getGenerator(userData);
 
 		if (generator.isPresent()) {
-			setGenerator(generator.get(), userData);
+			setGenerator(generator.get(), userData, methodNode);
 			return generator;
 		}
 
 		return Optional.empty();
 	}
 
-	private static Optional<List<List<ChoiceNode>>> initializeList(TestCasesUserInput userData) throws Exception {
-		MethodNode methodNode = getMethodNode(userData);
+	private static Optional<List<List<ChoiceNode>>> initializeList(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
 		return Optional.of(UserInputHelper.getTestsFromEcFeedModel(methodNode, Optional.ofNullable(userData.getTestSuites())));
 	}
 
@@ -132,9 +147,7 @@ public class Main {
 
 	}
 
-	private static void setGenerator(AbstractAlgorithm<ChoiceNode> generator, TestCasesUserInput userData) throws Exception {
-		MethodNode methodNode = getMethodNode(userData);
-
+	private static void setGenerator(AbstractAlgorithm<ChoiceNode> generator, TestCasesUserInput userData, MethodNode methodNode) throws Exception {
 		Collection<Constraint> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
 				methodNode,
 				Optional.ofNullable(userData.getConstraints()));
@@ -149,6 +162,11 @@ public class Main {
 	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
 		return UserInputHelper.getMethodNodeFromEcFeedModel(null, fModel
 				, Optional.ofNullable(userData.getMethod()));
+	}
+
+	private static List<MethodNode> getAllMethodNodes(TestCasesUserInput userData)
+	{
+		return UserInputHelper.getAllMatchingMethodNodesFromEcFeedModel(fModel, userData.getMethod());
 	}
 
 }
