@@ -53,6 +53,10 @@ dependencies {
 
 
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
+
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+
 }
 
 sourceSets {
