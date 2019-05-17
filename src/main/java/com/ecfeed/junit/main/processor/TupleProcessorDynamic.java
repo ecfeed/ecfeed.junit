@@ -26,23 +26,18 @@ public class TupleProcessorDynamic {
 
         List<ChoiceNode> tuple = null;
 
-        try {
-            tuple = fGenerator.get().getNext();
-        } catch (GeneratorException e) {
-            e.printStackTrace();
-        }
-
-        do {
-
-            fConsumer.accept(tuple);
-
+        while(true)
+        {
             try {
                 tuple = fGenerator.get().getNext();
+                if(tuple==null)
+                    break;
+                fGenerator.get().getConstraintEvaluator().adapt(tuple);
             } catch (GeneratorException e) {
                 e.printStackTrace();
             }
-
-        } while (tuple != null);
+            fConsumer.accept(tuple);
+        }
     }
 
 }
