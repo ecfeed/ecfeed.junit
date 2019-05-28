@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class RestServiceTestRunner {
 
-    public static void runRestServiceTest(IRestServiceTest backendTest) {
+    public static void launchTest(IRestServiceTest backendTest) {
 
         try {
-            backendTest.runServiceTest();
+            backendTest.runTest();
         } catch (Exception e) {
             String message = ExceptionHelper.createErrorMessage(e, true, false);
             throw new RuntimeException(message);

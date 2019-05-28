@@ -23,7 +23,7 @@ public class RestServiceHelper {
             ExceptionHelper.reportRuntimeException("Getting http response failed.", e);
         }
 
-        verifyResponseStatusOk(response.getStatus());
+        verifyResponseStatusOk(response);
 
         return response;
     }
@@ -31,13 +31,31 @@ public class RestServiceHelper {
     private static HttpResponse<JsonNode> getJsonNodeHttpResponse(
             String url, String authorization) throws Exception {
 
-        return Unirest.get(url)
+        Unirest.setTimeouts(0, 0);
+
+        return Unirest
+                    .get(url)
                     .header(HEADER_NAME_AUTHORIZATION, authorization)
                     .header(HEADER_NAME_CACHE_CONTROL, NO_CACHE)
                     .asJson();
     }
 
-    private static String createAuthorizationValue(String token) {
+    public static void delete(String url, String authorization) {
+
+        try {
+            Unirest.setTimeouts(0, 0);
+
+            Unirest.delete(url)
+                    .header(HEADER_NAME_AUTHORIZATION, authorization)
+                    .header(HEADER_NAME_CACHE_CONTROL, NO_CACHE)
+                    .asJson();
+
+        } catch (Exception e) {
+            ExceptionHelper.reportRuntimeException(e);
+        }
+    }
+
+    public static String createAuthorizationValue(String token) {
 
         if (token == null) {
             ExceptionHelper.reportRuntimeException("Authorization token is not set.");
@@ -47,11 +65,35 @@ public class RestServiceHelper {
     }
 
 
-    private static void verifyResponseStatusOk(int status) {
+    private static void verifyResponseStatusOk(HttpResponse<JsonNode> httpResponse) {
 
-        if (status != 200) {
-            throw new RuntimeException("Request returned code: " + status);
+        int status = httpResponse.getStatus();
+
+        if (status == 200) {
+            return;
         }
+
+        String responseBody = httpResponse.getBody().toString();
+
+        String lastCause = getLastCause(responseBody);
+
+        String message =
+                "Http request returned error code: " + status +
+                        ". Cause from server: " + lastCause;
+
+        throw new RuntimeException(message);
+    }
+
+    private static String getLastCause(String responseBody) {
+
+        final String causedBy = "Caused by: ";
+
+        int lastReasonIndex = responseBody.lastIndexOf(causedBy);
+
+        if (lastReasonIndex != -1) {
+            responseBody = responseBody.substring(lastReasonIndex + causedBy.length());
+        }
+        return responseBody;
     }
 
     static String getTokenFromEnvironment(String envVariable) {
