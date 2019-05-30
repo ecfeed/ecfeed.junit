@@ -10,19 +10,19 @@ public class BackendTest {
     @Test
     public void shouldPrepareManager() {
 
-        BackendTestHelper.launchTest(new PrepareManagerTest());
+        BackendTestHelper.launchTest(
+                new PrepareManagerTest(), BackendTestHelper.TestUsers.MANAGER_ONLY);
     }
 
     class PrepareManagerTest implements IRestServiceTest {
 
         @Override
-        public void runTest() {
-
-            String backendManagersToken = BackendTestHelper.prepareTestManager();
+        public void runTest(String[] tokens) {
 
             String url = BackendTestHelper.createBackendUrl("/users/test/managerAccess");
 
-            BackendTestHelper.sendGetRequestWithOkResponse(backendManagersToken, url);
+            BackendTestHelper.sendGetRequestWithOkResponse(
+                    BackendTestHelper.getManagersToken(tokens), url);
         }
 
     }
@@ -30,23 +30,23 @@ public class BackendTest {
     @Test
     public void shouldPrepareUserTest() {
 
-        BackendTestHelper.launchTest(new PrepareUserTest());
+        BackendTestHelper.launchTest(
+                new PrepareUserTest(), BackendTestHelper.TestUsers.USER_ONLY);
     }
 
     class PrepareUserTest implements IRestServiceTest {
 
         @Override
-        public void runTest() {
-
-            String token = BackendTestHelper.prepareTestUser(1);
+        public void runTest(String[] tokens) {
 
             String url = BackendTestHelper.createBackendUrl("/users/test/regularUserAccess");
 
-            BackendTestHelper.sendGetRequestWithOkResponse(token, url);
+            BackendTestHelper.sendGetRequestWithOkResponse(
+                    BackendTestHelper.getUsersToken(1, tokens), url);
         }
     }
 
-    //    @Test
+//        @Test
 //    public void shouldCheckIfUserExists() {
 //
 //        BackendTestHelper.launchTest(new CheckIfUserExistsTest());
@@ -57,11 +57,10 @@ public class BackendTest {
 //        @Override
 //        public void runTest() {
 //
+//            String backendManagersToken = BackendTestHelper.prepareTestManager();
+//
 //            String mailToFind = "non-existent-user-45672168652@none.com";
 //            String url = "http://localhost:8085/api/users/existence/" + mailToFind;
-//
-////            String managersToken = BackendTestHelper.getManagersTestToken();
-//            String managersToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1qbEVOVVpCTkRReE1rRTBRME0yT1RRMk4wVTFRVE5EUmpjMU5EWXlSVEJCTlRVMFFqZzVOZyJ9.eyJodHRwOi8vY29tLmVjZmVlZC90b2tlblV1aWQiOiI2MWE3YjU5OS01Yzc2LTRiMTktYjYxMy03YjEwM2JlOWI3YmEiLCJpc3MiOiJodHRwczovL2VjZmVlZC1kZXZlbG9wbWVudC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDIwNDI0NDMzNjI2MzA4MzA1ODciLCJhdWQiOlsiaHR0cDovL2VjZmVlZC5jb20vYXBpIiwiaHR0cHM6Ly9lY2ZlZWQtZGV2ZWxvcG1lbnQuZXUuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTU1OTEwODM3MywiZXhwIjoxNTU5MTE1NTczLCJhenAiOiJWc0s4Q25zb2pMOFNCNzYzVWNWdEJLZHFtcG5pRzlSSSIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgbWFuYWdlciIsInBlcm1pc3Npb25zIjpbIm1hbmFnZXIiXX0.A6J2jdTLqKFJnpLCTIvZeJTi-HqEgbnYLkboWQrBGDV02iGZRq6ufxbqH6He56PyCXSx8wm7UfvY1epvupKiaNCYAbcwMUcuyniEAB9aD2vuHXYjkbIjjd9GzimQY9QwZOFoOXA5zArd47HE9S8syNHlRcg5thgoVbv9KFHCnQGkrv-mALhkc-p2-voEnKg5lcRuigOm3ZbLo63qBrSiAMGEtP0c8RQwO3RuiGZsg-uUV-ZeWl5NF3K1hefESKx5m2_r0EByY0G06mSqlgZPx9L_-pRymCKW4gS8wdRFBgNYpoezhouJs9JE-NbO-EEyTBBgtXlcADRPnlIqd6cOTA";
 //
 //            HttpResponse<JsonNode> response =
 //                    RestServiceHelper.sendGetRequest(url, managersToken);
@@ -71,7 +70,7 @@ public class BackendTest {
 //            String message = jsonObject.getString("data");
 //            assertEquals("N", message);
 //        }
-
+//
 //        private void deleteUser() {
 //
 //            String url = "http://localhost:8085/api/users";

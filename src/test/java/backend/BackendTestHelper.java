@@ -9,14 +9,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BackendTestHelper {
 
-    public static void launchTest(IRestServiceTest backendTest) {
+    public enum TestUsers {
+        MANAGER_ONLY,
+        USER_ONLY,
+        MANAGER_AND_USER,
+    }
+
+    public static void launchTest(IRestServiceTest restServiceTest, TestUsers testUsers) {
 
         try {
-            backendTest.runTest();
+            String managersToken = prepareManager(testUsers);
+            String usersToken = prepareUser(testUsers);
+            String tokens[] = {managersToken, usersToken};
+
+            restServiceTest.runTest(tokens);
         } catch (Exception e) {
             String message = ExceptionHelper.createErrorMessage(e, true, false);
             throw new RuntimeException(message);
         }
+    }
+
+    private static String prepareManager(TestUsers testUsers) {
+
+        if (testUsers == TestUsers.MANAGER_ONLY || testUsers == TestUsers.MANAGER_AND_USER) {
+            return prepareTestManager();
+        }
+
+        return null;
+    }
+
+    private static String prepareUser(TestUsers testUsers) {
+
+        if (testUsers == TestUsers.USER_ONLY || testUsers == TestUsers.MANAGER_AND_USER) {
+            return prepareTestUser(1);
+        }
+
+        return null;
+    }
+
+    public static String getManagersToken(String[] tokens) {
+
+        return tokens[0];
+    }
+
+    public static String getUsersToken(int userNo, String[] tokens) {
+
+        return tokens[userNo];
     }
 
     public static String prepareTestUser(int userNo) {

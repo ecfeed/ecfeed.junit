@@ -2,5 +2,5 @@ package backend;
 
 public interface IRestServiceTest {
 
-    void runTest();
+    void runTest(String[] tokens);
 }
