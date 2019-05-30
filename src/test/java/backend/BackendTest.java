@@ -1,13 +1,6 @@
 package backend;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class BackendTest {
@@ -15,28 +8,69 @@ public class BackendTest {
     // REMARK: WITHOUT AUTH0 TESTS !!!
 
     @Test
-    public void shouldCheckIfUserExists() {
+    public void shouldPrepareManager() {
 
-        RestServiceTestRunner.launchTest(new CheckIfUserExistsTest());
+        BackendTestHelper.launchTest(new PrepareManagerTest());
     }
 
-    class CheckIfUserExistsTest implements IRestServiceTest {
+    class PrepareManagerTest implements IRestServiceTest {
 
         @Override
         public void runTest() {
 
-            // TODO - user should be logged first (test is incomplete)
+            String backendManagersToken = BackendTestHelper.prepareTestManager();
 
-            String mailToFind = "non-existent-user-45672168652@none.com";
-            String url = "http://localhost:8085/api/users/existence/" + mailToFind;
+            String url = BackendTestHelper.createBackendUrl("/users/test/managerAccess");
 
-            HttpResponse<JsonNode> response = sendGetManagersRequest(url);
-
-            JsonNode jsonNode = response.getBody();
-            JSONObject jsonObject = jsonNode.getObject();
-            String message = jsonObject.getString("message");
-            assertEquals("N", message);
+            BackendTestHelper.sendGetRequestWithOkResponse(backendManagersToken, url);
         }
+
+    }
+
+    @Test
+    public void shouldPrepareUserTest() {
+
+        BackendTestHelper.launchTest(new PrepareUserTest());
+    }
+
+    class PrepareUserTest implements IRestServiceTest {
+
+        @Override
+        public void runTest() {
+
+            String token = BackendTestHelper.prepareTestUser(1);
+
+            String url = BackendTestHelper.createBackendUrl("/users/test/regularUserAccess");
+
+            BackendTestHelper.sendGetRequestWithOkResponse(token, url);
+        }
+    }
+
+    //    @Test
+//    public void shouldCheckIfUserExists() {
+//
+//        BackendTestHelper.launchTest(new CheckIfUserExistsTest());
+//    }
+//
+//    class CheckIfUserExistsTest implements IRestServiceTest {
+//
+//        @Override
+//        public void runTest() {
+//
+//            String mailToFind = "non-existent-user-45672168652@none.com";
+//            String url = "http://localhost:8085/api/users/existence/" + mailToFind;
+//
+////            String managersToken = BackendTestHelper.getManagersTestToken();
+//            String managersToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1qbEVOVVpCTkRReE1rRTBRME0yT1RRMk4wVTFRVE5EUmpjMU5EWXlSVEJCTlRVMFFqZzVOZyJ9.eyJodHRwOi8vY29tLmVjZmVlZC90b2tlblV1aWQiOiI2MWE3YjU5OS01Yzc2LTRiMTktYjYxMy03YjEwM2JlOWI3YmEiLCJpc3MiOiJodHRwczovL2VjZmVlZC1kZXZlbG9wbWVudC5ldS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDIwNDI0NDMzNjI2MzA4MzA1ODciLCJhdWQiOlsiaHR0cDovL2VjZmVlZC5jb20vYXBpIiwiaHR0cHM6Ly9lY2ZlZWQtZGV2ZWxvcG1lbnQuZXUuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTU1OTEwODM3MywiZXhwIjoxNTU5MTE1NTczLCJhenAiOiJWc0s4Q25zb2pMOFNCNzYzVWNWdEJLZHFtcG5pRzlSSSIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgbWFuYWdlciIsInBlcm1pc3Npb25zIjpbIm1hbmFnZXIiXX0.A6J2jdTLqKFJnpLCTIvZeJTi-HqEgbnYLkboWQrBGDV02iGZRq6ufxbqH6He56PyCXSx8wm7UfvY1epvupKiaNCYAbcwMUcuyniEAB9aD2vuHXYjkbIjjd9GzimQY9QwZOFoOXA5zArd47HE9S8syNHlRcg5thgoVbv9KFHCnQGkrv-mALhkc-p2-voEnKg5lcRuigOm3ZbLo63qBrSiAMGEtP0c8RQwO3RuiGZsg-uUV-ZeWl5NF3K1hefESKx5m2_r0EByY0G06mSqlgZPx9L_-pRymCKW4gS8wdRFBgNYpoezhouJs9JE-NbO-EEyTBBgtXlcADRPnlIqd6cOTA";
+//
+//            HttpResponse<JsonNode> response =
+//                    RestServiceHelper.sendGetRequest(url, managersToken);
+//
+//            JsonNode jsonNode = response.getBody();
+//            JSONObject jsonObject = jsonNode.getObject();
+//            String message = jsonObject.getString("data");
+//            assertEquals("N", message);
+//        }
 
 //        private void deleteUser() {
 //
@@ -101,90 +135,52 @@ public class BackendTest {
 //
 //            return (String) userObject.get("email");
 //        }
-    }
+//    }
 
-    @Test
-    public void shouldGetUsersStripeHistory() {
+//    @Test
+//    public void shouldGetUsersStripeHistory() {
+//
+//        BackendTestHelper.launchTest(new GetUsersStripeHistoryTest());
+//    }
+//
+//    class GetUsersStripeHistoryTest implements IRestServiceTest {
+//
+//        @Override
+//        public void runTest() {
+//
+//            String url = "http://localhost:8085/api/stripe/history";
+//
+//            HttpResponse<JsonNode> response = getUserResponse(url);
+//
+//            assertEquals(RestServiceHelper.OK_STATUS, response.getStatus());
+//        }
+//    }
 
-        RestServiceTestRunner.launchTest(new GetUsersStripeHistoryTest());
-    }
+//    @Test
+//    public void shouldNotGetUsersStripeHistoryWhenInvalidToken() {
+//
+//        BackendTestHelper.launchTest(new GetUsersStripeHistoryTest2());
+//    }
+//
+//    class GetUsersStripeHistoryTest2 implements IRestServiceTest {
+//
+//        @Override
+//        public void runTest() {
+//
+//            String token = "rubbish";
+//            String url = "http://localhost:8085/api/stripe/history";
+//
+//            try {
+//                RestServiceHelper.sendRequestWithJsonResponse(url, token);
+//            } catch (Exception e) {
+//                return;
+//            }
+//        }
+//    }
 
-    class GetUsersStripeHistoryTest implements IRestServiceTest {
-
-        @Override
-        public void runTest() {
-
-            String url = "http://localhost:8085/api/stripe/history";
-
-            HttpResponse<JsonNode> response = getUserResponse(url);
-
-            assertEquals(RestServiceHelper.OK_STATUS, response.getStatus());
-        }
-    }
-
-    @Test
-    public void shouldNotGetUsersStripeHistoryWhenInvalidToken() {
-
-        RestServiceTestRunner.launchTest(new GetUsersStripeHistoryTest2());
-    }
-
-    class GetUsersStripeHistoryTest2 implements IRestServiceTest {
-
-        @Override
-        public void runTest() {
-
-            String token = "rubbish";
-            String url = "http://localhost:8085/api/stripe/history";
-
-            try {
-                RestServiceHelper.sendRequestWithJsonResponse(url, token);
-            } catch (Exception e) {
-                return;
-            }
-        }
-    }
-
-    private HttpResponse<JsonNode> getUserResponse(String url) {
-
-        String token = getUsersToken();
-
-        return RestServiceHelper.sendRequestWithJsonResponse(url, token);
-    }
-
-    private HttpResponse<JsonNode> sendGetManagersRequest(String url) {
-
-        String token = getManagersToken();
-
-//        System.out.println("Manager token: ");
-//        System.out.println(token);
-
-        return RestServiceHelper.sendRequestWithJsonResponse(url, token);
-    }
-
-    private HttpResponse<JsonNode> sendManagersDeleteRequest(String url) {
-
-        String token = getManagersToken();
-
-//        System.out.println("Manager token: ");
-//        System.out.println(token);
-
-        return RestServiceHelper.sendRequestWithJsonResponse(url, token);
-    }
-
-    public String getManagersToken() {
-
-        //        String token = RestServiceHelper.getTokenFromEnvironment("EC_AUTH0_MANAGER_TOKEN");
-        String token = "PASTE HERE";
-
-        return token;
-    }
-
-    private String getUsersToken() {
-
-        //        String token = RestServiceHelper.getTokenFromEnvironment("EC_AUTH0_USER_TOKEN");
-        String token = "PASTE HERE";
-
-        return token;
-    }
+//    private HttpResponse<JsonNode> sendManagersDeleteRequest(String url) {
+//
+//        return RestServiceHelper.sendRequestWithJsonResponse(url, token);
+//    }
 
 }

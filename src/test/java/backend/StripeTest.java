@@ -8,7 +8,7 @@ public class StripeTest {
     @Test
     public void shouldRequestUsersDataByMail() {
 
-        RestServiceTestRunner.launchTest(new RequestUsersDataByMailTest());
+        BackendTestHelper.launchTest(new RequestUsersDataByMailTest());
     }
 
     class RequestUsersDataByMailTest implements IRestServiceTest {

@@ -12,13 +12,12 @@ public class RestServiceHelper {
     public static final String NO_CACHE = "no-cache";
     public static final int OK_STATUS = 200;
 
-    public static HttpResponse<JsonNode> sendRequestWithJsonResponse(String url, String token) {
+    public static HttpResponse<JsonNode> sendOptionsRequest(String url) {
 
-        String authorization = createAuthorizationValue(token);
         HttpResponse<JsonNode> response = null;
 
         try {
-            response = getJsonNodeHttpResponse(url, authorization);
+            response = sendOptionsRequestIntr(url);
         } catch (Exception e) {
             ExceptionHelper.reportRuntimeException("Getting http response failed.", e);
         }
@@ -28,16 +27,38 @@ public class RestServiceHelper {
         return response;
     }
 
-    private static HttpResponse<JsonNode> getJsonNodeHttpResponse(
-            String url, String authorization) throws Exception {
+    public static HttpResponse<JsonNode> sendGetRequest(String url, String token) {
 
-        Unirest.setTimeouts(0, 0);
+        String authorization = createAuthorizationValue(token);
+        HttpResponse<JsonNode> response = null;
 
-        return Unirest
+        try {
+            Unirest.setTimeouts(0, 0);
+
+            response = Unirest
                     .get(url)
                     .header(HEADER_NAME_AUTHORIZATION, authorization)
                     .header(HEADER_NAME_CACHE_CONTROL, NO_CACHE)
                     .asJson();
+
+        } catch (Exception e) {
+            ExceptionHelper.reportRuntimeException("Getting http response failed.", e);
+        }
+
+        verifyResponseStatusOk(response);
+
+        return response;
+    }
+
+    private static HttpResponse<JsonNode> sendOptionsRequestIntr(String url) throws Exception {
+
+        Unirest.setTimeouts(0, 0);
+
+        return Unirest
+                .options(url)
+//                .header(HEADER_NAME_AUTHORIZATION, authorization)
+                .header(HEADER_NAME_CACHE_CONTROL, NO_CACHE)
+                .asJson();
     }
 
     public static void delete(String url, String authorization) {
@@ -106,4 +127,6 @@ public class RestServiceHelper {
 
         return stripeToken;
     }
+
+
 }

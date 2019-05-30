@@ -16,7 +16,7 @@ public class StripeAccesor {
         final String token = RestServiceHelper.getTokenFromEnvironment(ENV_EC_STRIPE_TOKEN);
 
         HttpResponse<JsonNode> response =
-                RestServiceHelper.sendRequestWithJsonResponse(url, token);
+                RestServiceHelper.sendGetRequest(url, token);
 
         final JSONObject bodyObject = response.getBody().getObject();
 
