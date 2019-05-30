@@ -21,4 +21,23 @@ public class StripeTest {
 //        }
 //    }
 
+//    @Test
+//    public void shouldGetUsersStripeHistory() {
+//
+//        BackendTestHelper.launchTest(new GetUsersStripeHistoryTest());
+//    }
+//
+//    class GetUsersStripeHistoryTest implements IRestServiceTest {
+//
+//        @Override
+//        public void runTest() {
+//
+//            String url = "http://localhost:8085/api/stripe/history";
+//
+//            HttpResponse<JsonNode> response = getUserResponse(url);
+//
+//            assertEquals(RestServiceHelper.OK_STATUS, response.getStatus());
+//        }
+//    }
+
 }

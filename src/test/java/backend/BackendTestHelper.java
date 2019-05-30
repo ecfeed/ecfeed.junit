@@ -94,18 +94,28 @@ public class BackendTestHelper {
         return jsonObject.getString("data");
     }
 
+    public static String sendGetRequestReturningData(String url, String backendManagersToken) {
+
+        HttpResponse<JsonNode> response =
+                RestServiceHelper.sendGetRequest(url, backendManagersToken);
+
+        JSONObject jsonObject = getBodyAsJsonObject(response);
+
+        return jsonObject.getString("data");
+    }
+
+    public static void sendGetRequestWithOkResponse(String url, String token) {
+
+        HttpResponse<JsonNode> response = RestServiceHelper.sendGetRequest(url, token);
+        assertResponseIsOk(response);
+    }
+
     public static JSONObject getBodyAsJsonObject(HttpResponse<JsonNode> response) {
 
         JsonNode jsonNode = response.getBody();
         JSONObject jsonObject = jsonNode.getObject();
 
         return jsonObject;
-    }
-
-    public static void sendGetRequestWithOkResponse(String token, String url) {
-
-        HttpResponse<JsonNode> response = RestServiceHelper.sendGetRequest(url, token);
-        assertResponseIsOk(response);
     }
 
     private static void assertResponseIsOk(HttpResponse<JsonNode> response) {
