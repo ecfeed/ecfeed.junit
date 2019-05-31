@@ -11,10 +11,8 @@ import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 
-import com.ecfeed.core.utils.GeneratorType;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
-import com.ecfeed.junit.annotation.AnnotationDefaultValue;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;
 import com.ecfeed.junit.main.processor.TupleProcessorStatic;
 import com.ecfeed.junit.runner.UserInputHelper;
