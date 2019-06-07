@@ -9,11 +9,7 @@ import java.util.concurrent.BlockingQueue;
 
 import com.ecfeed.core.evaluator.HomebrewConstraintEvaluator;
 import com.ecfeed.core.evaluator.Sat4jEvaluator;
-import com.ecfeed.core.generators.algorithms.AbstractAlgorithm;
-import com.ecfeed.core.generators.algorithms.AdaptiveRandomAlgorithm;
-import com.ecfeed.core.generators.algorithms.CartesianProductAlgorithm;
-import com.ecfeed.core.generators.algorithms.RandomAlgorithm;
-import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
+import com.ecfeed.core.generators.algorithms.*;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
 
@@ -62,7 +58,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 
 		switch (dataSource) {
 			case GEN_N_WISE :
-				fAlgorithm = new RandomizedNWiseAlgorithm<>(Integer.parseInt(fRequest.getN()), Integer.parseInt(fRequest.getCoverage()));
+				fAlgorithm = new AwesomeNWiseAlgorithm<>(Integer.parseInt(fRequest.getN()), Integer.parseInt(fRequest.getCoverage()));
 				break;
 			case GEN_CARTESIAN :
 				fAlgorithm = new CartesianProductAlgorithm<>();
