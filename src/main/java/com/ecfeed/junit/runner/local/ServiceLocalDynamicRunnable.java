@@ -7,15 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-import com.ecfeed.core.evaluator.HomebrewConstraintEvaluator;
 import com.ecfeed.core.evaluator.Sat4jEvaluator;
 import com.ecfeed.core.generators.algorithms.*;
 import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.generators.api.IConstraintEvaluator;
 
 
-import com.ecfeed.core.model.ChoiceNode;
-import com.ecfeed.core.model.Constraint;
+//import com.ecfeed.core.model.ChoiceNode;
+//import com.ecfeed.core.model.Constraint;
 
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;

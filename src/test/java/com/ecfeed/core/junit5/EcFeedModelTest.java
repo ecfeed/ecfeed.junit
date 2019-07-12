@@ -17,17 +17,17 @@ public class EcFeedModelTest {
 
 	public static enum EnumData {D1, D2, D3, D4, D5}
 
-	@EcFeedTest
-	@EcFeedModel("src/test/resources/big.ect")
-	@DisplayName("Custom test")
-	@EcFeedInput(""
-			+ "'dataSource':'genNWise',"
-			+ "'method':'com.ecfeed.core.junit5.EcFeedModelTest.ecFeedModelTest',"
-			+ "'coverage':'100',"
-			+ "'N':'2'"
-	)
-	void ecFeedModelTest(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) {
-	}
+//	@EcFeedTest
+//	@EcFeedModel("src/test/resources/big.ect")
+//	@DisplayName("Custom test")
+//	@EcFeedInput(""
+//			+ "'dataSource':'genNWise',"
+//			+ "'method':'com.ecfeed.core.junit5.EcFeedModelTest.ecFeedModelTest',"
+//			+ "'coverage':'100',"
+//			+ "'N':'2'"
+//	)
+//	void ecFeedModelTest(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) {
+//	}
 	
 	@EcFeedTest
 	@EcFeedModel("src/test/resources/test.ect")
