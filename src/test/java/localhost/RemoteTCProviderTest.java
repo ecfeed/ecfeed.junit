@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,7 +83,7 @@ public class RemoteTCProviderTest {
 
     private MethodNode getMethodNode() throws ParserException {
 
-        RootNode rootNode = new ModelParser().parseModel(TestModel.getModelXml(), null);
+        RootNode rootNode = new ModelParser().parseModel(TestModel.getModelXml(), null, new ArrayList<String>());
 
         ClassNode classNode = rootNode.getClass("test.Class1");
         MethodNode methodNode = classNode.getMethods().get(1);

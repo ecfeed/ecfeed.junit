@@ -44,6 +44,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
                 StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(
                                 EcFeedArgumentsProviderIterator.create(dataBlockingQueue, context),
+//                                EcFeedArgumentsProviderIteratorMock.create(dataBlockingQueue),
                                 Spliterator.IMMUTABLE),
                         false);
 

@@ -15,11 +15,11 @@ public class EcFeedResultVerifier implements AfterTestExecutionCallback {
 		Optional<Throwable> throwable = context.getExecutionException();
 		
 		EcFeedExtensionStore store = (EcFeedExtensionStore) context.getStore(Namespace.create("ecFeed")).get("ecFeedStore");
-		
+
 		if (store.getCollectStats()) {
 			if (throwable.isPresent()) {
 				RequestUpdateErrorSchema error = new RequestUpdateErrorSchema();
-				
+
 				error.setId(store.getTestId());
 				error.setErrorClass(throwable.get().getClass() + "");
 				error.setErrorMessage(throwable.get().getMessage());

@@ -51,7 +51,10 @@ dependencies {
     implementation 'org.springframework:spring-core:5.1.5.RELEASE'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
+// https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
+testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.0'
 
+    
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
