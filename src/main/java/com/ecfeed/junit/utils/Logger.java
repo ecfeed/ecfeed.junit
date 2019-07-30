@@ -13,7 +13,7 @@ public final class Logger { // TODO - REMOVE AND USE SystemLogger
 	public static void message(String info) {
 		
 		if (printToStream) {
-			System.out.println(info);
+	//		System.out.println(info);
 		}
 		
 	}

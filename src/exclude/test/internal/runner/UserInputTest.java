@@ -109,7 +109,7 @@ public class UserInputTest {
                 List<String> response = new ArrayList<>();
 
                 TestCasesRequest request = getTestCaseRequest();
-                request.setUserData("{'dataSource':'genNWise','coverage':'100','N':'2'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'100','n':'2'}");
 
                 new UserInputServiceTest(request, response).run();
 
@@ -225,7 +225,7 @@ public class UserInputTest {
                 TestCasesRequest request = getTestCaseRequest();
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'-1','N':'2'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'-1','n':'2'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -235,7 +235,7 @@ public class UserInputTest {
                         .hasSize(1);
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'101','N':'2'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'101','n':'2'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -245,7 +245,7 @@ public class UserInputTest {
                         .hasSize(1);
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'invalid','N':'2'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'invalid','n':'2'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -267,7 +267,7 @@ public class UserInputTest {
                 TestCasesRequest request = getTestCaseRequest();
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'100','N':'-1'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'100','n':'-1'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -277,7 +277,7 @@ public class UserInputTest {
                         .hasSize(1);
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'100','N':'3'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'100','n':'3'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -287,7 +287,7 @@ public class UserInputTest {
                         .hasSize(1);
 
                 response.clear();
-                request.setUserData("{'dataSource':'genNWise','coverage':'100','N':'invalid'}");
+                request.setUserData("{'dataSource':'genNWise','coverage':'100','n':'invalid'}");
                 new UserInputServiceTest(request, response).run();
 
                 softly.assertThat(response)
@@ -422,7 +422,7 @@ public class UserInputTest {
                 List<String> response = new ArrayList<>();
 
                 TestCasesRequest request = getTestCaseRequest();
-                request.setUserData("{'dataSource':'invalid','coverage':'100','N':'2'}");
+                request.setUserData("{'dataSource':'invalid','coverage':'100','n':'2'}");
 
                 new UserInputServiceTest(request, response).run();
 

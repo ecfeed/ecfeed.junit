@@ -24,7 +24,7 @@ public class EcFeedModelTest {
 			+ "'dataSource':'genNWise',"
 			+ "'method':'com.ecfeed.core.junit5.EcFeedModelTest.ecFeedModelTest',"
 			+ "'coverage':'100',"
-			+ "'N':'2',"
+			+ "'n':'2',"
 			+ "'duplicates':'false',"
 			+ "'depth':'2',"
 			+ "'length':'100',"
@@ -55,7 +55,7 @@ public class EcFeedModelTest {
 		
 		@EcFeedTest
 		@DisplayName("N-Wise")
-		@EcFeedInput("'dataSource':'genNWise', 'coverage':'100', 'N':'2'")
+		@EcFeedInput("'dataSource':'genNWise', 'coverage':'100', 'n':'2'")
 		void serviceNWiseTest(EnumData op0, String op1, byte op2, char op3, short op4, int op5, long op6, float op7, double op8, boolean op9) {}
 		
 		@EcFeedTest

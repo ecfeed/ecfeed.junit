@@ -17,7 +17,7 @@ public final class TestCasesUserInputParserTest {
 						"'method' : 'method1', " + 
 						"'suiteSize' : 'suiteSize1', " + 
 						"'coverage' : 'coverage1', " + 
-						"'N' : 'N1', " + 
+						"'n' : 'N1', " +
 						"'duplicates' : 'duplicates1', " + 
 						"'depth' : 'depth1', " + 
 						"'length' : 'length1', " + 

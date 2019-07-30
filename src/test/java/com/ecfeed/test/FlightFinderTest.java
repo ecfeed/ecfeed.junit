@@ -18,17 +18,17 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 //@EcFeedKeyStore("src/test/resources/security")
 //@EcFeedModel("TestUuid1")
 
-//@EcFeedService("https://prod-gen.ecfeed.com")
-//@EcFeedModel("5905-6568-3203-5902-2571")
+@EcFeedService("https://prod-gen.ecfeed.com")
+@EcFeedModel("5905-6568-3203-5902-2571")
 
-@EcFeedService("https://development-gen.ecfeed.com")
-@EcFeedModel("6572-8506-3585-3035-5924")
+//@EcFeedService("https://development-gen.ecfeed.com")
+//@EcFeedModel("6572-8506-3585-3035-5924")
 
 @Disabled
 public class FlightFinderTest {
 
 //	@EcFeedTest
-//	@EcFeedInput("'dataSource':'genNWise','coverage':'100','N':'2', 'constraints':'ALL'")
+//	@EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'2', 'constraints':'ALL'")
 //	public void findFlightsTest(String airportFrom, String airportTo, int daysToFlyOut, boolean isReturnFlight, int daysBetweenFlights, TicketClass ticketClass, float maxPrice) {
 //		System.out.println(airportFrom + " " + airportTo + " " + daysToFlyOut + " " + isReturnFlight + " " + daysBetweenFlights + " " + ticketClass + " " + maxPrice);
 //	}
@@ -63,7 +63,7 @@ public class FlightFinderTest {
 	}
 	
 	@EcFeedTest
-	@EcFeedInput("'dataSource':'genNWise','coverage':'100','N':'2', 'constraints':'ALL'")
+	@EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'2', 'constraints':'ALL'")
     public void findFlightsTest(String airportFrom, String airportTo, int daysToFlyOut, boolean isReturnFlight, int daysBetweenFlights, TicketClass ticketClass, float maxPrice) {
 
     	if (airportFrom.equals(airportTo)) {
