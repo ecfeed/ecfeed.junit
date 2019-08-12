@@ -129,13 +129,8 @@ public class Main {
 			case GEN_RANDOM:
 				return Optional.of(new RandomAlgorithm<>(
 						Integer.parseInt(userData.getLength()),
-						Boolean.parseBoolean(userData.getDuplicates())));
-			case GEN_ADAPTIVE_RANDOM :
-				return Optional.of(new AdaptiveRandomAlgorithm<>(
-						Integer.parseInt(userData.getDepth()),
-						Integer.parseInt(userData.getCandidates()),
-						Integer.parseInt(userData.getLength()),
-						Boolean.parseBoolean(userData.getDuplicates())));
+						Boolean.parseBoolean(userData.getDuplicates()),
+						Boolean.parseBoolean(userData.getAdaptive())));
 			case STATIC:
 				return Optional.empty();
 			default :
