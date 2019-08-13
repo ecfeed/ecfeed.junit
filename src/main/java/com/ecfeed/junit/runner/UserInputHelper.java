@@ -135,11 +135,15 @@ public class UserInputHelper {
 	}
 	 
 	private static List<ChoiceNode> adjustMethodParameter(MethodParameterNode parameter, List<ChoiceNode> choices) {
-		List<ChoiceNode> choiceList = new ArrayList<ChoiceNode>();
+		List<ChoiceNode> choiceList = new ArrayList<>();
 		
 		if (parameter.isExpected()) {
-			choiceList.add(new ChoiceNode("[e]" + parameter.getDefaultValue(), null, parameter.getDefaultValue()));
-			return adjustChoiceNode(choiceList);
+		    ChoiceNode choice = new ChoiceNode("[e]" + parameter.getDefaultValue(), null, parameter.getDefaultValue());
+		    choice.setParent(parameter);
+
+		    choiceList.add(choice);
+
+		    return adjustChoiceNode(choiceList);
 		}
 		
 		choiceList.addAll(choices);
@@ -148,7 +152,7 @@ public class UserInputHelper {
 	}
 	
 	private static List<ChoiceNode> adjustChoiceNode(List<ChoiceNode> choiceNodeList) {
-		List<ChoiceNode> choiceList = new ArrayList<ChoiceNode>();
+		List<ChoiceNode> choiceList = new ArrayList<>();
 		
 		for (ChoiceNode choice : choiceNodeList) {
 			

@@ -37,7 +37,7 @@ public class UserInputJUnit5Test {
     @EcFeedTest
     @DisplayName("N-Wise")
     @EcFeedModel("TestUuid1")
-    @EcFeedInput("'dataSource':'genNWise','coverage':'100','N':'2','method':'test.Class1.randomized'")
+    @EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'n','method':'test.Class1.randomized'")
     void generatorNWiseTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
     }

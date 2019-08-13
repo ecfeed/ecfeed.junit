@@ -28,7 +28,7 @@ public class ShouldGenerateWithNWiseGenerator {
     }
 
     @EcFeedTest
-    @EcFeedInput("'dataSource':'genNWise','coverage':'100','N':'2', 'method':'test.Class1.randomized'")
+    @EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'2', 'method':'test.Class1.randomized'")
     public void test(int arg1, String arg2) {
         fActualCallCounter++;
     }

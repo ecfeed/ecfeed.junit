@@ -44,6 +44,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
                 StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(
                                 EcFeedArgumentsProviderIterator.create(dataBlockingQueue, context),
+//                                EcFeedArgumentsProviderIteratorMock.create(dataBlockingQueue),
                                 Spliterator.IMMUTABLE),
                         false);
 
@@ -57,7 +58,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
         TestCasesRequest restRequest = getTestCaseRequest(extensionContext);
 
         String serviceUrl = AnnotationProcessor.processService(extensionContext);
-        Optional<String> keyStorePath = Optional.of(AnnotationProcessor.processKeyStore(extensionContext));
+        Optional<String> keyStorePath = Optional.ofNullable(AnnotationProcessor.processKeyStore(extensionContext));
         String clientType = getCreateClientType(restRequest);
 
         return createJunitRestServiceRunnable(

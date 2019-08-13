@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Model name="FlightFinderTest" version="2">
+    <Class name="com.ecfeed.test.FlightFinderTest">
+        <Properties>
+            <Property name="runOnAndroid" type="boolean" value="false"/>
+        </Properties>
+        <Method name="initialTest">
+            <Properties>
+                <Property name="methodRunner" type="String" value="Java Runner"/>
+                <Property name="wbMapBrowserToParam" type="boolean" value="false"/>
+                <Property name="wbBrowser" type="String" value="Chrome"/>
+                <Property name="wbMapStartUrlToParam" type="boolean" value="false"/>
+            </Properties>
+        </Method>
+        <Method name="findFlightsTest">
+            <Properties>
+                <Property name="methodRunner" type="String" value="Java Runner"/>
+                <Property name="wbMapBrowserToParam" type="boolean" value="false"/>
+                <Property name="wbBrowser" type="String" value="Chrome"/>
+                <Property name="wbMapStartUrlToParam" type="boolean" value="false"/>
+            </Properties>
+            <Parameter name="airportFrom" type="String" isExpected="false" expected="0" linked="true" link="com.ecfeed.test.FlightFinderTest:airportFrom">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Choice name="Europe" value="">
+                    <Choice name="Frankfurt\sAm\sMain" value="FRA"/>
+                    <Choice name="Paris\sCharles\sDe\sGaulle" value="CDG"/>
+                </Choice>
+                <Choice name="America" value="">
+                    <Choice name="New\sYork\sJFK" value="JFK"/>
+                    <Choice name="Atlanta" value="ATL"/>
+                </Choice>
+                <Choice name="Asia" value="">
+                    <Choice name="Tokyo\sNarita" value="NRT"/>
+                    <Choice name="Delhi" value="DEL"/>
+                </Choice>
+            </Parameter>
+            <Parameter name="airportTo" type="String" isExpected="false" expected="0" linked="true" link="com.ecfeed.test.FlightFinderTest:airportFrom">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Choice name="Europe" value="">
+                    <Choice name="Frankfurt\sAm\sMain" value="FRA"/>
+                    <Choice name="Paris\sCharles\sDe\sGaulle" value="CDG">
+                        <Label label="premium"/>
+                    </Choice>
+                </Choice>
+                <Choice name="America" value="">
+                    <Label label="premium"/>
+                    <Choice name="New\sYork\sJFK" value="JFK"/>
+                    <Choice name="Atlanta" value="ATL"/>
+                </Choice>
+                <Choice name="Asia" value="">
+                    <Choice name="Tokyo\sNarita" value="NRT"/>
+                    <Choice name="Delhi" value="DEL"/>
+                </Choice>
+            </Parameter>
+            <Parameter name="daysToFlyout" type="int" isExpected="false" expected="0" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="today" value="0"/>
+                <Choice name="tomorrow" value="1"/>
+                <Choice name="next\sweek" value="7"/>
+                <Choice name="next\smonth" value="31"/>
+            </Parameter>
+            <Parameter name="isReturnFlight" type="boolean" isExpected="false" expected="false" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="one\sway" value="false"/>
+                <Choice name="return" value="false"/>
+            </Parameter>
+            <Parameter name="daysBetweenFlights" type="int" isExpected="false" expected="0" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="not\srelevant" value="0"/>
+                <Choice name="one\sday" value="1"/>
+                <Choice name="one\sweek" value="7"/>
+                <Choice name="one\smonth" value="31"/>
+            </Parameter>
+            <Parameter name="ticketClass" type="com.ecfeed.test.TicketClass" isExpected="false" expected="PREMIUM_ECONOMY" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="economy" value="ECONOMY">
+                    <Label label="label"/>
+                </Choice>
+                <Choice name="premium\seconomy" value="PREMIUM_ECONOMY">
+                    <Label label="premium"/>
+                </Choice>
+                <Choice name="business" value="BUSINESS"/>
+                <Choice name="first" value="FIRST">
+                    <Label label="premium"/>
+                </Choice>
+            </Parameter>
+            <Parameter name="maxPrice" type="float" isExpected="true" expected="POSITIVE_INFINITY" linked="false">
+                <Properties>
+                    <Property name="wbIsOptional" type="boolean" value="false"/>
+                </Properties>
+                <Comments>
+                    <TypeComments/>
+                </Comments>
+                <Choice name="min\svalue" value="MIN_VALUE"/>
+                <Choice name="max\svalue" value="MAX_VALUE"/>
+            </Parameter>
+            <Constraint name="return\sflight">
+                <Premise>
+                    <Statement choice="one\sway" parameter="isReturnFlight" relation="="/>
+                </Premise>
+                <Consequence>
+                    <Statement choice="not\srelevant" parameter="daysBetweenFlights" relation="="/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="return\sflight">
+                <Premise>
+                    <Statement choice="return" parameter="isReturnFlight" relation="="/>
+                </Premise>
+                <Consequence>
+                    <Statement choice="not\srelevant" parameter="daysBetweenFlights" relation="≠"/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="max\sprice">
+                <Premise>
+                    <StatementArray operator="and">
+                        <Statement choice="Europe" parameter="airportTo" relation="="/>
+                        <Statement choice="Europe" parameter="airportFrom" relation="="/>
+                    </StatementArray>
+                </Premise>
+                <Consequence>
+                    <ExpectedValueStatement parameter="maxPrice" value="300.0"/>
+                </Consequence>
+            </Constraint>
+            <Constraint name="premium">
+                <Premise>
+                    <StatementArray operator="or">
+                        <Statement choice="America" parameter="airportTo" relation="="/>
+                        <Statement choice="Europe:Paris\sCharles\sDe\sGaulle" parameter="airportTo" relation="="/>
+                    </StatementArray>
+                </Premise>
+                <Consequence>
+                    <LabelStatement label="premium" parameter="ticketClass" relation="="/>
+                </Consequence>
+            </Constraint>
+        </Method>
+        <Parameter name="airportFrom" type="String">
+            <Properties>
+                <Property name="wbIsOptional" type="boolean" value="false"/>
+            </Properties>
+            <Comments>
+                <TypeComments/>
+            </Comments>
+            <Choice name="Europe" value="">
+                <Choice name="Frankfurt\sAm\sMain" value="FRA"/>
+                <Choice name="Paris\sCharles\sDe\sGaulle" value="CDG">
+                    <Label label="premium"/>
+                </Choice>
+            </Choice>
+            <Choice name="America" value="">
+                <Label label="premium"/>
+                <Choice name="New\sYork\sJFK" value="JFK"/>
+                <Choice name="Atlanta" value="ATL"/>
+            </Choice>
+            <Choice name="Asia" value="">
+                <Choice name="Tokyo\sNarita" value="NRT"/>
+                <Choice name="Delhi" value="DEL"/>
+            </Choice>
+        </Parameter>
+    </Class>
+</Model>

@@ -51,6 +51,8 @@ dependencies {
     implementation 'org.springframework:spring-core:5.1.5.RELEASE'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
+// https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
+testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.0'
 
     // https://mvnrepository.com/artifact/org.sat4j/org.sat4j.pb
     compile group: 'org.sat4j', name: 'org.sat4j.pb', version: '2.3.1'
@@ -77,6 +79,11 @@ sourceSets {
     main {
         java {
             srcDirs = ['src/main/java', 'reference/submodule/ecfeed.core/src']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
         }
     }
 }

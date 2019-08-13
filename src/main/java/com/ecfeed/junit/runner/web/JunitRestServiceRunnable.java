@@ -178,7 +178,7 @@ public class JunitRestServiceRunnable implements Runnable {
         try {
             responseBufferedReader.close();
         } catch (IOException e) {
-            ExceptionHelper.reportRuntimeException("Cannot close response stream.");
+            SystemLogger.logCatch(e);
         }
     }
 

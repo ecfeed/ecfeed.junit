@@ -65,7 +65,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Order")
-	@EcFeedInput("'N':'default'")
+	@EcFeedInput("'n':'default'")
 	void extractOrderTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -271,7 +271,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("N-Wise")
-	@EcFeedInput("'dataSource':'nwise', 'coverage':'100', 'N':'2'")
+	@EcFeedInput("'dataSource':'nwise', 'coverage':'100', 'n':'2'")
 	void getNWiseTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		

@@ -22,7 +22,7 @@ public class ExternalJUnit5Test {
     @EcFeedTest
     @DisplayName("N-Wise")
     @EcFeedModel("TestUuid1")
-    @EcFeedInput("'dataSource':'genNWise','coverage':'100','N':'2','method':'test.Class1.randomized(int arg1, String arg2)'")
+    @EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'2','method':'test.Class1.randomized(int arg1, String arg2)'")
     void generatorNWiseTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
     }
