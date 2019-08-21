@@ -11,6 +11,7 @@ import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
+import localhost.utils.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -193,7 +194,7 @@ public class RemoteTCProviderTest {
         Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 
         return new GenWebServiceClient(
-                "https://localhost:8090", // TODO
+                TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
                 GenWebServiceClient.getTestCasesEndPoint(),
                 GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
                 keyStorePath);

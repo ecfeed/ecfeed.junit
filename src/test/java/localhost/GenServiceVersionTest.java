@@ -41,7 +41,7 @@ public class GenServiceVersionTest {
         Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 
         return new GenWebServiceClient(
-                "https://localhost:8090", // TODO
+                TestHelper.GEN_SERVICE_URL_ON_LOCALHOST, // TODO
                 GenWebServiceClient.getGenServiceVersionEndPoint(),
                 GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
                 keyStorePath);
