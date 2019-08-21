@@ -1,8 +1,10 @@
 package localhost;
 
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
+import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.webservice.client.WebServiceResponse;
+import localhost.utils.TestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -41,7 +43,7 @@ public class GenServiceVersionTest {
         return new GenWebServiceClient(
                 "https://localhost:8090", // TODO
                 GenWebServiceClient.getGenServiceVersionEndPoint(),
-                "localTestRunner", // TODO
+                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
                 keyStorePath);
     }
 

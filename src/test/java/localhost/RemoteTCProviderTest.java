@@ -7,6 +7,7 @@ import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProvider;
+import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
@@ -194,7 +195,7 @@ public class RemoteTCProviderTest {
         return new GenWebServiceClient(
                 "https://localhost:8090", // TODO
                 GenWebServiceClient.getTestCasesEndPoint(),
-                "localTestRunner", // TODO
+                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
                 keyStorePath);
     }
 
