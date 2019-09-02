@@ -77,18 +77,10 @@ public final class InputProcessor {
         return Optional.empty();
     }
 
-    static Integer extractN(OptionSet options) {
-        Integer N = null;
-        if (options.hasArgument(TUPLE_ARITY_SHORT)) {
-            try {
-                N = Integer.parseInt(options.valueOf(TUPLE_ARITY_SHORT).toString());
-            }
-            catch (NumberFormatException e)
-            {
-                ExceptionHelper.reportRuntimeException("Value of N provided must be an integer.");
-            }
-        }
-        return N;
+    static String extractN(OptionSet options) {
+        if (options.hasArgument(TUPLE_ARITY_SHORT))
+            return options.valueOf(TUPLE_ARITY_SHORT).toString();
+        return null;
     }
 
 }

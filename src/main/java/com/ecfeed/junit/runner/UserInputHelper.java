@@ -423,7 +423,7 @@ public class UserInputHelper {
 		try {
 			ModelParser modelParser = new ModelParser();
 
-			model = modelParser.parseModel(modelStream, null);
+			model = modelParser.parseModel(modelStream, null, new ArrayList<>());
 			model = ModelConverter.convertToCurrentVersion(model);
 		} catch (ParserException e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModelParser"));

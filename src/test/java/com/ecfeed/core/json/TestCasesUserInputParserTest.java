@@ -19,8 +19,7 @@ public final class TestCasesUserInputParserTest {
 						"'coverage' : 'coverage1', " + 
 						"'n' : 'N1', " +
 						"'duplicates' : 'duplicates1', " + 
-						"'depth' : 'depth1', " + 
-						"'length' : 'length1', " + 
+						"'length' : 'length1', " +
 						"'candidates' : 'candidates1', " + 
 						"'testSuites' : 'testSuites1', " + 
 						"'constraints' : 'constraints1', " + 
@@ -40,12 +39,11 @@ public final class TestCasesUserInputParserTest {
 		assertEquals(DataSource.STATIC, dataSource);
 		assertEquals("method1", testCasesRequest.getMethod());
 		assertEquals("suiteSize1", testCasesRequest.getSuiteSize());
-		assertEquals("coverage1", testCasesRequest.getCoverage());
-		assertEquals("N1", testCasesRequest.getN());
-		assertEquals("duplicates1", testCasesRequest.getDuplicates());
-		assertEquals("depth1", testCasesRequest.getDepth());
-		assertEquals("length1", testCasesRequest.getLength());
-		assertEquals("candidates1", testCasesRequest.getCandidates());
+		assertEquals("coverage1", testCasesRequest.getProperties().get("coverage"));
+		assertEquals("N1", testCasesRequest.getProperties().get("n"));
+		assertEquals("duplicates1", testCasesRequest.getProperties().get("duplicates"));
+		assertEquals("length1", testCasesRequest.getProperties().get("length"));
+		assertEquals("candidates1", testCasesRequest.getProperties().get("candidates"));
 		assertEquals("testSuites1", testCasesRequest.getTestSuites());
 		assertEquals("constraints1", testCasesRequest.getConstraints());
 		assertEquals("choices1", testCasesRequest.getChoices());

@@ -27,7 +27,5 @@ public final class CommandLineConstants {
 
     public final static String DEFAULT_METHOD = "";
 
-    public final static int DEFAULT_COVERAGE = 100;
-
     public final static String DEFAULT_DATA_SOURCE = GeneratorType.N_WISE.toString();
 }

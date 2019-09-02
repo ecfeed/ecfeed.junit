@@ -53,11 +53,11 @@ public class AnnotationInputGetTest {
 		
 		assertAll("Compound",
 				() -> {
-					assertNotNull(request.getCoverage(),
+					assertNotNull(request.getProperties().get("coverage"),
 							() -> "The coverage could not be extracted");
 				},
 				() -> {
-					assertEquals("default", request.getCoverage(),
+					assertEquals("default", request.getProperties().get("coverage"),
 							() -> "The coverage is erroneous");
 				}
 		);
@@ -71,11 +71,11 @@ public class AnnotationInputGetTest {
 		
 		assertAll("Compound",
 				() -> {
-					assertNotNull(request.getN(),
+					assertNotNull(request.getProperties().get("n"),
 							() -> "The order could not be extracted");
 				},
 				() -> {
-					assertEquals("default", request.getN(),
+					assertEquals("default", request.getProperties().get("n"),
 							() -> "The order is erroneous");
 				}
 		);
@@ -107,11 +107,11 @@ public class AnnotationInputGetTest {
 		
 		assertAll("Compound",
 				() -> {
-					assertNotNull(request.getDuplicates(),
+					assertNotNull(request.getProperties().get("duplicates"),
 							() -> "The duplicate flag could not be extracted");
 				},
 				() -> {
-					assertEquals("default", request.getDuplicates(),
+					assertEquals("default", request.getProperties().get("duplicates"),
 							() -> "The duplicate flag is erroneous");
 				}
 		);
@@ -125,11 +125,11 @@ public class AnnotationInputGetTest {
 		
 		assertAll("Compound",
 				() -> {
-					assertNotNull(request.getDepth(),
+					assertNotNull(request.getProperties().get("depth"),
 							() -> "The depth could not be extracted");
 				},
 				() -> {
-					assertEquals("default", request.getDepth(),
+					assertEquals("default", request.getProperties().get("depth"),
 							() -> "The depth is erroneous");
 				}
 		);
@@ -143,30 +143,12 @@ public class AnnotationInputGetTest {
 		
 		assertAll("Compound",
 				() -> {
-					assertNotNull(request.getLength(),
+					assertNotNull(request.getProperties().get("length"),
 							() -> "The number of samples could not be extracted");
 				},
 				() -> {
-					assertEquals("default", request.getLength(),
+					assertEquals("default", request.getProperties().get("length"),
 							() -> "The number od samples is erroneous");
-				}
-		);
-	}
-	
-	@Test
-	@DisplayName("Candidates")
-	@EcFeedInput("'candidates':'default'")
-	void extractCandidatesTest(ExtensionContext extensionContext) {
-		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
-		
-		assertAll("Compound",
-				() -> {
-					assertNotNull(request.getCandidates(),
-							() -> "The number of candidates could not be extracted");
-				},
-				() -> {
-					assertEquals("default", request.getCandidates(),
-							() -> "The number of candidates is erroneous");
 				}
 		);
 	}
@@ -281,11 +263,11 @@ public class AnnotationInputGetTest {
 							() -> "The generator name is erroneous");
 				},
 				() -> {
-					assertEquals("100", request.getCoverage(),
+					assertEquals("100", request.getProperties().get("coverage"),
 							() -> "The coverage is erroneous");
 				},
 				() -> {
-					assertEquals("2", request.getN(),
+					assertEquals("2", request.getProperties().get("n"),
 							() -> "The order is erroneous");
 				}
 		);
@@ -303,11 +285,11 @@ public class AnnotationInputGetTest {
 							() -> "The generator name is erroneous");
 				},
 				() -> {
-					assertEquals("100", request.getLength(),
+					assertEquals("100", request.getProperties().get("length"),
 							() -> "The number of samples is erroneous");
 				},
 				() -> {
-					assertEquals("false", request.getDuplicates(),
+					assertEquals("false", request.getProperties().get("duplicates"),
 							() -> "The duplicates flag is erroneous");
 				}
 		);
@@ -315,7 +297,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Random adaptive")
-	@EcFeedInput("'dataSource':'random_adaptive', 'depth':'10', 'length':'2', 'candidates':'2', 'duplicates':'false'")
+	@EcFeedInput("'dataSource':'random_adaptive', 'depth':'10', 'length':'2', 'duplicates':'false'")
 	void getSampleAdaptiveTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -325,19 +307,15 @@ public class AnnotationInputGetTest {
 							() -> "The generator name is erroneous");
 				},
 				() -> {
-					assertEquals("10", request.getDepth(),
+					assertEquals("10", request.getProperties().get("depth"),
 							() -> "The depth is erroneous");
 				},
 				() -> {
-					assertEquals("2", request.getLength(),
+					assertEquals("2", request.getProperties().get("length"),
 							() -> "The number of samples is erroneous");
 				},
 				() -> {
-					assertEquals("2", request.getCandidates(),
-							() -> "The number of candidates is erroneous");
-				},
-				() -> {
-					assertEquals("false", request.getDuplicates(),
+					assertEquals("false", request.getProperties().get("duplicates"),
 							() -> "The duplicates flag is erroneous");
 				}
 		);

@@ -1,8 +1,10 @@
 package com.ecfeed.junit.main;
 
 import com.ecfeed.core.evaluator.Sat4jEvaluator;
-import com.ecfeed.core.generators.algorithms.*;
-import com.ecfeed.core.generators.api.IConstraintEvaluator;
+import com.ecfeed.core.generators.GeneratorFactoryWithCodes;
+import com.ecfeed.core.generators.NWiseGenerator;
+import com.ecfeed.core.generators.api.IGenerator;
+import com.ecfeed.core.generators.api.ParameterConverter;
 import com.ecfeed.core.json.TestCasesUserInputParser;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.Constraint;
@@ -11,12 +13,12 @@ import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.utils.DataSource;
 import com.ecfeed.core.model.RootNode;
 
+import com.ecfeed.core.utils.GeneratorType;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;
 import com.ecfeed.junit.main.processor.TupleProcessorStatic;
 import com.ecfeed.junit.runner.UserInputHelper;
-import com.ecfeed.junit.utils.Localization;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ecfeed.core.utils.DataSource.STATIC;
 import static com.ecfeed.junit.main.CommandLineConstants.*;
 
 public class Main {
@@ -39,7 +42,7 @@ public class Main {
 		fModel = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
 		for(MethodNode methodNode : getAllMethodNodes(fUserInput)) {
 			System.out.println(methodNode.getLongSignature());
-			Optional<AbstractAlgorithm<ChoiceNode>> generator = initializeGenerator(fUserInput, methodNode);
+			Optional<IGenerator<ChoiceNode>> generator = initializeGenerator(fUserInput, methodNode);
 			Optional<List<List<ChoiceNode>>> list = initializeList(fUserInput, methodNode);
 
 			if (fVerbose) {
@@ -87,75 +90,54 @@ public class Main {
 		else
 			fUserInput.setMethod(DEFAULT_METHOD);
 
-		if (fUserInput.getCoverage() == null)
-			fUserInput.setCoverage(DEFAULT_COVERAGE);
-
 		if (fUserInput.getDataSource() == null)
 			fUserInput.setDataSource(DEFAULT_DATA_SOURCE);
 
 		if (fUserInput.getConstraints() == null)
 			fUserInput.setAllConstraints();
 
-		Integer N = InputProcessor.extractN(options);
+		String N = InputProcessor.extractN(options);
 		if (N != null)
-			fUserInput.setN(N);
+			fUserInput.getProperties().put(NWiseGenerator.N_PARAMETER_NAME,N);
 	}
 
-	private static Optional<AbstractAlgorithm<ChoiceNode>> initializeGenerator(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
-		Optional<AbstractAlgorithm<ChoiceNode>> generator = getGenerator(userData);
+	private static Optional<IGenerator<ChoiceNode>> initializeGenerator(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
+		DataSource dataSource = DataSource.parse(userData.getDataSource());
 
-		if (generator.isPresent()) {
-			setGenerator(generator.get(), userData, methodNode);
-			return generator;
-		}
+		if(dataSource == STATIC)
+			return Optional.empty();
 
-		return Optional.empty();
+		GeneratorType generatorType = dataSource.toGeneratorType();
+
+		IGenerator<ChoiceNode> generator = new GeneratorFactoryWithCodes().createGenerator(generatorType);
+
+
+
+
+		Collection<Constraint> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
+				methodNode,
+				Optional.ofNullable(userData.getConstraints()));
+		List<List<ChoiceNode>> generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(
+				methodNode,
+				Optional.ofNullable(userData.getChoices()));
+
+		generator.initialize(generatorDataInput,
+				new Sat4jEvaluator(generatorDataConstraints, methodNode),
+				ParameterConverter.deserialize(userData.getProperties(), generator.getParameterDefinitions()),
+				new SimpleProgressMonitor());
+
+		return Optional.of(generator);
+
 	}
 
 	private static Optional<List<List<ChoiceNode>>> initializeList(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
 		return Optional.of(UserInputHelper.getTestsFromEcFeedModel(methodNode, Optional.ofNullable(userData.getTestSuites())));
 	}
 
-	private static Optional<AbstractAlgorithm<ChoiceNode>> getGenerator(TestCasesUserInput userData) throws Exception {
-		DataSource dataSource = DataSource.parse(userData.getDataSource());
-
-		switch (dataSource) {
-			case GEN_N_WISE :
-				return Optional.of(new AwesomeNWiseAlgorithm<>(
-						Integer.parseInt(userData.getN()),
-						Integer.parseInt(userData.getCoverage())));
-			case GEN_CARTESIAN :
-				return Optional.of(new CartesianProductAlgorithm<>());
-			case GEN_RANDOM:
-				return Optional.of(new RandomAlgorithm<>(
-						Integer.parseInt(userData.getLength()),
-						Boolean.parseBoolean(userData.getDuplicates()),
-						Boolean.parseBoolean(userData.getAdaptive())));
-			case STATIC:
-				return Optional.empty();
-			default :
-				RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceLocalInvalidGeneratorName"));
-				throw exception;
-		}
-
-	}
-
-	private static void setGenerator(AbstractAlgorithm<ChoiceNode> generator, TestCasesUserInput userData, MethodNode methodNode) throws Exception {
-		Collection<Constraint> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
-				methodNode,
-				Optional.ofNullable(userData.getConstraints()));
-		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
-		List<List<ChoiceNode>> generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(
-				methodNode,
-				Optional.ofNullable(userData.getChoices()));
-
-		generator.initialize(generatorDataInput, constraintEvaluator, new SimpleProgressMonitor());
-	}
-
-	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
-		return UserInputHelper.getMethodNodeFromEcFeedModel(null, fModel
-				, Optional.ofNullable(userData.getMethod()));
-	}
+//	private static MethodNode getMethodNode(TestCasesUserInput userData) throws Exception {
+//		return UserInputHelper.getMethodNodeFromEcFeedModel(null, fModel
+//				, Optional.ofNullable(userData.getMethod()));
+//	}
 
 	private static List<MethodNode> getAllMethodNodes(TestCasesUserInput userData)
 	{
