@@ -40,7 +40,8 @@ hs_err_pid*
 **/out
 
 *.gradletasknamecache
-
+**/main/resources/application.properties
+**/test/resources/security
 
 
 

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'java-library'
@@ -99,3 +101,65 @@ task jarWithDependencies(type: Jar) {
     }
     with jar
 }
+
+def getBuildTime() {
+    return new Date().format('yyyy-MM-dd.HH-mm-ss')
+}
+
+def getBuildGitBranch() {
+    def value = ['git', 'branch'].execute()
+    def result = value.text.split("\n")
+
+    return result.find{ it.contains("* ") }.substring(2)
+}
+
+def getBuildGitStatus() {
+    def value = ['git', 'diff-index', 'HEAD'].execute()
+    def result = value.text.split()
+
+    return result.length > 0 ? 'dirty' : 'clean'
+}
+
+def getBuildGitCommit() {
+    def value = ['git', 'rev-parse', 'HEAD'].execute()
+
+    return value.text
+}
+
+task deleteResources(type: Delete) {
+    group = "Custom"
+    description= "Remove resource files."
+
+    doFirst {
+        delete fileTree(project.projectDir.toString() + '/src/main/resources') {
+            include "**/*.properties"
+        }
+    }
+
+}
+
+task updateResources() {
+    group = "Custom"
+    description = "Update resource files."
+
+    doFirst {
+        copy {
+            from(project.projectDir.toString() + '/src/main/templates') {
+                include '**/*.properties'
+                filter(ReplaceTokens, tokens:
+                    [
+                        'build.time'  : getBuildTime(),
+                        'build.branch': getBuildGitBranch(),
+                        'build.commit': getBuildGitCommit(),
+                        'build.status' : getBuildGitStatus()
+                    ]
+                )
+            }
+            into(project.projectDir.toString() + '/src/main/resources')
+        }
+    }
+
+}
+
+rootProject.tasks.getByName('updateResources').dependsOn deleteResources
+rootProject.tasks.getByName('processResources').dependsOn updateResources
