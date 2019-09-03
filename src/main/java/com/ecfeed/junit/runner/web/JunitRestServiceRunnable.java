@@ -110,7 +110,7 @@ public class JunitRestServiceRunnable implements Runnable {
 
     private WebServiceResponse getServerResponse(String requestText) {
 
-        return fWebServiceClient.postRequest(fRequestType, requestText);
+        return fWebServiceClient.sendPostRequest(fRequestType, requestText);
     }
 
     private void getServerUpdateResponse() {
@@ -125,7 +125,7 @@ public class JunitRestServiceRunnable implements Runnable {
         }
 
         String requestText = fServiceObjectMapper.mapRequestToString(request);
-        WebServiceResponse webServiceResponse = fWebServiceClient.postRequest(requestType, requestText);
+        WebServiceResponse webServiceResponse = fWebServiceClient.sendPostRequest(requestType, requestText);
 
         if (!webServiceResponse.isResponseStatusOk()) {
             ExceptionHelper.reportRuntimeException("Failed to send update request.");
