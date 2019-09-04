@@ -17,7 +17,7 @@ public class SecurityServiceTest extends ServiceRestTemplate {
 
     @Override
     protected void adjustParameters(String... settings) {
-        fClientType = "localTestRunner";
+        fClientType = GenWebServiceClientType.LOCAL_TEST_RUNNER.toString();
 
         fKeyStorePath = settings[0];
         fTrustStorePath = settings[0];

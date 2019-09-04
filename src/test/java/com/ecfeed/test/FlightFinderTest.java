@@ -14,7 +14,7 @@ import org.openqa.selenium.WebElement;
 
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-//@EcFeedService("https://localhost:8090")
+//@EcFeedService(TestHelper.GEN_SERVICE_URL_ON_LOCALHOST)
 //@EcFeedKeyStore("src/test/resources/security")
 //@EcFeedModel("TestUuid1")
 
