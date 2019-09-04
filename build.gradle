@@ -135,7 +135,7 @@ task deleteResources(type: Delete) {
 
     doFirst {
         delete fileTree(project.projectDir.toString() + '/src/main/resources') {
-            include "**/*.properties"
+            include "**/application.properties"
         }
     }
 
