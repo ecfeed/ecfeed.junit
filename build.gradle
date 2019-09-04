@@ -75,6 +75,9 @@ testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', versio
 
 // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.41.0'
 }
 
 sourceSets {
