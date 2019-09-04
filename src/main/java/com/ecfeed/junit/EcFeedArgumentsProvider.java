@@ -150,6 +150,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 
         return new GenWebServiceClient(
                 serviceUrl,
+                GenWebServiceClient.getTestCasesEndPoint(),
                 clientType,
                 keyStorePath);
     }

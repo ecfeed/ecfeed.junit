@@ -197,6 +197,7 @@ public class RemoteTCProviderTest {
 
         return new GenWebServiceClient(
                 "https://localhost:8090", // TODO
+                GenWebServiceClient.getTestCasesEndPoint(),
                 "localTestRunner", // TODO
                 keyStorePath);
 
