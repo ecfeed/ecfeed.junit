@@ -29,7 +29,6 @@ public class EcFeedModelTest {
 			+ "'duplicates':'false',"
 			+ "'depth':'2',"
 			+ "'length':'100',"
-			+ "'candidates':'2',"
 			+ "'testSuites':['t1'],"
 			+ "'constraints':['c1'],"
 			+ "'choices':{'arg2':['choice1:choice1','choice2']}"
@@ -69,10 +68,6 @@ public class EcFeedModelTest {
 		@EcFeedInput("'dataSource':'genRandom', 'length':'10', 'duplicates':'false'")
 		void serviceRandomTest(EnumData op0, String op1, byte op2, char op3, short op4, int op5, long op6, float op7, double op8, boolean op9) {}
 		
-		@EcFeedTest
-		@DisplayName("Random adaptive")
-		@EcFeedInput("'dataSource':'genAdaptiveRandom', 'depth':'10', 'length':'10', 'candidates':'10', 'duplicates':'false'")
-		void serviceRandomAdaptiveTest(EnumData op0, String op1, byte op2, char op3, short op4, int op5, long op6, float op7, double op8, boolean op9) {}
 	}
 
 	

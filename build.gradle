@@ -58,7 +58,7 @@ testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', versio
 
     // https://mvnrepository.com/artifact/org.sat4j/org.sat4j.pb
     compile group: 'org.sat4j', name: 'org.sat4j.pb', version: '2.3.1'
-    
+
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
     compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
 
