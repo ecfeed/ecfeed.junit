@@ -1,4 +1,4 @@
-package com.ecfeed.junit.annotation;
+package com.ecfeed.junit;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Optional;
 
+import com.ecfeed.junit.annotation.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 

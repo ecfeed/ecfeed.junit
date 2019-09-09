@@ -1,6 +1,9 @@
 package com.example.test;
 
-import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.annotation.EcFeedInput;
+import com.ecfeed.junit.annotation.EcFeedKeyStore;
+import com.ecfeed.junit.annotation.EcFeedModel;
+import com.ecfeed.junit.annotation.EcFeedTest;
 
 @EcFeedModel("src/test/resources/tutorial.ect")
 @EcFeedInput("'dataSource':'genNWise', 'constraints':'ALL', 'coverage':'100', 'n':'2'")

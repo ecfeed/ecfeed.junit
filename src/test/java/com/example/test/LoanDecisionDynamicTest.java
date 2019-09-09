@@ -1,6 +1,7 @@
 package com.example.test;
 
-import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.annotation.EcFeedModel;
+import com.ecfeed.junit.annotation.EcFeedTest;
 
 @EcFeedModel("auto")
 public class LoanDecisionDynamicTest {

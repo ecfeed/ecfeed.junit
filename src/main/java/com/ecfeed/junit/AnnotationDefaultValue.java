@@ -1,4 +1,4 @@
-package com.ecfeed.junit.annotation;
+package com.ecfeed.junit;
 
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;

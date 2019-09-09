@@ -14,26 +14,26 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class GenServiceVersionTest {
 
-    @Test
-    public void getVersionTest() {
-
-        IWebServiceClient genWebServiceClient = createWebServiceClient();
-
-        WebServiceResponse webServiceResponse = genWebServiceClient.sendGetRequest();
-
-        if (!webServiceResponse.isResponseStatusOk()) {
-            fail();
-        }
-
-        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
-
-        try {
-            bufferedReader.readLine();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-
-    }
+//    @Test
+//    public void getVersionTest() {
+//
+//        IWebServiceClient genWebServiceClient = createWebServiceClient();
+//
+//        WebServiceResponse webServiceResponse = genWebServiceClient.sendGetRequest();
+//
+//        if (!webServiceResponse.isResponseStatusOk()) {
+//            fail();
+//        }
+//
+//        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
+//
+//        try {
+//            bufferedReader.readLine();
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//
+//    }
 
 
     private IWebServiceClient createWebServiceClient() { // TODO - similar method in RemoteTCProviderTest
