@@ -18,7 +18,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.ecfeed.core.utils.ExtensionContextResolver;
 import com.ecfeed.core.utils.TestCasesUserInput;
-import com.ecfeed.junit.annotation.AnnotationProcessor;
+import com.ecfeed.junit.AnnotationProcessor;
 import com.ecfeed.junit.annotation.EcFeedInput;
 import com.google.common.collect.Maps;
 

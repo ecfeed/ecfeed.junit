@@ -6,7 +6,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.annotation.EcFeedInput;
+import com.ecfeed.junit.annotation.EcFeedModel;
+import com.ecfeed.junit.annotation.EcFeedService;
+import com.ecfeed.junit.annotation.EcFeedTest;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

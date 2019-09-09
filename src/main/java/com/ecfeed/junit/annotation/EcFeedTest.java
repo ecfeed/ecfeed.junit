@@ -12,6 +12,13 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import com.ecfeed.junit.EcFeedArgumentsProvider;
 import com.ecfeed.junit.EcFeedResultVerifier;
 
+/**
+ * <p>Defines the EcFeed test method.</p>
+ *
+ * If no other annotations present, the test stream is generated using the default values for each argument.
+ *
+ * @see <a href="https://ecfeed.com/tutorials/junit-documentation#ecfeedtest">https://ecfeed.com/tutorials/junit-documentation</a>
+ */
 @ParameterizedTest
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -4,8 +4,10 @@ import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.webservice.client.WebServiceResponse;
+import localhost.utils.ExecutionConditionLocalHostAvailable;
 import localhost.utils.TestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.BufferedReader;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class GenServiceVersionTest {
 
     @Test
+    @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void getVersionTest() {
 
         IWebServiceClient genWebServiceClient = createWebServiceClient();

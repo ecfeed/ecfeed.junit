@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.ecfeed.core.utils.ExtensionContextResolver;
-import com.ecfeed.junit.annotation.AnnotationProcessor;
+import com.ecfeed.junit.AnnotationProcessor;
 import com.ecfeed.junit.annotation.EcFeedInput;
 import com.ecfeed.junit.annotation.EcFeedKeyStore;
 import com.ecfeed.junit.annotation.EcFeedModel;

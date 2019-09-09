@@ -4,15 +4,19 @@ plugins {
     id 'java'
     id 'java-library'
     id 'application'
+    id 'maven'
+    id 'signing'
 }
-
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-version = '1.0.0'
 
 repositories {
     mavenCentral()
 }
+
+group = 'com.ecfeed'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+mainClassName = "com.ecfeed.junit.main.Main"
 
 test {
     useJUnitPlatform()
@@ -23,8 +27,6 @@ jar {
         attributes 'Main-Class': 'com.ecfeed.junit.main.Main'
     }
 }
-
-mainClassName = "com.ecfeed.junit.main.Main"
 
 dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
@@ -53,14 +55,12 @@ dependencies {
     implementation 'org.springframework:spring-core:5.1.5.RELEASE'
     implementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
-// https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
-testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.0'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.0'
 
     
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 
-    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
 
 }
 
@@ -77,8 +77,31 @@ sourceSets {
     }
 }
 
+javadoc {
+    include 'com/ecfeed/junit/annotation/*'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set("javadoc")
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
 task jarWithDependencies(type: Jar) {
-    classifier = 'ALL'
+    archiveClassifier.set("ALL")
     manifest { attributes 'Main-Class': 'com.ecfeed.junit.main.Main' }
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
     {
@@ -115,7 +138,7 @@ def getBuildGitCommit() {
 
 task deleteResources(type: Delete) {
     group = "Custom"
-    description= "Remove resource files."
+    description = "Remove resource files."
 
     doFirst {
         delete fileTree(project.projectDir.toString() + '/src/main/resources') {
@@ -138,7 +161,7 @@ task updateResources() {
                         'build.time'  : getBuildTime(),
                         'build.branch': getBuildGitBranch(),
                         'build.commit': getBuildGitCommit(),
-                        'build.status' : getBuildGitStatus()
+                        'build.status': getBuildGitStatus()
                     ]
                 )
             }
@@ -150,3 +173,72 @@ task updateResources() {
 
 rootProject.tasks.getByName('updateResources').dependsOn deleteResources
 rootProject.tasks.getByName('processResources').dependsOn updateResources
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+      tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+      }
+    }
+  }
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+              authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+               name 'ecFeed'
+               packaging 'jar'
+               description '' +
+                       'An open library used to connect to the ecFeed service. ' +
+                       'It can be also used as a standalone testing tool. ' +
+                       'It is integrated with Junit5 and generates a stream of test cases using a selected algorithm (e.g. Cartesian, N-Wise). ' +
+                       'There are no limitations associated with the off-line version but the user cannot access the on-line computation servers and the model database.'
+               url 'https://ecfeed.com/'
+
+               scm {
+                   url 'scm:git@github.com:ecfeed/ecfeed.junit.git'
+                   connection 'scm:git@github.com:ecfeed/ecfeed.junit.git'
+                   developerConnection 'scm:git@github.com:ecfeed/ecfeed.junit.git'
+               }
+
+               licenses {
+                   license {
+                       name 'Eclipse Public License - v 1.0'
+                       url 'https://www.eclipse.org/legal/epl-v10.html'
+                   }
+               }
+
+               developers {
+                   developer {
+                       id 'p.chamuczynski'
+                       name 'Patryk Chamuczynski'
+                       email 'p.chamuczynski@testify.no'
+                   }
+                   developer {
+                       id 'marek'
+                       name 'Marek Kuczabinski'
+                       email 'm.kuczabinski@testify.no'
+                   }
+                   developer {
+                       id 'k.skorupski'
+                       name 'Krzysztof Skorupski'
+                       email 'k.skorupski@testify.no'
+                   }
+                   developer {
+                       id 'p.uznanski'
+                       name 'Przemyslaw Uznanski'
+                       email 'p.uznanski@testify.no'
+                   }
+               }
+
+           }
+        }
+    }
+}
