@@ -232,7 +232,7 @@ uploadArchives {
                        email 'k.skorupski@testify.no'
                    }
                    developer {
-                       id 'p.uznanski'
+                       id 'izulin'
                        name 'Przemyslaw Uznanski'
                        email 'p.uznanski@testify.no'
                    }
