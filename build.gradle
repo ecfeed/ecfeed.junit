@@ -70,8 +70,8 @@ testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', versio
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 
 
-    // https://mvnrepository.com/artifact/org.ow2.sat4j/org.ow2.sat4j.core
-    compile group: 'org.ow2.sat4j', name: 'org.ow2.sat4j.core', version: '2.3.5'
+//    // https://mvnrepository.com/artifact/org.ow2.sat4j/org.ow2.sat4j.core
+//    compile group: 'org.ow2.sat4j', name: 'org.ow2.sat4j.core', version: '2.3.5'
 
 // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
