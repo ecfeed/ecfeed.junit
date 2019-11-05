@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-import com.ecfeed.core.evaluator.Sat4jEvaluator;
+import com.ecfeed.core.evaluator.SatSolverConstraintEvaluator;
 import com.ecfeed.core.generators.GeneratorFactoryWithCodes;
 import com.ecfeed.core.generators.algorithms.*;
 import com.ecfeed.core.generators.api.GeneratorException;
@@ -88,7 +88,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 
 		SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
 
-		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new Sat4jEvaluator(generatorDataConstraints, methodNode);
+		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new SatSolverConstraintEvaluator(generatorDataConstraints, methodNode);
 		fAlgorithm.initialize(generatorDataInput, constraintEvaluator,
 				ParameterConverter.deserialize(fRequest.getProperties(), fAlgorithm.getParameterDefinitions()),
 				simpleProgressMonitor);

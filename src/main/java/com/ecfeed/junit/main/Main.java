@@ -1,6 +1,6 @@
 package com.ecfeed.junit.main;
 
-import com.ecfeed.core.evaluator.Sat4jEvaluator;
+import com.ecfeed.core.evaluator.SatSolverConstraintEvaluator;
 import com.ecfeed.core.generators.GeneratorFactoryWithCodes;
 import com.ecfeed.core.generators.NWiseGenerator;
 import com.ecfeed.core.generators.api.IGenerator;
@@ -98,7 +98,7 @@ public class Main {
 
 		String N = InputProcessor.extractN(options);
 		if (N != null)
-			fUserInput.getProperties().put(NWiseGenerator.N_PARAMETER_NAME,N);
+			fUserInput.getProperties().put(NWiseGenerator.PARAMETER_NAME_N,N);
 	}
 
 	private static Optional<IGenerator<ChoiceNode>> initializeGenerator(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
@@ -122,7 +122,7 @@ public class Main {
 				Optional.ofNullable(userData.getChoices()));
 
 		generator.initialize(generatorDataInput,
-				new Sat4jEvaluator(generatorDataConstraints, methodNode),
+				new SatSolverConstraintEvaluator(generatorDataConstraints, methodNode),
 				ParameterConverter.deserialize(userData.getProperties(), generator.getParameterDefinitions()),
 				new SimpleProgressMonitor());
 
