@@ -1,6 +1,7 @@
 package com.ecfeed.junit.runner.local;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +58,6 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 	}
 	
 	private void initializeGenerator(Method testMethod) throws GeneratorException {
-
 		DataSource dataSource = DataSource.parse(fRequest.getDataSource());
 
 		if(dataSource == STATIC)
@@ -79,6 +79,15 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 		if (fModel.equals("auto")) {
 			generatorDataConstraints = new ArrayList<>();
 			generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
+			methodNode = new MethodNode("methodnode", null);
+			Type[] typeList = testMethod.getGenericParameterTypes();
+
+			for(int i=0;i<generatorDataInput.size();i++) {
+
+				MethodParameterNode node = new MethodParameterNode("arg"+i, null, typeList[i].getTypeName(), null, false, false, null);
+				node.addChoices(generatorDataInput.get(i));
+				methodNode.addParameter(node);
+			}
 		} else {
 			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(fModel));
 			methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()));

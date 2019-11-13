@@ -16,11 +16,13 @@ public final class TestCasesUserInputParserTest {
 						"'dataSource' : 'static', " + 
 						"'method' : 'method1', " + 
 						"'suiteSize' : 'suiteSize1', " + 
-						"'coverage' : 'coverage1', " + 
+						"'properties':{" +
+						"'coverage' : 'coverage1', " +
 						"'n' : 'N1', " +
 						"'duplicates' : 'duplicates1', " + 
 						"'length' : 'length1', " +
-						"'candidates' : 'candidates1', " + 
+						"'candidates' : 'candidates1' " +
+						"}," +
 						"'testSuites' : 'testSuites1', " + 
 						"'constraints' : 'constraints1', " + 
 						"'choices' : 'choices1' " + 

@@ -29,7 +29,7 @@ public class ShouldGenerateAdaptiveRandomGenerator {
     }
 
     @EcFeedTest
-    @EcFeedInput("'dataSource':'genAdaptiveRandom', 'depth':'10', 'length':'10', 'candidates':'10', 'duplicates':'false', 'method':'test.Class1.testMethod'")
+    @EcFeedInput("'dataSource':'genRandom', 'properties':{'length':'10', 'duplicates':'false'}, 'method':'test.Class1.testMethod'")
     public void test(String arg1, String arg2) { fActualCallCounter++; }
 
 }

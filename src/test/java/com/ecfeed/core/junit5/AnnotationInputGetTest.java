@@ -47,7 +47,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Coverage")
-	@EcFeedInput("'coverage':'default'")
+	@EcFeedInput("'properties':{'coverage':'default'}")
 	void extractCoverageTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -65,7 +65,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Order")
-	@EcFeedInput("'n':'default'")
+	@EcFeedInput("'properties':{'n':'default'}")
 	void extractOrderTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -101,7 +101,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Duplicates")
-	@EcFeedInput("'duplicates':'default'")
+	@EcFeedInput("'properties':{'duplicates':'default'}")
 	void extractDuplicatesTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -119,7 +119,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Depth")
-	@EcFeedInput("'depth':'default'")
+	@EcFeedInput("'properties':{'depth':'default'}")
 	void extractDepthTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -137,7 +137,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Length")
-	@EcFeedInput("'length':'default'")
+	@EcFeedInput("'properties':{'length':'default'}")
 	void extractLengthTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -253,7 +253,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("N-Wise")
-	@EcFeedInput("'dataSource':'nwise', 'coverage':'100', 'n':'2'")
+	@EcFeedInput("'dataSource':'nwise', 'properties':{'coverage':'100', 'n':'2'}")
 	void getNWiseTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -275,7 +275,7 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Random")
-	@EcFeedInput("'dataSource':'random', 'length':'100', 'duplicates':'false'")
+	@EcFeedInput("'dataSource':'random', 'properties':{'length':'100', 'duplicates':'false'}")
 	void getSampleTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
@@ -297,13 +297,13 @@ public class AnnotationInputGetTest {
 	
 	@Test
 	@DisplayName("Random adaptive")
-	@EcFeedInput("'dataSource':'random_adaptive', 'depth':'10', 'length':'2', 'duplicates':'false'")
+	@EcFeedInput("'dataSource':'random', 'properties':{'depth':'10', 'length':'2', 'duplicates':'false'}")
 	void getSampleAdaptiveTest(ExtensionContext extensionContext) {
 		TestCasesUserInput request = AnnotationProcessor.processInputSchema(extensionContext);
 		
 		assertAll("Compound",
 				() -> {
-					assertEquals("random_adaptive", request.getDataSource(),
+					assertEquals("random", request.getDataSource(),
 							() -> "The generator name is erroneous");
 				},
 				() -> {

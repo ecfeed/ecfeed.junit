@@ -24,11 +24,13 @@ public class EcFeedModelTest {
 	@EcFeedInput(""
 			+ "'dataSource':'genNWise',"
 			+ "'method':'com.ecfeed.core.junit5.EcFeedModelTest.ecFeedModelTest',"
+			+ "'properties' : {"
 			+ "'coverage':'100',"
 			+ "'n':'2',"
 			+ "'duplicates':'false',"
 			+ "'depth':'2',"
-			+ "'length':'100',"
+			+ "'length':'100'"
+			+ "},"
 			+ "'testSuites':['t1'],"
 			+ "'constraints':['c1'],"
 			+ "'choices':{'arg2':['choice1:choice1','choice2']}"
@@ -55,7 +57,7 @@ public class EcFeedModelTest {
 
 		@EcFeedTest
 		@DisplayName("N-Wise")
-		@EcFeedInput("'dataSource':'genNWise', 'coverage':'100', 'n':'2'")
+		@EcFeedInput("'dataSource':'genNWise', 'properties':{'coverage':'100', 'n':'2'}")
 		void serviceNWiseTest(EnumData op0, String op1, byte op2, char op3, short op4, int op5, long op6, float op7, double op8, boolean op9) {}
 		
 		@EcFeedTest
@@ -65,7 +67,7 @@ public class EcFeedModelTest {
 		
 		@EcFeedTest
 		@DisplayName("Random")
-		@EcFeedInput("'dataSource':'genRandom', 'length':'10', 'duplicates':'false'")
+		@EcFeedInput("'dataSource':'genRandom', 'properties':{'length':'10', 'duplicates':'false'}")
 		void serviceRandomTest(EnumData op0, String op1, byte op2, char op3, short op4, int op5, long op6, float op7, double op8, boolean op9) {}
 		
 	}

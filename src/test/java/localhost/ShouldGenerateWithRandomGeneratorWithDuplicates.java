@@ -30,7 +30,7 @@ public class ShouldGenerateWithRandomGeneratorWithDuplicates {
 
     @EcFeedTest
     //@EcFeedInput("'dataSource':'genRandom', 'length':'10', 'duplicates':'false', 'method':'test.Class1.testMethod'")
-    @EcFeedInput("'dataSource':'genRandom', 'length':'10', 'duplicates':'true', 'method':'test.Class1.testMethod'")
+    @EcFeedInput("'dataSource':'genRandom', 'properties':{'length':'10', 'duplicates':'true'}, 'method':'test.Class1.testMethod'")
     public void test(String arg1, String arg2) {
         fActualCallCounter++;
     }
