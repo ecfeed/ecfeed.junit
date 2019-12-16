@@ -1,6 +1,7 @@
 package localhost;
 
 import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import localhost.utils.TestHelper;
 import org.junit.jupiter.api.AfterAll;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @EcFeed
 @EcFeedService(TestHelper.GEN_SERVICE_URL_ON_LOCALHOST)
 @EcFeedKeyStore("src/test/resources/security")
-@EcFeedModel("TestUuid1")
+@EcFeedModel(TestDataSupplier.testModelUuid)
 @ExtendWith(ExecutionConditionLocalHostAvailable.class)
 public class ShouldGenerateWithTwoConstraints {
 

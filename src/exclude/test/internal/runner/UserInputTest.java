@@ -32,7 +32,7 @@ public class UserInputTest {
     private static TestCasesRequest getTestCaseRequest() {
         TestCasesRequest request = new TestCasesRequest();
 
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setMethod("test.Class1.randomized(int arg1, String arg2)");
         request.setUserData("{'dataSource':'static','testSuites':['default']}");
         return request;
@@ -184,7 +184,7 @@ public class UserInputTest {
 
                 TestCasesRequest request = new TestCasesRequest();
 
-                request.setModelName("TestUuid1");
+                request.setModelName(TestDataSupplier.testModelUuid);
                 request.setMethod("test.Class1.alternative1(String arg1, int arg2)");
                 request.setUserData("{'dataSource':'genCartesian','method':'test.Class1.alternative2'}");
 

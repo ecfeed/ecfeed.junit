@@ -16,6 +16,7 @@ import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.junit.runner.web.ServiceObjectMapper;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.params.provider.Arguments;
@@ -141,7 +142,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 
         String clientType = "regular";
 
-        if (restRequest.getModel().equals("TestUuid1")) {
+        if (restRequest.getModel().equals(TestDataSupplier.testModelUuid)) {
             clientType = GenWebServiceClientType.LOCAL_TEST_RUNNER.toString();
         }
 

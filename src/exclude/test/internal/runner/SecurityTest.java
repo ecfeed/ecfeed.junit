@@ -34,7 +34,7 @@ public class SecurityTest {
 
         TestCasesRequest request = new TestCasesRequest();
         request.setMethod("test.Class1.randomized(int arg1, String arg2)");
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setUserData("{'dataSource':'static','testSuites':['default']}");
 
         try {
@@ -57,7 +57,7 @@ public class SecurityTest {
 
         TestCasesRequest request = new TestCasesRequest();
         request.setMethod("test.Class1.randomized(int arg1, String arg2)");
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setUserData("{'dataSource':'static','testSuites':['default']}");
 
         try {
@@ -79,7 +79,7 @@ public class SecurityTest {
 
         TestCasesRequest request = new TestCasesRequest();
         request.setMethod("test.Class1.randomized(int arg1, String arg2)");
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setUserData("{'dataSource':'static','testSuites':['default']}");
 
         try {
@@ -101,7 +101,7 @@ public class SecurityTest {
 
         TestCasesRequest request = new TestCasesRequest();
         request.setMethod("test.Class1.randomized(int arg1, String arg2)");
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setUserData("{'dataSource':'static','testSuites':['default']}");
 
         try {

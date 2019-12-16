@@ -11,6 +11,7 @@ import com.ecfeed.core.genservice.provider.RemoteTCProvider;
 import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import localhost.utils.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +47,9 @@ public class RemoteTCProviderTest {
 
         MethodNode methodNode = getMethodNode();
 
-        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"" +
+                TestDataSupplier.testModelUuid +
+                "\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
 
         RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
 
@@ -73,7 +76,9 @@ public class RemoteTCProviderTest {
 
         MethodNode methodNode = getMethodNode();
 
-        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"" +
+                TestDataSupplier.testModelUuid +
+                "\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
 
         RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
 

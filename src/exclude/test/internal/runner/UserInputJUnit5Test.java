@@ -28,7 +28,7 @@ public class UserInputJUnit5Test {
 
     @EcFeedTest
     @DisplayName("Static")
-    @EcFeedModel("TestUuid1")
+    @EcFeedModel(TestDataSupplier.testModelUuid)
     @EcFeedInput("'dataSource':'static','testSuites':['default'],'method':'test.Class1.randomized'")
     void generatorStaticTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
@@ -36,7 +36,7 @@ public class UserInputJUnit5Test {
 
     @EcFeedTest
     @DisplayName("N-Wise")
-    @EcFeedModel("TestUuid1")
+    @EcFeedModel(TestDataSupplier.testModelUuid)
     @EcFeedInput("'dataSource':'genNWise','coverage':'100','n':'n','method':'test.Class1.randomized'")
     void generatorNWiseTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
@@ -44,7 +44,7 @@ public class UserInputJUnit5Test {
 
     @EcFeedTest
     @DisplayName("Cartesian")
-    @EcFeedModel("TestUuid1")
+    @EcFeedModel(TestDataSupplier.testModelUuid)
     @EcFeedInput("'dataSource':'genCartesian','method':'test.Class1.randomized'")
     void generatorCartesianTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
@@ -52,7 +52,7 @@ public class UserInputJUnit5Test {
 
     @EcFeedTest
     @DisplayName("Random")
-    @EcFeedModel("TestUuid1")
+    @EcFeedModel(TestDataSupplier.testModelUuid)
     @EcFeedInput("'dataSource':'genRandom', 'length':'10', 'duplicates':'true','method':'test.Class1.randomized'")
     void generatorRandomTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
@@ -60,7 +60,7 @@ public class UserInputJUnit5Test {
 
     @EcFeedTest
     @DisplayName("Adaptive random")
-    @EcFeedModel("TestUuid1")
+    @EcFeedModel(TestDataSupplier.testModelUuid)
     @EcFeedInput("'dataSource':'genAdaptiveRandom', 'depth':'1', 'length':'10', 'candidates':'1', 'duplicates':'true','method':'test.Class1.randomized'")
     void generatorRandomAdaptiveTest(int arg1, String arg2) {
         System.out.println("arg1 = [" + arg1 + "], arg2 = [" + arg2 + "]");
