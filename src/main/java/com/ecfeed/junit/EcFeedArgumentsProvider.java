@@ -13,8 +13,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
+import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.junit.runner.web.ServiceObjectMapper;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.params.provider.Arguments;
@@ -137,11 +139,13 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
     }
 
     private String getCreateClientType(TestCasesRequest restRequest) {
+
         String clientType = "regular";
 
-        if (restRequest.getModel().equals("TestUuid1")) {
-            clientType = "localTestRunner"; // TODO
+        if (restRequest.getModel().equals(TestDataSupplier.testModelUuid)) {
+            clientType = GenWebServiceClientType.LOCAL_TEST_RUNNER.toString();
         }
+
         return clientType;
     }
 
@@ -150,6 +154,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 
         return new GenWebServiceClient(
                 serviceUrl,
+                GenWebServiceClient.getTestCasesEndPoint(),
                 clientType,
                 keyStorePath);
     }

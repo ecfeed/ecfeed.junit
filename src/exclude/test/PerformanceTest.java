@@ -19,7 +19,7 @@ public class PerformanceTest {
     private static TestCasesRequest getTestCaseRequest() {
         TestCasesRequest request = new TestCasesRequest();
 
-        request.setModelName("TestUuid1");
+        request.setModelName(TestDataSupplier.testModelUuid);
         request.setMethod("test.Class1.testMethod(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)");
         request.setUserData("{'dataSource':'genCartesian'}");
         return request;

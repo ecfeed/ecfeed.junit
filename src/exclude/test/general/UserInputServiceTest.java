@@ -18,7 +18,7 @@ public class UserInputServiceTest extends ServiceRestTemplate {
 
 	@Override
 	protected void adjustParameters(String... customSettings) {
-		fClientType = "localTestRunner";
+		fClientType = GenWebServiceClientType.LOCAL_TEST_RUNNER.toString();
 		fKeyStorePath = "src/test/resources/security";
 		fTrustStorePath = "src/test/resources/security";
 	}

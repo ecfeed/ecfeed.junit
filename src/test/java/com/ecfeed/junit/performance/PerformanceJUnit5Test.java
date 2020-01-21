@@ -1,12 +1,13 @@
 package com.ecfeed.junit.performance;
 
 import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@EcFeed("TestUuid1")
+@EcFeed(TestDataSupplier.testModelUuid)
 @DisplayName("Performance - JUnit5")
 @Disabled("This test is not compatible with IDE")
 @EcFeedService("https://localhost:8090/testCaseService")

@@ -1,34 +1,42 @@
 package com.ecfeed.junit.runner.local;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-import com.ecfeed.core.generators.algorithms.AbstractAlgorithm;
-import com.ecfeed.core.generators.algorithms.AdaptiveRandomAlgorithm;
-import com.ecfeed.core.generators.algorithms.CartesianProductAlgorithm;
-import com.ecfeed.core.generators.algorithms.RandomAlgorithm;
-import com.ecfeed.core.generators.algorithms.RandomizedNWiseAlgorithm;
+import com.ecfeed.core.evaluator.SatSolverConstraintEvaluator;
+import com.ecfeed.core.generators.GeneratorFactoryWithCodes;
+import com.ecfeed.core.generators.algorithms.*;
 import com.ecfeed.core.generators.api.GeneratorException;
-import com.ecfeed.core.model.ChoiceNode;
-import com.ecfeed.core.model.IConstraint;
+import com.ecfeed.core.generators.api.IConstraintEvaluator;
+
+
+//import com.ecfeed.core.model.ChoiceNode;
+//import com.ecfeed.core.model.Constraint;
+
+import com.ecfeed.core.generators.api.IGenerator;
+import com.ecfeed.core.generators.api.ParameterConverter;
 import com.ecfeed.core.model.MethodNode;
-import com.ecfeed.core.utils.DataSource;
-import com.ecfeed.core.utils.ExceptionHelper;
-import com.ecfeed.core.utils.SimpleProgressMonitor;
-import com.ecfeed.core.utils.TestCasesUserInput;
+import com.ecfeed.core.utils.*;
+
+import com.ecfeed.core.model.*;
+
+
 import com.ecfeed.junit.message.MessageHelper;
 import com.ecfeed.junit.runner.UserInputHelper;
 import com.ecfeed.junit.utils.Localization;
 import com.ecfeed.junit.utils.Logger;
 
+import static com.ecfeed.core.utils.DataSource.STATIC;
+
 public class ServiceLocalDynamicRunnable implements Runnable {
 	private volatile BlockingQueue<String> fResponseQueue;
 	
-	private AbstractAlgorithm<ChoiceNode> fAlgorithm;
+	private IGenerator<ChoiceNode> fAlgorithm;
 	private TestCasesUserInput fRequest;
 	private String fModel;
 	
@@ -38,70 +46,65 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 		fResponseQueue = responseQueue;
 
 		try {
-			setGeneratorAlgorithm();
-		} catch (Exception e) {
-			ExceptionHelper.reportRuntimeException(e.getMessage());
+			initializeGenerator(testMethod);
 		}
-
-		initializeAlgorithm(testMethod);
-	}
-	
-	private void setGeneratorAlgorithm() throws Exception {
-
-		DataSource dataSource = DataSource.parse(fRequest.getDataSource());
-
-		switch (dataSource) {
-			case GEN_N_WISE :
-				fAlgorithm = new RandomizedNWiseAlgorithm<>(Integer.parseInt(fRequest.getN()), Integer.parseInt(fRequest.getCoverage()));
-				break;
-			case GEN_CARTESIAN :
-				fAlgorithm = new CartesianProductAlgorithm<>();
-				break;
-			case GEN_RANDOM:
-				fAlgorithm = new RandomAlgorithm<>(Integer.parseInt(fRequest.getLength()), Boolean.parseBoolean(fRequest.getDuplicates()));
-				break;
-			case GEN_ADAPTIVE_RANDOM :
-				fAlgorithm = new AdaptiveRandomAlgorithm<>(Integer.parseInt(fRequest.getDepth()), Integer.parseInt(fRequest.getCandidates()), Integer.parseInt(fRequest.getLength()), Boolean.parseBoolean(fRequest.getDuplicates()));
-				break;
-			case STATIC:
-				fAlgorithm = null;
-				break;
-			default :
-				RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceLocalInvalidGeneratorName"));
-				Logger.exception(exception);
-				throw exception;
-			}
-		
-	}
-	
-	private void initializeAlgorithm(Method testMethod) {
-		Collection<IConstraint<ChoiceNode>> generatorDataConstraints;
-		List<List<ChoiceNode>> generatorDataInput;
-		
-		try {
-			
-			if (fModel.equals("auto")) {
-				generatorDataConstraints = new ArrayList<>();
-				generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
-			} else {
-				MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, fModel, Optional.ofNullable(fRequest.getMethod()));
-				
-				generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
-				generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
-			}
-
-			SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
-			fAlgorithm.initialize(generatorDataInput, generatorDataConstraints, simpleProgressMonitor);
-
-		} catch (GeneratorException e) {
+		catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
 			exception.addSuppressed(e);
 			Logger.exception(exception);
 			throw exception;
 		}
-		
+
 	}
 	
+	private void initializeGenerator(Method testMethod) throws GeneratorException {
+		DataSource dataSource = DataSource.parse(fRequest.getDataSource());
+
+		if(dataSource == STATIC)
+		{
+			fAlgorithm = null;
+			return;
+		}
+
+		GeneratorType generatorType = dataSource.toGeneratorType();
+
+		fAlgorithm = new GeneratorFactoryWithCodes().createGenerator(generatorType);
+
+		Collection<Constraint> generatorDataConstraints;
+		List<List<ChoiceNode>> generatorDataInput;
+
+
+		MethodNode methodNode = null;
+
+		if (fModel.equals("auto")) {
+			generatorDataConstraints = new ArrayList<>();
+			generatorDataInput = ServiceLocalChoice.getInputChoices(testMethod);
+			methodNode = new MethodNode("methodnode", null);
+			Type[] typeList = testMethod.getGenericParameterTypes();
+
+			for(int i=0;i<generatorDataInput.size();i++) {
+
+				MethodParameterNode node = new MethodParameterNode("arg"+i, null, typeList[i].getTypeName(), null, false, false, null);
+				node.addChoices(generatorDataInput.get(i));
+				methodNode.addParameter(node);
+			}
+		} else {
+			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(fModel));
+			methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()));
+			generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
+			generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
+		}
+
+		SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();
+
+		IConstraintEvaluator<ChoiceNode> constraintEvaluator = new SatSolverConstraintEvaluator(generatorDataConstraints, methodNode);
+		fAlgorithm.initialize(generatorDataInput, constraintEvaluator,
+				ParameterConverter.deserialize(fRequest.getProperties(), fAlgorithm.getParameterDefinitions()),
+				simpleProgressMonitor);
+
+	}
+	
+
 	@Override
 	public void run() {
 		Logger.message("");
@@ -114,7 +117,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 		List<ChoiceNode> tuple = null;
 
 		try { 
-			tuple = fAlgorithm.getNext();
+			tuple = fAlgorithm.next();
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("serviceLocalFirstTupleError"), e);
 			exception.addSuppressed(e);
@@ -131,7 +134,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 			fResponseQueue.offer(MessageHelper.resultTestSchema(tuple, "" + iteration));
 			
 			try {
-				tuple = (List<ChoiceNode>) fAlgorithm.getNext();
+				tuple = (List<ChoiceNode>) fAlgorithm.next();
 			} catch (GeneratorException e) {
 				fResponseQueue.offer(MessageHelper.resultErrorSchema(Localization.bundle.getString("serviceLocalTupleError")));
 			}

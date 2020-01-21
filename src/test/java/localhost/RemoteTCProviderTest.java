@@ -1,5 +1,6 @@
 package localhost;
 
+
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
@@ -7,10 +8,14 @@ import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProvider;
+import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
+import localhost.utils.TestHelper;
 import org.junit.jupiter.api.DisplayName;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -31,7 +36,6 @@ public class RemoteTCProviderTest {
     @DisplayName("testGenerator")
     @ExtendWith(ExecutionConditionLocalHostAvailable.class)
     public void testGenerator() {
-
         try {
             runGeneratorTest();
         } catch (Exception e) {
@@ -43,7 +47,9 @@ public class RemoteTCProviderTest {
 
         MethodNode methodNode = getMethodNode();
 
-        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"" +
+                TestDataSupplier.testModelUuid +
+                "\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
 
         RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
 
@@ -70,7 +76,9 @@ public class RemoteTCProviderTest {
 
         MethodNode methodNode = getMethodNode();
 
-        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"TestUuid1\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
+        String requestText = "{\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\",\"model\":\"" +
+                TestDataSupplier.testModelUuid +
+                "\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
 
         RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
 
@@ -165,9 +173,11 @@ public class RemoteTCProviderTest {
             return;
         }
 
+
         if (name.equals("choice12")) {
             return;
         }
+
 
         fail("Invalid choice name: " + name);
     }
@@ -179,6 +189,7 @@ public class RemoteTCProviderTest {
         if (name.equals("choice21")) {
             return;
         }
+
 
         if (name.equals("choice22")) {
             return;
@@ -192,9 +203,11 @@ public class RemoteTCProviderTest {
         Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 
         return new GenWebServiceClient(
-                "https://localhost:8090", // TODO
-                "localTestRunner", // TODO
+                TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
+                GenWebServiceClient.getTestCasesEndPoint(),
+                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
                 keyStorePath);
+
     }
 
 }

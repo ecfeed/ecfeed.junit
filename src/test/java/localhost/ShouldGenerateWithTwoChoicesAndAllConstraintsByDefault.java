@@ -1,7 +1,9 @@
 package localhost;
 
 import com.ecfeed.junit.annotation.*;
+import com.ecfeed.junit.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
+import localhost.utils.TestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @EcFeed
-@EcFeedService("https://localhost:8090")
+@EcFeedService(TestHelper.GEN_SERVICE_URL_ON_LOCALHOST)
 @EcFeedKeyStore("src/test/resources/security")
-@EcFeedModel("TestUuid1")
+@EcFeedModel(TestDataSupplier.testModelUuid)
 @ExtendWith(ExecutionConditionLocalHostAvailable.class)
 public class ShouldGenerateWithTwoChoicesAndAllConstraintsByDefault {
 

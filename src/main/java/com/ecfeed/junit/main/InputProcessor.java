@@ -1,5 +1,6 @@
 package com.ecfeed.junit.main;
 
+import com.ecfeed.core.utils.ExceptionHelper;
 import com.ecfeed.junit.utils.Localization;
 import joptsimple.OptionSet;
 
@@ -65,6 +66,21 @@ public final class InputProcessor {
         }
 
         return false;
+    }
+
+    static Optional<String> extractMethod(OptionSet options)
+    {
+        if(options.hasArgument(METHOD_LONG))
+            return Optional.of(options.valueOf(METHOD_LONG).toString());
+        if(options.hasArgument(METHOD_SHORT))
+            return Optional.of(options.valueOf(METHOD_SHORT).toString());
+        return Optional.empty();
+    }
+
+    static String extractN(OptionSet options) {
+        if (options.hasArgument(TUPLE_ARITY_SHORT))
+            return options.valueOf(TUPLE_ARITY_SHORT).toString();
+        return null;
     }
 
 }

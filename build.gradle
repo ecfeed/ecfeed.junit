@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'java-library'
@@ -54,12 +56,28 @@ dependencies {
 // https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
 testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.0'
 
-    
+    // https://mvnrepository.com/artifact/org.sat4j/org.sat4j.pb
+    compile group: 'org.sat4j', name: 'org.sat4j.pb', version: '2.3.1'
+
+    // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
+    compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.21'
+
+    // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess
+    testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.0'
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.4.0'
 
-    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
 
+//    // https://mvnrepository.com/artifact/org.ow2.sat4j/org.ow2.sat4j.core
+//    compile group: 'org.ow2.sat4j', name: 'org.ow2.sat4j.core', version: '2.3.5'
+
+// https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.41.0'
 }
 
 sourceSets {
@@ -86,3 +104,65 @@ task jarWithDependencies(type: Jar) {
     }
     with jar
 }
+
+def getBuildTime() {
+    return new Date().format('yyyy-MM-dd.HH-mm-ss')
+}
+
+def getBuildGitBranch() {
+    def value = ['git', 'branch'].execute()
+    def result = value.text.split("\n")
+
+    return result.find{ it.contains("* ") }.substring(2)
+}
+
+def getBuildGitStatus() {
+    def value = ['git', 'diff-index', 'HEAD'].execute()
+    def result = value.text.split()
+
+    return result.length > 0 ? 'dirty' : 'clean'
+}
+
+def getBuildGitCommit() {
+    def value = ['git', 'rev-parse', 'HEAD'].execute()
+
+    return value.text
+}
+
+task deleteResources(type: Delete) {
+    group = "Custom"
+    description= "Remove resource files."
+
+    doFirst {
+        delete fileTree(project.projectDir.toString() + '/src/main/resources') {
+            include "**/application.properties"
+        }
+    }
+
+}
+
+task updateResources() {
+    group = "Custom"
+    description = "Update resource files."
+
+    doFirst {
+        copy {
+            from(project.projectDir.toString() + '/src/main/templates') {
+                include '**/*.properties'
+                filter(ReplaceTokens, tokens:
+                    [
+                        'build.time'  : getBuildTime(),
+                        'build.branch': getBuildGitBranch(),
+                        'build.commit': getBuildGitCommit(),
+                        'build.status' : getBuildGitStatus()
+                    ]
+                )
+            }
+            into(project.projectDir.toString() + '/src/main/resources')
+        }
+    }
+
+}
+
+rootProject.tasks.getByName('updateResources').dependsOn deleteResources
+rootProject.tasks.getByName('processResources').dependsOn updateResources

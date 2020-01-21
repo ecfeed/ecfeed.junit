@@ -2,6 +2,7 @@ package com.ecfeed.junit.runner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
@@ -35,8 +36,7 @@ public class UserInputHelper {
 	
 	private static FixedChoiceValueFactory fFactory = new FixedChoiceValueFactory(null, false);
 	
-	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, String modelPath, Optional<String> testName) throws GeneratorException {
-		RootNode model = loadEcFeedModelFromDirectory(modelPath);
+	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, RootNode model, Optional<String> testName) throws GeneratorException {
 		List<MethodNode> modelMethods = new ArrayList<>();
 		
 		for (ClassNode classNode : model.getClasses()) {
@@ -56,6 +56,21 @@ public class UserInputHelper {
 		}
 		
 		return modelMethods.get(0);
+	}
+
+	public static List<MethodNode> getAllMatchingMethodNodesFromEcFeedModel(RootNode model, String methodPrefix)
+	{
+		List<MethodNode> modelMethods = new ArrayList<>();
+
+		for (ClassNode classNode : model.getClasses()) {
+			for (MethodNode methodNode : classNode.getMethods()) {
+				if (isMethodNamePrefix(methodPrefix, methodNode)) {
+					modelMethods.add(methodNode);
+				}
+			}
+		}
+
+		return modelMethods;
 	}
 	
 	public static List<List<ChoiceNode>> getChoicesFromEcFeedModel(MethodNode methodNode, Optional<Object> choiceRestrictions) throws GeneratorException {
@@ -99,7 +114,7 @@ public class UserInputHelper {
 		
 	}
 	
-	public static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModel(MethodNode methodNode, Optional<Object> constraintName) throws GeneratorException {
+	public static List<Constraint> getConstraintsFromEcFeedModel(MethodNode methodNode, Optional<Object> constraintName) throws GeneratorException {
 		
 		if (constraintName.isPresent()) {
 			Object constraintObject = constraintName.get();
@@ -165,6 +180,11 @@ public class UserInputHelper {
 		}
 		
 		return isMethodClassNameIdentical(test, model) && isMethodNameIdentical(test, model);
+	}
+
+	private static boolean isMethodNamePrefix(String methodName, MethodNode modelMethod)
+	{
+		return modelMethod.getLongSignature().startsWith(methodName);
 	}
 	
 	private static boolean isMethodClassNameIdentical(Method test, MethodNode model) {
@@ -235,7 +255,7 @@ public class UserInputHelper {
 		return testSuite;
 	}
 	
-	private static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModelString(MethodNode methodNode, String constraintData) throws GeneratorException {
+	private static List<Constraint> getConstraintsFromEcFeedModelString(MethodNode methodNode, String constraintData) throws GeneratorException {
 
 		if (constraintData.equals("ALL")) {
 			return methodNode.getAllConstraints();
@@ -248,12 +268,12 @@ public class UserInputHelper {
 		
 	}
 	
-	private static List<IConstraint<ChoiceNode>> getConstraintsFromEcFeedModelList(MethodNode methodNode, List<?> constraintData) throws GeneratorException {
-		List<IConstraint<ChoiceNode>> constraint = new ArrayList<>();
-		List<IConstraint<ChoiceNode>> constraintList = new ArrayList<>();
+	private static List<Constraint> getConstraintsFromEcFeedModelList(MethodNode methodNode, List<?> constraintData) throws GeneratorException {
+		List<Constraint> constraint = new ArrayList<>();
+		List<Constraint> constraintList = new ArrayList<>();
 		
 		for (Object constraintObject : constraintData) {
-			for (IConstraint<ChoiceNode> constraintMethod : methodNode.getAllConstraints()) {
+			for (Constraint constraintMethod : methodNode.getAllConstraints()) {
 				if (((Constraint) constraintMethod).getName().equals(constraintObject.toString())) {
 					constraintList.add(constraintMethod);
 				}
@@ -386,11 +406,14 @@ public class UserInputHelper {
 			
 	}
 	
- 	private static RootNode loadEcFeedModelFromDirectory(String path) throws GeneratorException {
+ 	public static RootNode loadEcFeedModelFromDirectory(Optional<String> path) throws GeneratorException {
 		InputStream modelStream = null;
-		
+
 		try {
-			modelStream = Files.newInputStream(Paths.get(path));
+			if(path.isPresent())
+				modelStream = Files.newInputStream(Paths.get(path.get()));
+			else
+				modelStream = System.in;
 		} catch (IOException e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModel"));
 		}
@@ -399,8 +422,8 @@ public class UserInputHelper {
 		
 		try {
 			ModelParser modelParser = new ModelParser();
-			
-			model = modelParser.parseModel(modelStream, null, new ArrayList<String>());
+
+			model = modelParser.parseModel(modelStream, null, new ArrayList<>());
 			model = ModelConverter.convertToCurrentVersion(model);
 		} catch (ParserException e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModelParser"));
