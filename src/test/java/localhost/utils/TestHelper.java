@@ -14,10 +14,11 @@ public class TestHelper {
 
     public static final String GEN_SERVICE_URL_ON_LOCALHOST = "https://localhost:8090";
     public static final String REQUEST_DATA = "requestData";
+    private static final String TEST_KEY_STORE_PATH = "src/test/resources/security";
 
     public static IWebServiceClient createWebServiceClient(String endpoint) {
 
-        Optional<String> keyStorePath = Optional.of("src/test/resources/security");
+        Optional<String> keyStorePath = Optional.of(TEST_KEY_STORE_PATH);
 
         return new GenWebServiceClient(
                 TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
