@@ -101,7 +101,9 @@ public class RemoteTCProviderTest {
 
     private RemoteTCProvider createTCProvider(MethodNode methodNode, String requestText) throws Exception {
 
-        IWebServiceClient webServiceClient = createWebServiceClient();
+        IWebServiceClient webServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
         RemoteTCProvider remoteTCProvider = new RemoteTCProvider(webServiceClient);
 
         RemoteTCProviderInitData remoteTCProviderInitData =
@@ -196,18 +198,6 @@ public class RemoteTCProviderTest {
         }
 
         fail("Invalid choice name: " + name);
-    }
-
-    private IWebServiceClient createWebServiceClient() {
-
-        Optional<String> keyStorePath = Optional.of("src/test/resources/security");
-
-        return new GenWebServiceClient(
-                TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
-                GenWebServiceClient.getTestCasesEndPoint(),
-                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
-                keyStorePath);
-
     }
 
 }

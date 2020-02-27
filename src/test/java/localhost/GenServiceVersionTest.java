@@ -17,7 +17,8 @@ public class GenServiceVersionTest {
     @Test
     public void getVersionTest() {
 
-        IWebServiceClient genWebServiceClient = createWebServiceClient();
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getGenServiceVersionEndPoint());
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendGetRequest();
 
@@ -33,18 +34,6 @@ public class GenServiceVersionTest {
             fail(e.getMessage());
         }
 
-    }
-
-
-    private IWebServiceClient createWebServiceClient() { // TODO - similar method in RemoteTCProviderTest
-
-        Optional<String> keyStorePath = Optional.of("src/test/resources/security");
-
-        return new GenWebServiceClient(
-                TestHelper.GEN_SERVICE_URL_ON_LOCALHOST, // TODO
-                GenWebServiceClient.getGenServiceVersionEndPoint(),
-                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
-                keyStorePath);
     }
 
 }
