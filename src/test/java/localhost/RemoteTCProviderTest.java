@@ -51,7 +51,9 @@ public class RemoteTCProviderTest {
                 TestDataSupplier.testModelUuid +
                 "\",\"userData\":\"{'dataSource':'genCartesian'}\"}";
 
-        RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
+        fSimpleProgressMonitor = new SimpleProgressMonitor();
+
+        RemoteTCProvider remoteTCProvider = TestHelper.createTCProvider(methodNode, TestHelper.REQUEST_DATA, requestText, fSimpleProgressMonitor);
 
         try {
             getAndCheckGeneratedTestCases(remoteTCProvider);
@@ -80,7 +82,9 @@ public class RemoteTCProviderTest {
                 TestDataSupplier.testModelUuid +
                 "\",\"userData\":\"{'dataSource':'static','testSuites':['second']}\"}";
 
-        RemoteTCProvider remoteTCProvider = createTCProvider(methodNode, requestText);
+        fSimpleProgressMonitor = new SimpleProgressMonitor();
+
+        RemoteTCProvider remoteTCProvider = TestHelper.createTCProvider(methodNode, TestHelper.REQUEST_DATA, requestText, fSimpleProgressMonitor);
 
         try {
             getAndCheckStaticTestCases(remoteTCProvider);
@@ -97,23 +101,6 @@ public class RemoteTCProviderTest {
         MethodNode methodNode = classNode.getMethods().get(1);
 
         return methodNode;
-    }
-
-    private RemoteTCProvider createTCProvider(MethodNode methodNode, String requestText) throws Exception {
-
-        IWebServiceClient webServiceClient =
-                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
-
-        RemoteTCProvider remoteTCProvider = new RemoteTCProvider(webServiceClient);
-
-        RemoteTCProviderInitData remoteTCProviderInitData =
-                new RemoteTCProviderInitData(methodNode, "requestData", requestText);
-
-        fSimpleProgressMonitor = new SimpleProgressMonitor();
-
-        remoteTCProvider.initialize(remoteTCProviderInitData, fSimpleProgressMonitor);
-
-        return remoteTCProvider;
     }
 
     private void getAndCheckGeneratedTestCases(RemoteTCProvider remoteTCProvider) throws Exception {
