@@ -14,15 +14,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class GenerationWithExportTest {
 
     @Test
-    public void getVersionTest() {
+    public void generateWithExportTest() {
 
         IWebServiceClient genWebServiceClient =
                 TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
 
-        String request = "{ 'dataSource':'genCartesian', 'method':'test.Class1.testMethod' }";
-        request = request.replace("'", "\""); // TODO - to helper
+        // TODO - remove tag: method ?
+        String request = "{\"method\":\"public void localhost.ShouldGenerateWithCartesianGenerator.test(java.lang.String,java.lang.String)\",\"model\":\"TestUuid11\",\"userData\":\"{'dataSource':'genCartesian', 'method':'test.Class1.testMethod'}\",\"sessionId\":null}";
 
-        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_DATA, request);
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
         if (!webServiceResponse.isResponseStatusOk()) {
             fail();
@@ -31,7 +31,16 @@ public class GenerationWithExportTest {
         BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
 
         try {
-            bufferedReader.readLine();
+
+            for(;;) {
+                String line = bufferedReader.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+                System.out.println(line);
+            }
         } catch (Exception e) {
             fail(e.getMessage());
         }

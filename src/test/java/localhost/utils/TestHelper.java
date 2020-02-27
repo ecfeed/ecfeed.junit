@@ -14,6 +14,7 @@ public class TestHelper {
 
     public static final String GEN_SERVICE_URL_ON_LOCALHOST = "https://localhost:8090";
     public static final String REQUEST_DATA = "requestData";
+    public static final String REQUEST_EXPORT = "requestExport";
     private static final String TEST_KEY_STORE_PATH = "src/test/resources/security";
 
     public static IWebServiceClient createWebServiceClient(String endpoint) {
