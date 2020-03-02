@@ -68,17 +68,18 @@ public class GenerationWithExportTest {
 
     private void verifyResponseRow(int testCaseIndex, JSONObject jsonObjectRow) throws JSONException {
 
-        String testCaseIndexStr = jsonObjectRow.getString("index"); // TODO - convert index in JSON to number instead of String
-        int resultTestCaseIndex = Integer.parseInt(testCaseIndexStr);
+        int resultTestCaseIndex = jsonObjectRow.getInt("index");
         assertEquals(testCaseIndex, resultTestCaseIndex);
 
         String arg1 = jsonObjectRow.getString("arg1");
-        if (!arg1.startsWith("V")) {
+        final String v = "V";
+
+        if (!arg1.startsWith(v)) {
             fail();
         }
 
         String arg2 = jsonObjectRow.getString("arg2");
-        if (!arg2.startsWith("V")) {
+        if (!arg2.startsWith(v)) {
             fail();
         }
     }
