@@ -24,8 +24,11 @@ public class GenerationWithExportTest {
         IWebServiceClient genWebServiceClient =
                 TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
 
-        // TODO - remove tag: method ?
-        String request = "{\"method\":\"public void localhost.ShouldGenerateWithCartesianGenerator.test(java.lang.String,java.lang.String)\",\"model\":\"TestUuid11\",\"userData\":\"{'dataSource':'genCartesian', 'method':'test.Class1.testMethod'}\",\"sessionId\":null}";
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"" +
+                "}";
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
