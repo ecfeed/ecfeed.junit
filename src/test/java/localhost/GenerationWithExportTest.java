@@ -9,7 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.IIOException;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class GenerationWithExportTest {
 
     @Test
-    public void generateWithExportTest() {
+    public void generateWithDefaultExportFormat() {
 
         IWebServiceClient genWebServiceClient =
                 TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
@@ -32,10 +34,47 @@ public class GenerationWithExportTest {
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
-        verifyResponse(webServiceResponse);
+        verifyJsonTemplateResponse(webServiceResponse);
     }
 
-    private void verifyResponse(WebServiceResponse webServiceResponse) {
+    @Test
+    public void generateWithDefaultJsonTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"JSON\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        verifyJsonTemplateResponse(webServiceResponse);
+    }
+
+    @Test
+    public void generateWithDefaultCsvTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"CSV\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        verifyCsvTemplateResponse(webServiceResponse);
+    }
+
+
+    private void verifyJsonTemplateResponse(WebServiceResponse webServiceResponse) {
 
         if (!webServiceResponse.isResponseStatusOk()) {
             fail();
@@ -97,6 +136,28 @@ public class GenerationWithExportTest {
             fail();
         }
         return jsonObject;
+    }
+
+    private void verifyCsvTemplateResponse(WebServiceResponse webServiceResponse) {
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            fail();
+        }
+
+        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
+
+        String result = "";
+
+        try {
+            for (String line; (line = bufferedReader.readLine()) != null; ) {
+                result = result + (line + "|");
+            }
+        } catch (IOException e) {
+            fail();
+        }
+
+        assertEquals("arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||", result);
+        System.out.println(result);
     }
 
 }
