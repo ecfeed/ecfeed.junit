@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import javax.imageio.IIOException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -70,9 +69,69 @@ public class GenerationWithExportTest {
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
-        verifyCsvTemplateResponse(webServiceResponse);
+        verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
     }
 
+    @Test
+    public void generateWithInvalidTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template = "XXX";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        verifyErrorResponse(webServiceResponse);
+    }
+
+    @Test
+    public void generateWithTrivialCustomTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template = "[Header]\\nHEADER\\n[TestCase]\\nTESTCASE\\n[Footer]\\nFOOTER";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        verifyResponse(webServiceResponse, "HEADER|TESTCASE|TESTCASE|TESTCASE|TESTCASE|FOOTER|");
+   }
+
+    private void verifyErrorResponse(WebServiceResponse webServiceResponse) {
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            fail();
+        }
+
+        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
+
+        String line = null;
+
+        try {
+            line = bufferedReader.readLine();
+        } catch (Exception e) {
+            fail();
+        }
+
+        if (!line.startsWith("ERROR: ")) {
+            fail();
+        }
+    }
 
     private void verifyJsonTemplateResponse(WebServiceResponse webServiceResponse) {
 
@@ -138,7 +197,9 @@ public class GenerationWithExportTest {
         return jsonObject;
     }
 
-    private void verifyCsvTemplateResponse(WebServiceResponse webServiceResponse) {
+    private void verifyResponse(
+            WebServiceResponse webServiceResponse,
+            String expectedResponse) {
 
         if (!webServiceResponse.isResponseStatusOk()) {
             fail();
@@ -156,8 +217,7 @@ public class GenerationWithExportTest {
             fail();
         }
 
-        assertEquals("arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||", result);
-        System.out.println(result);
+        assertEquals(expectedResponse, result);
     }
 
 }
