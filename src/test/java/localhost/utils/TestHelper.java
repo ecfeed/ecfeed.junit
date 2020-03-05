@@ -7,8 +7,14 @@ import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
+import com.ecfeed.core.webservice.client.WebServiceResponse;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestHelper {
 
@@ -45,6 +51,29 @@ public class TestHelper {
         remoteTCProvider.initialize(remoteTCProviderInitData, simpleProgressMonitor);
 
         return remoteTCProvider;
+    }
+
+    public static void verifyResponse(
+            WebServiceResponse webServiceResponse,
+            String expectedResponse) {
+
+        if (!webServiceResponse.isResponseStatusOk()) {
+            fail();
+        }
+
+        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
+
+        String result = "";
+
+        try {
+            for (String line; (line = bufferedReader.readLine()) != null; ) {
+                result = result + (line + "|");
+            }
+        } catch (IOException e) {
+            fail();
+        }
+
+        assertEquals(expectedResponse, result);
     }
 
 

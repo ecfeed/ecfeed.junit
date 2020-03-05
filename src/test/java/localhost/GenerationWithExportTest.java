@@ -69,7 +69,7 @@ public class GenerationWithExportTest {
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
-        verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
+        TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
     }
 
     @Test
@@ -109,8 +109,33 @@ public class GenerationWithExportTest {
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
-        verifyResponse(webServiceResponse, "HEADER|TESTCASE|TESTCASE|TESTCASE|TESTCASE|FOOTER|");
+        TestHelper.verifyResponse(webServiceResponse, "HEADER|TESTCASE|TESTCASE|TESTCASE|TESTCASE|FOOTER|");
    }
+
+    @Test
+    public void generateWithRealCustomTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template = "[Header]\\n" +
+                "$1.name,$2.name\\n" +
+                "[TestCase]\\n" +
+                "$1.value,$2.value\\n" +
+                "[Footer]\\n" +
+                "\\n";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
+    }
 
     private void verifyErrorResponse(WebServiceResponse webServiceResponse) {
 
@@ -195,29 +220,6 @@ public class GenerationWithExportTest {
             fail();
         }
         return jsonObject;
-    }
-
-    private void verifyResponse(
-            WebServiceResponse webServiceResponse,
-            String expectedResponse) {
-
-        if (!webServiceResponse.isResponseStatusOk()) {
-            fail();
-        }
-
-        BufferedReader bufferedReader = webServiceResponse.getResponseBufferedReader();
-
-        String result = "";
-
-        try {
-            for (String line; (line = bufferedReader.readLine()) != null; ) {
-                result = result + (line + "|");
-            }
-        } catch (IOException e) {
-            fail();
-        }
-
-        assertEquals(expectedResponse, result);
     }
 
 }
