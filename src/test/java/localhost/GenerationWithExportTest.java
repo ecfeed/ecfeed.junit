@@ -69,7 +69,7 @@ public class GenerationWithExportTest {
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
-        TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
+        TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22|");
     }
 
     @Test
@@ -113,7 +113,7 @@ public class GenerationWithExportTest {
    }
 
     @Test
-    public void generateWithRealCustomTemplate() {
+    public void generateWithRealCustomTemplate1() {
 
         IWebServiceClient genWebServiceClient =
                 TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
@@ -135,6 +135,75 @@ public class GenerationWithExportTest {
         WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
 
         TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22||");
+    }
+
+    @Test
+    public void generateWithRealCustomTemplate2() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template = "[Header]\\n" +
+                "$1.name,$2.name\\n" +
+                "[TestCase]\\n" +
+                "$1.value,$2.value\\n" +
+                "[Footer]\\n";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        TestHelper.verifyResponse(webServiceResponse, "arg1,arg2|V11,V21|V11,V22|V12,V21|V12,V22|");
+    }
+
+
+    @Test
+    public void generateWithMinimalCustomTemplate() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template =
+                "[TestCase]\\n" +
+                "$1.value,$2.value\\n";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        TestHelper.verifyResponse(webServiceResponse, "V11,V21|V11,V22|V12,V21|V12,V22|");
+    }
+
+    @Test
+    public void generateWithNewLinesInTestCaseTag() {
+
+        IWebServiceClient genWebServiceClient =
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+
+        final String template =
+                "[TestCase]\\n" +
+                        "$1.value\\n\\n$2.value\\n\\n";
+
+        String request = "{" +
+                "\"model\":\"TestUuid11\"," +
+                "\"method\":\"test.Class1.testMethod(java.lang.String,java.lang.String)\"," +
+                "\"userData\":\"{'dataSource':'genCartesian'}\"," +
+                "\"template\":\"" + template + "\"" +
+                "}";
+
+        WebServiceResponse webServiceResponse = genWebServiceClient.sendPostRequest(TestHelper.REQUEST_EXPORT, request);
+
+        TestHelper.verifyResponse(webServiceResponse, "V11||V21||V11||V22||V12||V21||V12||V22||");
     }
 
     private void verifyErrorResponse(WebServiceResponse webServiceResponse) {
