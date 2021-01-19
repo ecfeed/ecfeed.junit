@@ -4,6 +4,7 @@ package localhost;
 import com.ecfeed.core.model.*;
 import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
+import com.ecfeed.core.utils.ListOfStrings;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
@@ -95,7 +96,13 @@ public class RemoteTCProviderTest {
 
     private MethodNode getMethodNode() throws ParserException {
 
-        RootNode rootNode = new ModelParser().parseModel(TestModel.getModelXml(), null, new ArrayList<String>());
+        ListOfStrings listOfErrors = new ListOfStrings();
+
+        RootNode rootNode = new ModelParser().parseModel(TestModel.getModelXml(), null, listOfErrors);
+
+        if (!listOfErrors.isEmpty()) {
+            fail();
+        }
 
         ClassNode classNode = rootNode.getClass("test.Class1");
         MethodNode methodNode = classNode.getMethods().get(1);

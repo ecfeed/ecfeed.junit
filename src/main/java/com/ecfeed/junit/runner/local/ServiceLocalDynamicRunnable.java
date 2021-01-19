@@ -40,13 +40,18 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 	private TestCasesUserInput fRequest;
 	private String fModel;
 	
-	public ServiceLocalDynamicRunnable(BlockingQueue<String> responseQueue, Method testMethod, TestCasesUserInput request, String model) {
+	public ServiceLocalDynamicRunnable(
+			BlockingQueue<String> responseQueue,
+			Method testMethod,
+			TestCasesUserInput request,
+			String model, IExtLanguageManager extLanguageManager) {
+
 		fModel = model;
 		fRequest = request;
 		fResponseQueue = responseQueue;
 
 		try {
-			initializeGenerator(testMethod);
+			initializeGenerator(testMethod, extLanguageManager);
 		}
 		catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
@@ -57,7 +62,7 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 
 	}
 	
-	private void initializeGenerator(Method testMethod) throws GeneratorException {
+	private void initializeGenerator(Method testMethod, IExtLanguageManager extLanguageManager) throws GeneratorException {
 		DataSource dataSource = DataSource.parse(fRequest.getDataSource());
 
 		if(dataSource == STATIC)
@@ -84,15 +89,18 @@ public class ServiceLocalDynamicRunnable implements Runnable {
 
 			for(int i=0;i<generatorDataInput.size();i++) {
 
-				MethodParameterNode node = new MethodParameterNode("arg"+i, null, typeList[i].getTypeName(), null, false, false, null);
+				MethodParameterNode node =
+						new MethodParameterNode(
+								"arg"+i, typeList[i].getTypeName(), null,
+								false, false, null, null);
 				node.addChoices(generatorDataInput.get(i));
 				methodNode.addParameter(node);
 			}
 		} else {
 			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(fModel));
-			methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()));
+			methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(fRequest.getMethod()), extLanguageManager);
 			generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getConstraints()));
-			generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()));
+			generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(methodNode, Optional.ofNullable(fRequest.getChoices()), extLanguageManager);
 		}
 
 		SimpleProgressMonitor simpleProgressMonitor = new SimpleProgressMonitor();

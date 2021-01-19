@@ -181,7 +181,7 @@ public final class MessageHelper {
 			ChoiceNode choiceNode = tuple.get(i);
 			
 			parameter[i] = new ChoiceSchema();
-			parameter[i].setName(choiceNode.getFullName());
+			parameter[i].setName(choiceNode.getName());
 			
 			if (choiceNode.isRandomizedValue()) {
 				parameter[i].setValue(fFactory.createValue(choiceNode) + "");

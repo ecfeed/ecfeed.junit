@@ -9,6 +9,7 @@ import com.ecfeed.core.generators.api.GeneratorException;
 import com.ecfeed.core.model.ChoiceNode;
 import com.ecfeed.core.model.MethodNode;
 import com.ecfeed.core.model.RootNode;
+import com.ecfeed.core.utils.IExtLanguageManager;
 import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.message.MessageHelper;
 import com.ecfeed.junit.runner.UserInputHelper;
@@ -21,13 +22,22 @@ public class ServiceLocalTestSuiteRunnable implements Runnable {
 	
 	private List<List<ChoiceNode>> testCases;
 
-	public ServiceLocalTestSuiteRunnable(BlockingQueue<String> responseQueue, Method testMethod, TestCasesUserInput request, String modelPath) {
+	public ServiceLocalTestSuiteRunnable(
+			BlockingQueue<String> responseQueue,
+			Method testMethod,
+			TestCasesUserInput request,
+			String modelPath,
+			IExtLanguageManager extLanguageManager) {
 		fResponseQueue = responseQueue;
 		
 		try {
 			RootNode model = UserInputHelper.loadEcFeedModelFromDirectory(Optional.ofNullable(modelPath));
-			MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(testMethod, model, Optional.ofNullable(request.getMethod()));
+
+			MethodNode methodNode = UserInputHelper.getMethodNodeFromEcFeedModel(
+					testMethod, model, Optional.ofNullable(request.getMethod()), extLanguageManager );
+
 			testCases = UserInputHelper.getTestsFromEcFeedModel(methodNode, Optional.ofNullable(request.getTestSuites()));
+
 		} catch (GeneratorException e) {
 			RuntimeException exception = new RuntimeException(Localization.bundle.getString("generatorInitializationError"), e);
 			exception.addSuppressed(e);

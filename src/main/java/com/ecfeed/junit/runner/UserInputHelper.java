@@ -16,32 +16,27 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.ecfeed.core.generators.api.GeneratorException;
-import com.ecfeed.core.model.AbstractParameterNode;
-import com.ecfeed.core.model.ChoiceNode;
-import com.ecfeed.core.model.ClassNode;
-import com.ecfeed.core.model.Constraint;
-import com.ecfeed.core.model.FixedChoiceValueFactory;
-import com.ecfeed.core.model.IConstraint;
-import com.ecfeed.core.model.MethodNode;
-import com.ecfeed.core.model.MethodParameterNode;
-import com.ecfeed.core.model.ModelConverter;
-import com.ecfeed.core.model.ModelOperationException;
-import com.ecfeed.core.model.RootNode;
-import com.ecfeed.core.model.TestCaseNode;
+import com.ecfeed.core.model.*;
 import com.ecfeed.core.model.serialization.ModelParser;
 import com.ecfeed.core.model.serialization.ParserException;
+import com.ecfeed.core.utils.IExtLanguageManager;
+import com.ecfeed.core.utils.ListOfStrings;
 import com.ecfeed.junit.utils.Localization;
 
 public class UserInputHelper {
 	
 	private static FixedChoiceValueFactory fFactory = new FixedChoiceValueFactory(null, false);
 	
-	public static MethodNode getMethodNodeFromEcFeedModel(Method testMethod, RootNode model, Optional<String> testName) throws GeneratorException {
+	public static MethodNode getMethodNodeFromEcFeedModel(
+			Method testMethod,
+			RootNode model,
+			Optional<String> testName,
+			IExtLanguageManager extLanguageManager) throws GeneratorException {
 		List<MethodNode> modelMethods = new ArrayList<>();
 		
 		for (ClassNode classNode : model.getClasses()) {
 			for (MethodNode methodNode : classNode.getMethods()) {
-				if (isMethodIdentical(testMethod, testName, methodNode)) {
+				if (isMethodIdentical(testMethod, testName, methodNode, extLanguageManager)) {
 					modelMethods.add(methodNode);
 				}
 			}
@@ -58,13 +53,16 @@ public class UserInputHelper {
 		return modelMethods.get(0);
 	}
 
-	public static List<MethodNode> getAllMatchingMethodNodesFromEcFeedModel(RootNode model, String methodPrefix)
+	public static List<MethodNode> getAllMatchingMethodNodesFromEcFeedModel(
+			RootNode model,
+			String methodPrefix,
+			IExtLanguageManager extLanguageManager)
 	{
 		List<MethodNode> modelMethods = new ArrayList<>();
 
 		for (ClassNode classNode : model.getClasses()) {
 			for (MethodNode methodNode : classNode.getMethods()) {
-				if (isMethodNamePrefix(methodPrefix, methodNode)) {
+				if (isMethodNamePrefix(methodPrefix, methodNode, extLanguageManager)) {
 					modelMethods.add(methodNode);
 				}
 			}
@@ -73,12 +71,16 @@ public class UserInputHelper {
 		return modelMethods;
 	}
 	
-	public static List<List<ChoiceNode>> getChoicesFromEcFeedModel(MethodNode methodNode, Optional<Object> choiceRestrictions) throws GeneratorException {
+	public static List<List<ChoiceNode>> getChoicesFromEcFeedModel(
+			MethodNode methodNode,
+			Optional<Object> choiceRestrictions,
+			IExtLanguageManager extLanguageManager) throws GeneratorException {
+
 		List<List<ChoiceNode>> generatorChoices = new ArrayList<>();
 		List<MethodParameterNode> modelMethodParameters = methodNode.getMethodParameters();
 		Map<String, List<String>> modelMethodRestrictions = getChoiceRestrictionsFromUserInput(choiceRestrictions);
 		
-		validateChoiceRestrictionName(methodNode, modelMethodRestrictions);
+		validateChoiceRestrictionName(methodNode, modelMethodRestrictions, extLanguageManager);
 		
 		for (MethodParameterNode parameter : modelMethodParameters) {
 			generatorChoices.add(adjustMethodParameter(parameter, adjustChoicesUsingRestrictions(parameter, modelMethodRestrictions)));
@@ -138,7 +140,7 @@ public class UserInputHelper {
 		List<ChoiceNode> choiceList = new ArrayList<>();
 		
 		if (parameter.isExpected()) {
-		    ChoiceNode choice = new ChoiceNode("[e]" + parameter.getDefaultValue(), null, parameter.getDefaultValue());
+		    ChoiceNode choice = new ChoiceNode("[e]" + parameter.getDefaultValue(), parameter.getDefaultValue(), null);
 		    choice.setParent(parameter);
 
 		    choiceList.add(choice);
@@ -166,37 +168,45 @@ public class UserInputHelper {
 		return choiceList;
 	}
 
-	private static boolean isMethodIdentical(Method test, Optional<String> remoteName, MethodNode model) {
+	private static boolean isMethodIdentical(
+			Method test,
+			Optional<String> remoteNameOpt,
+			MethodNode methodNode,
+			IExtLanguageManager extLanguageManager) {
 		
-		if (remoteName.isPresent()) {
+		if (remoteNameOpt.isPresent()) {
+
+			final String remoteName = remoteNameOpt.get();
 
 			if (test == null) {
-				return remoteName.get().equals(model.getLongSignature());
+				String signature = MethodNodeHelper.createLongSignature(methodNode, true, extLanguageManager);
+				return remoteName.equals(signature);
 			}
 
-			String nameModel =  ((ClassNode) model.getParent()).getFullName() + "." + model.getFullName();
+			String nameModel =  ((ClassNode) methodNode.getParent()).getName() + "." + methodNode.getName();
 
-			return nameModel.equals(remoteName.get()) && isMethodParameterListIdentical(test, model);
+			return nameModel.equals(remoteName) && isMethodParameterListIdentical(test, methodNode);
 		}
 		
-		return isMethodClassNameIdentical(test, model) && isMethodNameIdentical(test, model);
+		return isMethodClassNameIdentical(test, methodNode) && isMethodNameIdentical(test, methodNode);
 	}
 
-	private static boolean isMethodNamePrefix(String methodName, MethodNode modelMethod)
+	private static boolean isMethodNamePrefix(String methodName, MethodNode modelMethod, IExtLanguageManager extLanguageManager)
 	{
-		return modelMethod.getLongSignature().startsWith(methodName);
+		String signature = MethodNodeHelper.createLongSignature(modelMethod, true, extLanguageManager);
+		return signature.startsWith(methodName);
 	}
 	
 	private static boolean isMethodClassNameIdentical(Method test, MethodNode model) {
 		String classTest = test.getDeclaringClass().getCanonicalName();
-		String classModel = ((ClassNode) model.getParent()).getFullName();		
+		String classModel = ((ClassNode) model.getParent()).getName();
 		
 		return classTest.equals(classModel);
 	}
 
  	private static boolean isMethodNameIdentical(Method test, MethodNode model) {
 		String nameTest = test.getName();
-		String nameModel = model.getFullName();
+		String nameModel = model.getName();
 		
 		if (nameTest.equals(nameModel)) {
 			return isMethodParameterListIdentical(test, model);
@@ -327,7 +337,7 @@ public class UserInputHelper {
 	 
 	private static List<ChoiceNode> adjustChoicesUsingRestrictions(MethodParameterNode parameter, Map<String, List<String>> mapRestrictions) {
 		
-		List<String> choiceListUser = mapRestrictions.get(parameter.getFullName());
+		List<String> choiceListUser = mapRestrictions.get(parameter.getName());
 		List<ChoiceNode> choiceListParameter = extractChoices(new ArrayList<>(), parameter.getChoices());
 		
 		if (choiceListUser != null) {
@@ -378,12 +388,18 @@ public class UserInputHelper {
 		return true;
 	}
 	
-	private static void validateChoiceRestrictionName(MethodNode methodNode, Map<String, List<String>> userRestriction) throws GeneratorException {
+	private static void validateChoiceRestrictionName(
+			MethodNode methodNode,
+			Map<String,
+			List<String>> userRestriction,
+			IExtLanguageManager extLanguageManager)	throws GeneratorException {
+
 		Set<String> parameterNames = new HashSet<>(methodNode.getParametersNames());
 		
 		for (String key : userRestriction.keySet()) {
 			if (parameterNames.contains(key)) {
-				validateChoiceRestrictionArgument(methodNode.getMethodParameter(key), userRestriction.get(key));
+				MethodParameterNode methodParameterNode = MethodNodeHelper.findMethodParameterByName(key, methodNode, extLanguageManager);
+				validateChoiceRestrictionArgument(methodParameterNode, userRestriction.get(key));
 			} else {
 				GeneratorException.report(Localization.bundle.getString("userInputHelperWrongInputArgumentName") + key);
 			}
@@ -419,15 +435,22 @@ public class UserInputHelper {
 		}
 		
 		RootNode model = null;
+
+		ListOfStrings listOfErrors = new ListOfStrings();
 		
 		try {
 			ModelParser modelParser = new ModelParser();
 
-			model = modelParser.parseModel(modelStream, null, new ArrayList<>());
+			model = modelParser.parseModel(modelStream, null, listOfErrors);
+
+			if (!listOfErrors.isEmpty()) {
+				GeneratorException.report("Cannot read model. " + listOfErrors.getFirstString());
+			}
+
 			model = ModelConverter.convertToCurrentVersion(model);
 		} catch (ParserException e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModelParser"));
-		} catch (ModelOperationException e) {
+		} catch (Exception e) {
 			GeneratorException.report(Localization.bundle.getString("userInputHelperWrongModelOperation"));
 		}
 		

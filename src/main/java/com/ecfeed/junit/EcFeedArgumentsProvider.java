@@ -12,6 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.ecfeed.core.utils.ExtLanguageManagerForJava;
+import com.ecfeed.core.utils.IExtLanguageManager;
 import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import com.ecfeed.core.webservice.client.IWebServiceClient;
@@ -40,7 +42,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
         EcFeedExtensionStore store = new EcFeedExtensionStore();
         context.getStore(Namespace.create("ecFeed")).put("ecFeedStore", store);
 
-        new Thread(createRunnable(context, store)).start();
+        new Thread(createRunnable(context, store, new ExtLanguageManagerForJava())).start();
 
         Stream<Arguments> testStream =
                 StreamSupport.stream(
@@ -55,7 +57,8 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
 
     private Runnable createRunnable(
             ExtensionContext extensionContext,
-            EcFeedExtensionStore ecFeedExtensionStore) {
+            EcFeedExtensionStore ecFeedExtensionStore,
+            IExtLanguageManager extLanguageManager) {
 
         TestCasesRequest restRequest = getTestCaseRequest(extensionContext);
 
@@ -66,14 +69,20 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
         return createJunitRestServiceRunnable(
                 extensionContext, ecFeedExtensionStore,
                 restRequest,
-                serviceUrl, keyStorePath, clientType);
+                serviceUrl,
+                keyStorePath,
+                clientType,
+                extLanguageManager);
     }
 
     private Runnable createJunitRestServiceRunnable(
             ExtensionContext extensionContext,
             EcFeedExtensionStore ecFeedExtensionStore,
             TestCasesRequest testCasesRequest,
-            String serviceUrl, Optional<String> keyStorePath, String clientType) {
+            String serviceUrl,
+            Optional<String> keyStorePath,
+            String clientType,
+            IExtLanguageManager extLanguageManager) {
 
         if (!serviceUrl.equals(AnnotationDefaultValue.DEFAULT_ECFEED_SERVICE)) {
 
@@ -90,7 +99,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
         String model = testCasesRequest.getModel();
 
         if (model.equals("auto") || isModelFile(model)) {
-            return createRunnableForAutoOrFileModel(extensionContext, model);
+            return createRunnableForAutoOrFileModel(extensionContext, model, extLanguageManager);
         }
 
         // TODO
@@ -121,20 +130,21 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
                 ecFeedExtensionStore, serviceObjectMapper);
     }
 
-    private Runnable createRunnableForAutoOrFileModel(ExtensionContext extensionContext, String model) {
+    private Runnable createRunnableForAutoOrFileModel(
+            ExtensionContext extensionContext, String model, IExtLanguageManager extLanguageManager) {
 
         TestCasesUserInput restUserInput = getTestCasesUserInput(extensionContext);
         Method restMethod = extensionContext.getTestMethod().get();
 
         if (model.equals("auto")) { // TODO
-            return new ServiceLocalDynamicRunnable( dataBlockingQueue, restMethod, restUserInput, model);
+            return new ServiceLocalDynamicRunnable(dataBlockingQueue, restMethod, restUserInput, model, extLanguageManager);
         }
 
         if (restUserInput.getDataSource().equalsIgnoreCase("static")) { // TODO
-            return new ServiceLocalTestSuiteRunnable(dataBlockingQueue, restMethod, restUserInput, model);
+            return new ServiceLocalTestSuiteRunnable(dataBlockingQueue, restMethod, restUserInput, model, extLanguageManager);
         }
 
-        return new ServiceLocalDynamicRunnable(dataBlockingQueue, restMethod, restUserInput, model);
+        return new ServiceLocalDynamicRunnable(dataBlockingQueue, restMethod, restUserInput, model, extLanguageManager);
 
     }
 
@@ -166,7 +176,7 @@ public class EcFeedArgumentsProvider implements ArgumentsProvider {
     private TestCasesRequest getTestCaseRequest(ExtensionContext context) {
         TestCasesRequest restRequest = new TestCasesRequest();
 
-        restRequest.setModelName(AnnotationProcessor.processModelName(context));
+        restRequest.setModelIdentificationStr(AnnotationProcessor.processModelName(context));
         restRequest.setMethod(AnnotationProcessor.extractMethodName(context));
         restRequest.setUserData("{" + AnnotationProcessor.processInput(context) + "}");
 

@@ -6,16 +6,10 @@ import com.ecfeed.core.generators.NWiseGenerator;
 import com.ecfeed.core.generators.api.IGenerator;
 import com.ecfeed.core.generators.api.ParameterConverter;
 import com.ecfeed.core.json.TestCasesUserInputParser;
-import com.ecfeed.core.model.ChoiceNode;
-import com.ecfeed.core.model.Constraint;
-import com.ecfeed.core.model.MethodNode;
+import com.ecfeed.core.model.*;
 
-import com.ecfeed.core.utils.DataSource;
-import com.ecfeed.core.model.RootNode;
+import com.ecfeed.core.utils.*;
 
-import com.ecfeed.core.utils.GeneratorType;
-import com.ecfeed.core.utils.SimpleProgressMonitor;
-import com.ecfeed.core.utils.TestCasesUserInput;
 import com.ecfeed.junit.main.processor.TupleProcessorDynamic;
 import com.ecfeed.junit.main.processor.TupleProcessorStatic;
 import com.ecfeed.junit.runner.UserInputHelper;
@@ -38,11 +32,18 @@ public class Main {
 	private static RootNode fModel;
 
 	public static void main(String[] args) throws Exception {
+
 		processConsoleInput(parseConsoleInput(args));
+
 		fModel = UserInputHelper.loadEcFeedModelFromDirectory(fFileInput.map( p -> p.toAbsolutePath().toString() ));
-		for(MethodNode methodNode : getAllMethodNodes(fUserInput)) {
-			System.out.println(methodNode.getLongSignature());
-			Optional<IGenerator<ChoiceNode>> generator = initializeGenerator(fUserInput, methodNode);
+
+		IExtLanguageManager extLanguageManager = new ExtLanguageManagerForJava();
+
+		for(MethodNode methodNode : getAllMethodNodes(fUserInput, extLanguageManager)) {
+
+			String signature = MethodNodeHelper.createLongSignature(methodNode, true, extLanguageManager);
+			System.out.println(signature);
+			Optional<IGenerator<ChoiceNode>> generator = initializeGenerator(fUserInput, methodNode, extLanguageManager);
 			Optional<List<List<ChoiceNode>>> list = initializeList(fUserInput, methodNode);
 
 			if (fVerbose) {
@@ -101,7 +102,10 @@ public class Main {
 			fUserInput.getProperties().put(NWiseGenerator.PARAMETER_NAME_N,N);
 	}
 
-	private static Optional<IGenerator<ChoiceNode>> initializeGenerator(TestCasesUserInput userData, MethodNode methodNode) throws Exception {
+	private static Optional<IGenerator<ChoiceNode>> initializeGenerator(
+			TestCasesUserInput userData,
+			MethodNode methodNode,
+			IExtLanguageManager extLanguageManager) throws Exception {
 		DataSource dataSource = DataSource.parse(userData.getDataSource());
 
 		if(dataSource == STATIC)
@@ -117,9 +121,12 @@ public class Main {
 		Collection<Constraint> generatorDataConstraints = UserInputHelper.getConstraintsFromEcFeedModel(
 				methodNode,
 				Optional.ofNullable(userData.getConstraints()));
-		List<List<ChoiceNode>> generatorDataInput = UserInputHelper.getChoicesFromEcFeedModel(
-				methodNode,
-				Optional.ofNullable(userData.getChoices()));
+
+		List<List<ChoiceNode>> generatorDataInput =
+				UserInputHelper.getChoicesFromEcFeedModel(
+					methodNode,
+					Optional.ofNullable(userData.getChoices()),
+					extLanguageManager);
 
 		generator.initialize(generatorDataInput,
 				new SatSolverConstraintEvaluator(generatorDataConstraints, methodNode),
@@ -139,9 +146,9 @@ public class Main {
 //				, Optional.ofNullable(userData.getMethod()));
 //	}
 
-	private static List<MethodNode> getAllMethodNodes(TestCasesUserInput userData)
+	private static List<MethodNode> getAllMethodNodes(TestCasesUserInput userData, IExtLanguageManager extLanguageManager)
 	{
-		return UserInputHelper.getAllMatchingMethodNodesFromEcFeedModel(fModel, userData.getMethod());
+		return UserInputHelper.getAllMatchingMethodNodesFromEcFeedModel(fModel, userData.getMethod(), extLanguageManager);
 	}
 
 }
