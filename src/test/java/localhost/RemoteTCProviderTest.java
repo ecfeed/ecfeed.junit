@@ -7,12 +7,8 @@ import com.ecfeed.core.model.serialization.ParserException;
 import com.ecfeed.core.utils.ListOfStrings;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
-import com.ecfeed.core.webservice.client.GenWebServiceClient;
 import com.ecfeed.core.genservice.provider.RemoteTCProvider;
-import com.ecfeed.core.webservice.client.GenWebServiceClientType;
-import com.ecfeed.core.webservice.client.IWebServiceClient;
-import com.ecfeed.core.genservice.provider.RemoteTCProviderInitData;
-import com.ecfeed.junit.utils.TestDataSupplier;
+import localhost.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import localhost.utils.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -20,9 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

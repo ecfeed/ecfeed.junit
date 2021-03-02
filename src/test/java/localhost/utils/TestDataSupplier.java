@@ -1,4 +1,4 @@
-package com.ecfeed.junit.utils;
+package localhost.utils;
 
 public class TestDataSupplier {
 
