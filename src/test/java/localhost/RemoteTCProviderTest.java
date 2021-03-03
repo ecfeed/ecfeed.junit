@@ -8,6 +8,7 @@ import com.ecfeed.core.utils.ListOfStrings;
 import com.ecfeed.core.utils.SimpleProgressMonitor;
 import com.ecfeed.core.utils.TestModel;
 import com.ecfeed.core.genservice.provider.RemoteTCProvider;
+import com.ecfeed.core.webservice.client.GenWebServiceClientType;
 import localhost.utils.TestDataSupplier;
 import localhost.utils.ExecutionConditionLocalHostAvailable;
 import localhost.utils.TestHelper;
@@ -48,7 +49,11 @@ public class RemoteTCProviderTest {
 
         fSimpleProgressMonitor = new SimpleProgressMonitor();
 
-        RemoteTCProvider remoteTCProvider = TestHelper.createTCProvider(methodNode, TestHelper.REQUEST_DATA, requestText, fSimpleProgressMonitor);
+        RemoteTCProvider remoteTCProvider =
+                TestHelper.createTCProvider(
+                        methodNode, TestHelper.REQUEST_DATA, requestText,
+                        GenWebServiceClientType.LOCAL_TEST_RAP, // connecting to RAP database, which should be initilized with test data
+                        fSimpleProgressMonitor);
 
         try {
             getAndCheckGeneratedTestCases(remoteTCProvider);
@@ -79,7 +84,11 @@ public class RemoteTCProviderTest {
 
         fSimpleProgressMonitor = new SimpleProgressMonitor();
 
-        RemoteTCProvider remoteTCProvider = TestHelper.createTCProvider(methodNode, TestHelper.REQUEST_DATA, requestText, fSimpleProgressMonitor);
+        RemoteTCProvider remoteTCProvider =
+                TestHelper.createTCProvider(
+                        methodNode, TestHelper.REQUEST_DATA, requestText,
+                        GenWebServiceClientType.LOCAL_TEST_RAP, // connecting to RAP database, which should be initilized with test data
+                        fSimpleProgressMonitor);
 
         try {
             getAndCheckStaticTestCases(remoteTCProvider);

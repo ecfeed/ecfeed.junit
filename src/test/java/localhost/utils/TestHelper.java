@@ -15,14 +15,14 @@ public class TestHelper {
     public static final String GEN_SERVICE_URL_ON_LOCALHOST = "https://localhost:8090";
     public static final String REQUEST_DATA = "requestData";
 
-    public static IWebServiceClient createWebServiceClient(String endpoint) {
+    public static IWebServiceClient createWebServiceClient(String endpoint, GenWebServiceClientType genWebServiceClientType) {
 
         Optional<String> keyStorePath = Optional.of("src/test/resources/security");
 
         return new GenWebServiceClient(
                 TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
                 endpoint,
-                GenWebServiceClientType.LOCAL_TEST_RUNNER.toString(),
+                genWebServiceClientType.toString(),
                 keyStorePath);
     }
 
@@ -30,10 +30,11 @@ public class TestHelper {
             MethodNode methodNode,
             String requestType,
             String requestText,
+            GenWebServiceClientType genWebServiceClientType,
             SimpleProgressMonitor simpleProgressMonitor) throws Exception {
 
         IWebServiceClient webServiceClient =
-                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint());
+                TestHelper.createWebServiceClient(GenWebServiceClient.getTestCasesEndPoint(), genWebServiceClientType);
 
         RemoteTCProvider remoteTCProvider = new RemoteTCProvider(webServiceClient);
 

@@ -18,7 +18,9 @@ public class GenServiceVersionTest {
     public void getVersionTest() {
 
         IWebServiceClient genWebServiceClient =
-                TestHelper.createWebServiceClient(GenWebServiceClient.getGenServiceVersionEndPoint());
+                TestHelper.createWebServiceClient(
+                        GenWebServiceClient.getGenServiceVersionEndPoint(),
+                        GenWebServiceClientType.LOCAL_TEST_RAP);
 
         WebServiceResponse webServiceResponse = genWebServiceClient.sendGetRequest();
 
