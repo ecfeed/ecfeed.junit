@@ -22,7 +22,7 @@ public class TestHelper {
         return new GenWebServiceClient(
                 TestHelper.GEN_SERVICE_URL_ON_LOCALHOST,
                 endpoint,
-                genWebServiceClientType.toString(),
+                genWebServiceClientType.getDescription(),
                 keyStorePath);
     }
 
